@@ -1,0 +1,12 @@
+# Lo que Vercel NO necesita para construir ni servir el juego. Cada deploy guarda una copia de lo que
+# se le sube: sin estas carpetas, cada uno pesa unos 18 MB menos (docs/ trae las capturas y el tráiler).
+# El juego (src/, public/, index.html), su configuración y scripts/lista-sin-internet.mjs (lo usa
+# vite.config.ts al construir) SÍ se suben. Nada de aquí lo carga el juego.
+/docs
+/tests
+/e2e
+/test-results
+/playwright-report
+/playwright.config.ts
+/voz-grabaciones
+/.github
