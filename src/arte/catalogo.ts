@@ -1,4 +1,5 @@
 import { CATEGORIAS } from '../data/categorias';
+import { ARBOLES } from './arboles';
 import { arteBote, arteTapa } from './botes';
 import { ESCENARIO } from './escenario';
 import { FAUNA } from './fauna';
@@ -15,6 +16,7 @@ export function catalogoArte(): ArteSvg[] {
     ...PERSONAJES,
     ...FAUNA,
     ...OBJETOS,
+    ...ARBOLES,
     ...ESCENARIO,
     ...ARTE_RESIDUOS,
     ...CATEGORIAS.flatMap((c) => [arteBote(c), arteTapa(c)]),

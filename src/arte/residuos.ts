@@ -5,6 +5,31 @@ import { arte, type ArteSvg } from './svg';
  * en src/data/residuos.ts el campo `imagen` usa el <nombre>.
  */
 
+const CUERPO_BOTELLA = 'M86 38 h28 v14 C 114 64 138 72 138 98 L 138 172 C 138 184 130 190 118 190 L 82 190 C 70 190 62 184 62 172 L 62 98 C 62 72 86 64 86 52 Z';
+
+/**
+ * La botella de plástico: vacía (el residuo) o llena de jugo (para la pregunta "¿está bien tirar una
+ * botella llena de jugo…?": el dibujo tiene que verse lleno). La etiqueta es azul, no verde: "la botella
+ * verde" es la que se rellena (botella-reutilizable) y así no se confunden.
+ */
+function botella(conJugo: boolean): string {
+  const jugo = conJugo
+    ? `<clipPath id="re-botella"><path d="${CUERPO_BOTELLA}"/></clipPath>
+    <g clip-path="url(#re-botella)"><rect x="56" y="60" width="88" height="134" fill="#F59A23"/><rect x="56" y="60" width="88" height="7" fill="#FFC56B"/></g>`
+    : '';
+  return `
+    <ellipse cx="100" cy="190" rx="50" ry="7" fill="#000" opacity=".12"/>
+    <rect x="82" y="14" width="36" height="24" rx="5" fill="#2459A6"/>
+    <path d="${CUERPO_BOTELLA}" fill="#CBEAF7"/>${jugo}
+    <path d="${CUERPO_BOTELLA}" fill="none" stroke="#4E95C2" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="62" y="112" width="76" height="38" fill="#3B82C4"/>
+    <path d="M72 120 h56 M72 132 h40" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+    <path d="M76 98 v8 M76 158 v20" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".8"/>`;
+}
+
+/** La botella llena de jugo (no es un residuo del juego de separar: solo ilustra una pregunta). */
+export const BOTELLA_LLENA = botella(true);
+
 const DIBUJOS: Record<string, string> = {
   platano: `
     <ellipse cx="100" cy="182" rx="70" ry="8" fill="#000" opacity=".12"/>
@@ -24,13 +49,7 @@ const DIBUJOS: Record<string, string> = {
     <path d="M99 86 C 104 76 114 74 120 76 C 116 84 108 88 99 86 Z" fill="#3FA56B"/>
     <circle cx="91" cy="104" r="6" fill="#FFC27A"/>
     <rect x="58" y="150" width="82" height="18" fill="#2459A6"/>`,
-  botella: `
-    <ellipse cx="100" cy="190" rx="50" ry="7" fill="#000" opacity=".12"/>
-    <rect x="82" y="14" width="36" height="24" rx="5" fill="#2459A6"/>
-    <path d="M86 38 h28 v14 C 114 64 138 72 138 98 L 138 172 C 138 184 130 190 118 190 L 82 190 C 70 190 62 184 62 172 L 62 98 C 62 72 86 64 86 52 Z" fill="#CBEAF7" stroke="#4E95C2" stroke-width="6" stroke-linejoin="round"/>
-    <rect x="62" y="112" width="76" height="38" fill="#4FB286"/>
-    <path d="M72 120 h56 M72 132 h40" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>
-    <path d="M76 98 v8 M76 158 v20" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".8"/>`,
+  botella: botella(false),
   lata: `
     <ellipse cx="100" cy="182" rx="56" ry="8" fill="#000" opacity=".12"/>
     <path d="M58 44 L 58 160 C 58 180 142 180 142 160 L 142 44 Z" fill="#C7CED6" stroke="#6E7882" stroke-width="6" stroke-linejoin="round"/>

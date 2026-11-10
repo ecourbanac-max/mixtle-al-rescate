@@ -1,65 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
-import { CATEGORIAS } from '../src/data/categorias';
-import { RESIDUOS } from '../src/data/residuos';
 import type { Ejercicio } from '../src/contenido/tipos';
 import { UNIDADES } from '../src/contenido/unidades';
-import { categoriaDe } from '../src/logica/clasificacion';
-import { todosLosEjercicios } from '../src/voz/frases';
 import { abrir, captura, crearGrupo, esperarPantalla, tocarBoton } from './ayudas';
-
-const EJERCICIOS = new Map(UNIDADES.flatMap((u) => u.lecciones.flatMap((l) => todosLosEjercicios(l.ejercicios))).map((e) => [e.id, e]));
-
-/**
- * Toca un elemento cuando ya dejó de desplazarse (el camino se mueve suave hacia la siguiente parada).
- * Se compara el centro: la parada siguiente "late" (cambia de tamaño) pero su centro no se mueve.
- */
-async function clic(page: Page, selector: string): Promise<void> {
-  const el = page.locator(selector).first();
-  // Desplazamiento del DOM: scrollIntoViewIfNeeded esperaría a que la burbuja deje de latir.
-  await el.evaluate((e) => e.scrollIntoView({ block: 'nearest' }));
-  let anterior = '';
-  await expect
-    .poll(async () => {
-      const c = await el.boundingBox();
-      const actual = c ? `${Math.round((c.x + c.width / 2) / 3)},${Math.round((c.y + c.height / 2) / 3)}` : '';
-      const quieto = actual !== '' && actual === anterior;
-      anterior = actual;
-      return quieto;
-    }, { intervals: [150], timeout: 10_000 })
-    .toBe(true);
-  await el.click({ force: true });
-}
-
-/** Resuelve bien el ejercicio que está en pantalla (como lo haría el grupo). */
-async function resolver(page: Page, e: Ejercicio): Promise<void> {
-  const zona = `[data-ejercicio-id="${e.id}"]`;
-  switch (e.tipo) {
-    case 'elige-imagen':
-    case 'escucha-toca':
-      return clic(page, `${zona} [data-tarjeta="${e.correcta}"]`);
-    case 'si-no':
-      return clic(page, `${zona} [data-respuesta="${e.respuesta ? 'si' : 'no'}"]`);
-    case 'al-bote':
-      for (const id of e.residuos) {
-        const categoria = categoriaDe(RESIDUOS.find((r) => r.id === id)!, CATEGORIAS)!;
-        await expect(page.locator(`${zona} [data-residuo="${id}"]`)).toBeVisible();
-        await clic(page, `${zona} [data-bote="${categoria.id}"]`);
-      }
-      return;
-    case 'parejas':
-      for (const p of e.pares) {
-        await clic(page, `${zona} [data-tarjeta="${p.izquierda.id}"]`);
-        await clic(page, `${zona} [data-tarjeta="${p.derecha.id}"]`);
-      }
-      return;
-    case 'ordena':
-      for (const paso of e.pasos) await clic(page, `${zona} [data-tarjeta="${paso.id}"]`);
-      return;
-    case 'encuentra-error':
-      for (const o of e.objetos.filter((x) => x.mal)) await clic(page, `${zona} [data-objeto="${o.id}"]`);
-      return;
-  }
-}
+import { EJERCICIOS, clic, resolver } from './resolver';
 
 /** Una respuesta equivocada para el ejercicio en pantalla (solo tipos de una tarjeta). */
 async function equivocarse(page: Page, e: Ejercicio): Promise<void> {

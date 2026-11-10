@@ -1,4 +1,6 @@
 import { ALTO, ANCHO } from '../config';
+import { etapaColocada } from './arboles';
+import { BOTELLA_LLENA } from './residuos';
 import { arte, type ArteSvg } from './svg';
 
 /*
@@ -29,6 +31,8 @@ const DIBUJOS: Record<string, string> = {
     <rect x="58" y="26" width="100" height="152" rx="8" fill="#FBF6EA" stroke="#7A2E0C" stroke-width="6"/>
     <path d="M72 64 H144 M72 88 H144 M72 112 H144 M72 136 H144" stroke="#9CC3E0" stroke-width="5"/>
     <g fill="#5E3E28"><circle cx="52" cy="50" r="6"/><circle cx="52" cy="90" r="6"/><circle cx="52" cy="130" r="6"/><circle cx="52" cy="170" r="6"/></g>`,
+  // La botella de plástico llena de jugo (la vacía es el residuo "botella", en residuos.ts).
+  'botella-llena': BOTELLA_LLENA,
   'bote-revuelto': `${sombra(74, 190)}
     <path d="M44 70 L 156 70 L 144 186 L 56 186 Z" fill="#8A949B" stroke="#4E575D" stroke-width="6" stroke-linejoin="round"/>
     <path d="M70 90 V 170 M100 90 V 170 M130 90 V 170" stroke="#4E575D" stroke-width="5" opacity=".5"/>
@@ -99,16 +103,11 @@ const DIBUJOS: Record<string, string> = {
     <path d="M34 136 C 70 128 130 128 166 136 M44 154 C 80 148 120 148 156 154" stroke="#7A5236" stroke-width="5" fill="none"/>`,
 
   // —— Unidad 3: árboles y cómo se cuidan ——
-  arbol: `${sombra(80, 188)}
-    <path d="M88 186 L 92 120 L 108 120 L 112 186 Z" fill="#7A5236" stroke="#5E3E28" stroke-width="5"/>
-    <circle cx="100" cy="82" r="62" fill="#3E8E5E"/><circle cx="62" cy="104" r="36" fill="#3E8E5E"/><circle cx="140" cy="104" r="36" fill="#3E8E5E"/>
-    <circle cx="82" cy="62" r="30" fill="#57A673" opacity=".7"/>`,
+  // El árbol grande, el arbolito y el brote están en src/arte/arboles.ts (las tres etapas, en escala).
   'arbol-sombra': `
-    <ellipse cx="96" cy="176" rx="90" ry="20" fill="#2F6E43" opacity=".35"/>
-    <circle cx="176" cy="26" r="20" fill="#FFD23F"/>
-    <path d="M88 178 L 92 112 L 108 112 L 112 178 Z" fill="#7A5236" stroke="#5E3E28" stroke-width="5"/>
-    <circle cx="100" cy="74" r="56" fill="#3E8E5E"/><circle cx="64" cy="96" r="32" fill="#3E8E5E"/><circle cx="136" cy="96" r="32" fill="#3E8E5E"/>
-    <circle cx="82" cy="56" r="26" fill="#57A673" opacity=".7"/>`,
+    <ellipse cx="92" cy="180" rx="90" ry="18" fill="#2F6E43" opacity=".35"/>
+    <circle cx="178" cy="24" r="19" fill="#FFD23F"/>
+    ${etapaColocada('arbol', 92, 178, 0.54)}`,
   sol: `${sombra(50)}
     <g stroke="#F2A900" stroke-width="10" stroke-linecap="round">
       <path d="M100 14 V 36 M100 164 V 186 M14 100 H 36 M164 100 H 186 M40 40 L 56 56 M144 144 L 160 160 M160 40 L 144 56 M56 144 L 40 160"/>
@@ -124,14 +123,12 @@ const DIBUJOS: Record<string, string> = {
     <path d="M168 46 l 22 22 l -12 6 l -16 -16 z" fill="#4E95C2" stroke="#163A70" stroke-width="4"/>
     <path d="M60 80 C 60 40 116 40 116 80" fill="none" stroke="#163A70" stroke-width="10"/>
     <g fill="#9CD7F2"><circle cx="186" cy="92" r="5"/><circle cx="196" cy="110" r="4"/><circle cx="178" cy="112" r="4"/></g>`,
+  // El mismo arbolito de las lecciones (arboles.ts), todavía en su bolsa negra de vivero.
   'arbolito-bolsa': `${sombra(56)}
-    <path d="M100 120 V 50" stroke="#7A5236" stroke-width="8" stroke-linecap="round"/>
-    <g fill="#57A673" stroke="#2F6E43" stroke-width="4">
-      <path d="M100 70 C 80 66 64 50 62 34 C 82 36 96 50 100 62 Z"/><path d="M100 64 C 120 60 136 44 138 28 C 118 30 104 44 100 56 Z"/>
-      <path d="M100 96 C 78 94 62 82 58 68 C 78 70 94 80 100 90 Z"/><path d="M100 92 C 122 90 138 78 142 64 C 122 66 106 76 100 86 Z"/>
-    </g>
     <path d="M58 118 H 142 L 134 184 H 66 Z" fill="#2B2724" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M70 140 H 130" stroke="#4A4440" stroke-width="4"/>`,
+    <path d="M70 140 H 130" stroke="#4A4440" stroke-width="4"/>
+    <ellipse cx="100" cy="119" rx="39" ry="6" fill="#6E4A2E" stroke="#000" stroke-width="3"/>
+    ${etapaColocada('arbolito', 100, 124, 0.72)}`,
   'rama-rota': `${sombra(80)}
     <path d="M70 184 L 76 70 L 94 70 L 100 184 Z" fill="#7A5236" stroke="#5E3E28" stroke-width="5"/>
     <path d="M86 110 L 140 80 L 146 92 L 92 124 Z" fill="#7A5236" stroke="#5E3E28" stroke-width="5"/>
@@ -199,11 +196,12 @@ const DIBUJOS: Record<string, string> = {
     <path d="M6 150 C 50 120 100 160 194 130 V 168 C 194 182 182 194 168 194 H 32 C 18 194 6 182 6 168 Z" fill="#8CC872"/>
     <path d="M40 120 L 70 70 L 100 120 Z" fill="#B7C3CA"/><path d="M60 86 L 70 70 L 80 86 Z" fill="#fff"/>
     <path d="M36 60 q 14 -12 28 0 q 12 -10 22 2" stroke="#fff" stroke-width="8" fill="none" stroke-linecap="round"/>`,
+  // El cielo sucio es GRIS (así lo nombran las consignas: "Toca el cielo gris"); antes era beige.
   'aire-sucio': `
-    <rect x="6" y="6" width="188" height="188" rx="26" fill="#C9C1A8"/>
-    <circle cx="150" cy="54" r="24" fill="#E8D9A0" opacity=".6"/>
-    <g fill="#8A8170"><rect x="24" y="96" width="34" height="98"/><rect x="66" y="70" width="30" height="124"/><rect x="104" y="110" width="36" height="84"/><rect x="146" y="86" width="30" height="108"/></g>
-    <g fill="#A79F8A" opacity=".85"><ellipse cx="60" cy="80" rx="60" ry="20"/><ellipse cx="140" cy="100" rx="64" ry="22"/><ellipse cx="90" cy="140" rx="90" ry="18"/></g>`,
+    <rect x="6" y="6" width="188" height="188" rx="26" fill="#B3B8BD"/>
+    <circle cx="150" cy="54" r="24" fill="#E4E2D6" opacity=".6"/>
+    <g fill="#747B82"><rect x="24" y="96" width="34" height="98"/><rect x="66" y="70" width="30" height="124"/><rect x="104" y="110" width="36" height="84"/><rect x="146" y="86" width="30" height="108"/></g>
+    <g fill="#959BA1" opacity=".85"><ellipse cx="60" cy="80" rx="60" ry="20"/><ellipse cx="140" cy="100" rx="64" ry="22"/><ellipse cx="90" cy="140" rx="90" ry="18"/></g>`,
 
   // —— Unidad 5: reduce y reutiliza ——
   'botella-reutilizable': `${sombra(44)}

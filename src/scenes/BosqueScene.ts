@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { ALTO_CUADRO_EN_ESCALA, ETAPAS_CRECIMIENTO } from '../arte/arboles';
 import { ANCHO } from '../config';
 import { TEXTOS_AVENTURAS } from '../contenido/aventuras';
 import { figurasRepetidas, type DatosDiploma } from '../logica/diploma';
@@ -16,11 +17,8 @@ const T = TEXTOS_AVENTURAS.u3;
 const ESPERA_PISTA_MS = 15000;
 /** Riegos que necesita cada arbolito para crecer (brote → arbolito → árbol). */
 const RIEGOS_POR_ARBOL = 2;
-const ETAPAS = [
-  { clave: 'brote', alto: 110 },
-  { clave: 'arbolito', alto: 210 },
-  { clave: 'arbol', alto: 320 },
-] as const;
+/** Las tres etapas en la misma escala: el arbolito mide la mitad del árbol grande y el brote, la mitad del arbolito. */
+const ETAPAS = ETAPAS_CRECIMIENTO.map((clave) => ({ clave, alto: ALTO_CUADRO_EN_ESCALA[clave] }));
 
 /** Lugares del bosquecito: en el pasto, a la derecha de Mixtle. */
 const LUGARES = [
@@ -108,8 +106,8 @@ export class BosqueScene extends Phaser.Scene {
     this.reiniciarPista();
     this.sembrados += 1;
     this.marcar();
-    const planta = this.add.image(lugar.x, lugar.y + 10, ETAPAS[0].clave).setOrigin(0.5, 0.95).setDepth(9 + lugar.y / 1000);
-    const escala = ETAPAS[0].alto / planta.height;
+    const planta = this.add.image(lugar.x, lugar.y + 10, ETAPAS[0]!.clave).setOrigin(0.5, 0.95).setDepth(9 + lugar.y / 1000);
+    const escala = ETAPAS[0]!.alto / planta.height;
     planta.setScale(0);
     lugar.planta = planta;
     this.tweens.add({ targets: planta, scale: escala, duration: 420, ease: 'Back.easeOut' });

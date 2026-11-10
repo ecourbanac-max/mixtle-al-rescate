@@ -45,7 +45,7 @@ export function SiNo({ ejercicio, responder, bloqueado }: PropsEjercicio<Datos>)
     <div className="flex flex-wrap items-center justify-center gap-[clamp(1.5rem,5vmin,4rem)]" data-ejercicio="si-no">
       {carita(true)}
       <div className="flex h-[clamp(10rem,33vmin,21rem)] items-center justify-center gap-2 rounded-[2rem] border-[6px] border-white bg-cielo p-4 shadow-[0_0.45rem_0_rgba(18,61,43,0.25)]">
-        <Arte clave={ejercicio.arte} className="h-full max-w-[clamp(9rem,28vmin,18rem)] object-contain" />
+        <Arte clave={ejercicio.arte} data-arte={ejercicio.arte} className="h-full max-w-[clamp(9rem,28vmin,18rem)] object-contain" />
         {ejercicio.junto && <Arte clave={ejercicio.junto} className="h-[62%] max-w-[clamp(6rem,18vmin,12rem)] self-end object-contain" />}
       </div>
       {carita(false)}

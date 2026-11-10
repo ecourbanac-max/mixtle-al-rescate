@@ -2575,12 +2575,6 @@
    "config": "16af21f1b195de",
    "archivo": "110bd2840831dd.050cddc5.mp3"
   },
-  "110f4e54e47e84.mp3": {
-   "texto": "Primero se tira en su bote.",
-   "ms": 1700,
-   "config": "05717f0c9010d0",
-   "archivo": "110f4e54e47e84.050cddc5.mp3"
-  },
   "11210acafda5bf.mp3": {
    "texto": "cuarenta y ocho",
    "ms": 1730,
@@ -4176,6 +4170,12 @@
    "ms": 960,
    "config": "0d4cc1bd76e538",
    "archivo": "1bc6875e58ddf6.050cddc5.mp3"
+  },
+  "1bd8a62642806d.mp3": {
+   "texto": "Primero va la botella y al final, la playera.",
+   "ms": 3790,
+   "config": "0ab24a7c00cded",
+   "archivo": "1bd8a62642806d.050cddc5.mp3"
   },
   "1bdeeca9f379fe.mp3": {
    "texto": "¿A qué bote va la envoltura de frituras?",

@@ -251,7 +251,7 @@ export const U1: Unidad = {
           tipo: 'ordena',
           id: 'u1-l3-e7',
           consigna: 'Ordena el viaje de la botella.',
-          pista: 'Primero se tira en su bote.',
+          pista: 'Primero va la botella y al final, la playera.',
           pasos: [
             { id: 'botella', arte: 'residuo-botella', nombre: 'la botella' },
             { id: 'bote-azul', arte: 'bote-reciclable', nombre: 'el bote azul de reciclable' },
@@ -330,7 +330,8 @@ export const U1: Unidad = {
           id: 'u1-l4-e6',
           consigna: '¿Está bien tirar una botella llena de jugo en el bote azul de reciclable?',
           pista: 'Lo que se recicla va vacío y limpio.',
-          arte: 'residuo-botella',
+          // La botella se dibuja llena (antes salía la botella vacía y el dibujo contradecía la pregunta).
+          arte: 'botella-llena',
           junto: 'bote-reciclable',
           respuesta: false,
           porque: 'Primero se vacía; lo que se recicla va limpio.',

@@ -98,7 +98,7 @@ export class Nivel3Scene extends Phaser.Scene {
       ease: 'Back.easeOut',
       onComplete: () => {
         sonido.tocar('brote');
-        const clave = lugar.que === 'arbol' ? 'arbolito' : FLORES[this.flores % FLORES.length]!;
+        const clave = lugar.que === 'arbol' ? 'arbol-frutal' : FLORES[this.flores % FLORES.length]!;
         const escala = lugar.que === 'arbol' ? 0.78 / 1.2 : 0.85 / 1.2;
         const planta = this.add.image(lugar.x, lugar.y + 10, clave).setOrigin(0.5, 0.96).setScale(0).setDepth(9 + lugar.y / 1000);
         planta.setName(`planta-${lugar.que}`);

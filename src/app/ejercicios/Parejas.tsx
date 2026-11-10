@@ -1,13 +1,17 @@
 import { useMemo, useState } from 'react';
 import type { Parejas as Datos } from '../../contenido/tipos';
 import { sonido } from '../../servicios/sonido';
-import { Tarjeta, revolver, type PropsEjercicio } from './comun';
+import { Tarjeta, revolver, tarjetasEnEscala, type PropsEjercicio } from './comun';
 
 type Lado = 'izquierda' | 'derecha';
 
 /** 3. Parejas: tocar una tarjeta de un lado y luego su pareja del otro lado. */
 export function Parejas({ ejercicio, responder, bloqueado }: PropsEjercicio<Datos>) {
-  const derechas = useMemo(() => revolver(ejercicio.pares.map((p) => p.derecha)), [ejercicio]);
+  // Todas las tarjetas se ven a la vez: las que se comparan por tamaño van en la misma escala.
+  const tarjetas = useMemo(() => {
+    const todas = tarjetasEnEscala(ejercicio.pares.flatMap((p) => [p.izquierda, p.derecha]));
+    return { izquierdas: todas.filter((_, i) => i % 2 === 0), derechas: revolver(todas.filter((_, i) => i % 2 === 1)) };
+  }, [ejercicio]);
   const [elegida, setElegida] = useState<{ lado: Lado; id: string } | null>(null);
   const [unidas, setUnidas] = useState<string[]>([]);
   const [error, setError] = useState<{ ids: string[]; vez: number } | null>(null);
@@ -56,7 +60,7 @@ export function Parejas({ ejercicio, responder, bloqueado }: PropsEjercicio<Dato
     <div className="flex items-center justify-center gap-[clamp(2rem,10vmin,8rem)]" data-ejercicio="parejas">
       {(['izquierda', 'derecha'] as const).map((lado) => (
         <div key={lado} className="flex flex-col" style={{ gap: separacion }}>
-          {(lado === 'izquierda' ? ejercicio.pares.map((p) => p.izquierda) : derechas).map((t) => (
+          {(lado === 'izquierda' ? tarjetas.izquierdas : tarjetas.derechas).map((t) => (
             <Tarjeta
               key={t.id}
               tarjeta={t}

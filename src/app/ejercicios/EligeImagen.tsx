@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { CATEGORIAS } from '../../data/categorias';
 import { Arte } from '../componentes/Arte';
 import type { EligeImagen as Datos, EscuchaToca } from '../../contenido/tipos';
-import { Tarjeta, type PropsEjercicio } from './comun';
+import { Tarjeta, tarjetasEnEscala, type PropsEjercicio } from './comun';
 
 /**
  * 1. Elige la imagen y 7. Escucha y toca (la misma mecánica; en "escucha y toca" no hay texto:
@@ -11,6 +11,8 @@ import { Tarjeta, type PropsEjercicio } from './comun';
 export function EligeImagen({ ejercicio, responder, bloqueado }: PropsEjercicio<Datos | EscuchaToca>) {
   const [acertada, setAcertada] = useState<string | null>(null);
   const [error, setError] = useState<{ id: string; vez: number } | null>(null);
+  // Si las opciones se comparan por tamaño (brote, arbolito, árbol grande), van en la misma escala.
+  const opciones = useMemo(() => tarjetasEnEscala(ejercicio.opciones), [ejercicio]);
   const conTexto = ejercicio.tipo === 'elige-imagen' && !!ejercicio.conTexto;
   // Si la pregunta es sobre un bote, el bote se ve a la izquierda con su nombre: no hace falta adivinar cuál es.
   const bote = ejercicio.tipo === 'elige-imagen' && ejercicio.bote ? CATEGORIAS.find((c) => c.id === ejercicio.bote) : undefined;
@@ -25,7 +27,7 @@ export function EligeImagen({ ejercicio, responder, bloqueado }: PropsEjercicio<
           </span>
         </div>
       )}
-      {ejercicio.opciones.map((op) => (
+      {opciones.map((op) => (
         <Tarjeta
           key={op.id}
           tarjeta={op}

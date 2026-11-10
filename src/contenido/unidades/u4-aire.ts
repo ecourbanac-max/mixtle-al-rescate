@@ -220,7 +220,8 @@ export const U4: Unidad = {
           opciones: [
             { id: 'sucio', arte: 'aire-sucio', nombre: 'el cielo gris' },
             { id: 'limpio', arte: 'aire-limpio', nombre: 'el cielo azul' },
-            { id: 'humo', arte: 'humo', nombre: 'el humo' },
+            // Antes la tercera opción era el humo, que también es gris y se confundía con "el cielo gris".
+            { id: 'sol', arte: 'sol', nombre: 'el sol' },
           ],
           correcta: 'sucio',
         },

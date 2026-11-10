@@ -112,12 +112,12 @@ const HOYO = `
   <ellipse cx="90" cy="34" rx="70" ry="20" fill="#5E3E28"/>
   <path d="M30 30 q 10 -8 20 0 M120 26 q 10 -8 20 0" stroke="#9A6D4C" stroke-width="5" fill="none" stroke-linecap="round"/>`;
 
-const BROTE = `
-  <path d="M60 110 C 60 90 60 70 62 50" stroke="#2E8B57" stroke-width="8" fill="none" stroke-linecap="round"/>
-  <path d="M62 60 C 40 60 24 46 22 26 C 44 26 60 38 62 60 Z" fill="#57A673"/>
-  <path d="M62 52 C 82 50 98 36 100 16 C 78 16 64 30 62 52 Z" fill="#3E8E5E"/>`;
-
-const ARBOLITO = `${LUZ}
+/*
+ * Árbol frutal (naranjo): tres copas con frutas. Hasta la v3 se llamaba "arbolito"; en la v3.1 el arbolito
+ * de las lecciones es un árbol joven sin frutas (src/arte/arboles.ts) y este queda como árbol del parque.
+ * Se usa donde el árbol es parte del paisaje o el contenido habla de frutos.
+ */
+const ARBOL_FRUTAL = `${LUZ}
   <ellipse cx="130" cy="336" rx="96" ry="12" fill="#000" opacity=".14"/>
   <path d="M118 336 C 122 290 120 240 126 200 L 140 200 C 144 240 142 290 146 336 Z" fill="url(#esc-tronco)"/>
   <path d="M132 260 C 110 244 96 236 80 232" stroke="${TRONCO}" stroke-width="10" fill="none" stroke-linecap="round"/>
@@ -149,8 +149,7 @@ export const ESCENARIO: ArteSvg[] = [
   arte('arbusto', 300, 200, ARBUSTO, 1.2),
   arte('bolsa', 200, 222, BOLSA, 1.2),
   arte('hoyo', 180, 72, HOYO, 1.2),
-  arte('brote', 120, 120, BROTE, 1.2),
-  arte('arbolito', 260, 350, ARBOLITO, 1.2),
+  arte('arbol-frutal', 260, 350, ARBOL_FRUTAL, 1.2),
   arte('flores-naranja', 200, 200, flores('#F28C28', '#FFD23F'), 1.2),
   arte('flores-morada', 200, 200, flores('#9B7FD4', '#FFE07A'), 1.2),
   arte('flores-amarilla', 200, 200, flores('#FFD23F', '#B84A14'), 1.2),

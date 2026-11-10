@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { enEscala, esDibujoEnEscala } from '../../arte/escala';
 import type { Tarjeta as DatosTarjeta } from '../../contenido/tipos';
 import type { Locucion } from '../../voz/locucion';
 import { sonido } from '../../servicios/sonido';
@@ -55,6 +56,9 @@ export const TAMANO_TARJETA = 'clamp(9rem,min(30vmin,22vw),20rem)';
 /** Tarjeta ilustrada grande para tocar (siempre ≥ 64 px; el nombre se lee también en voz). */
 export function Tarjeta({ tarjeta, estado = 'normal', conTexto = false, sacudir = 0, tamano = TAMANO_TARJETA, ancho, onClick }: PropsTarjeta) {
   const acostada = conTexto && !!ancho;
+  // Los dibujos en escala ya traen su margen en el lienzo común: ocupan casi toda la tarjeta, para que el más
+  // grande de la familia casi la llene.
+  const anchoDibujo = esDibujoEnEscala(tarjeta.arte) ? 'w-[96%]' : 'w-[82%]';
   return (
     <motion.button
       type="button"
@@ -77,7 +81,7 @@ export function Tarjeta({ tarjeta, estado = 'normal', conTexto = false, sacudir 
       // Alto fijo (no mínimo): "la botella" y "el corazón de manzana" miden lo mismo.
       style={acostada ? { width: ancho, height: tamano } : { width: tamano, height: conTexto ? `calc(${tamano} * 1.3)` : tamano }}
     >
-      <Arte clave={tarjeta.arte} className={acostada ? 'h-[82%] w-[40%] shrink-0 object-contain' : 'min-h-0 w-[82%] flex-1 object-contain'} />
+      <Arte clave={tarjeta.arte} data-arte={tarjeta.arte} className={acostada ? 'h-[82%] w-[40%] shrink-0 object-contain' : `min-h-0 ${anchoDibujo} flex-1 object-contain`} />
       {conTexto && (
         <span
           className={`flex items-center text-[clamp(1rem,2.4vmin,1.7rem)] leading-tight font-extrabold text-tinta ${acostada ? 'min-w-0 flex-1 text-left' : 'h-[2.5em] shrink-0 text-center'}`}
@@ -92,6 +96,16 @@ export function Tarjeta({ tarjeta, estado = 'normal', conTexto = false, sacudir 
       )}
     </motion.button>
   );
+}
+
+/**
+ * Las tarjetas que se van a ver juntas, con los dibujos que se comparan por tamaño en su versión en
+ * escala (mismo lienzo y mismo suelo): el brote, el arbolito y el árbol grande ya no llenan cada uno
+ * su tarjeta, y el más alto en pantalla es de verdad el más grande. Ver src/arte/escala.ts.
+ */
+export function tarjetasEnEscala<T extends DatosTarjeta>(tarjetas: readonly T[]): T[] {
+  const artes = enEscala(tarjetas.map((t) => t.arte));
+  return tarjetas.map((t, i) => (artes[i] === t.arte ? t : { ...t, arte: artes[i]! }));
 }
 
 /** Revuelve sin dejar el orden original (para que "ordena" nunca empiece resuelto). */
