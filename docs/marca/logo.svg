@@ -26,15 +26,15 @@
     <ellipse cx="244" cy="414" rx="46" ry="18" fill="#8A7563"/>
     <path d="M112 318 C 90 352 94 396 122 408 M248 318 C 270 352 266 396 238 408" fill="none" stroke="#8A7563" stroke-width="5" stroke-linecap="round" opacity=".6"/>
     <ellipse cx="180" cy="242" rx="54" ry="9" fill="#6E5A4A" opacity=".16"/>
-    <g class="banda-eco-urban" data-banda="blanca">
+    <g class="banda-eco-urban" data-banda="verde">
     <clipPath id="mx-banda"><path d="M108 252 C 92 330 98 400 128 420 L 232 420 C 262 400 268 330 252 252 C 236 214 124 214 108 252 Z"/></clipPath>
     <g clip-path="url(#mx-banda)">
       <path d="M252.46 183.36 L 59.24 357.33 L 80.65 381.11 L 273.87 207.14 Z" fill="#3A2A1F" opacity=".12" transform="translate(2 3)"/>
-      <path d="M254.13 185.21 L 60.91 359.19 L 78.98 379.25 L 272.2 205.28 Z" fill="#F4EFE3"/>
-      <path d="M268.18 200.82 L 74.96 374.79 L 78.98 379.25 L 272.2 205.28 Z" fill="#DCD2BE"/>
-      <path d="M211.03 224.02 L 224.63 248.1 L 220.92 251.45 L 208.05 226.7 Z M93.61 329.75 L 107.22 353.82 L 103.5 357.17 L 90.64 332.42 Z" fill="#DCD2BE" opacity=".8"/>
-      <path d="M255.8 187.07 L 62.58 361.04" stroke="#FFFFFF" stroke-width="2.4" opacity=".7"/>
-      <path d="M254.13 185.21 L 60.91 359.19 M272.2 205.28 L 78.98 379.25" stroke="#BFB49D" stroke-width="1.6" fill="none"/>
+      <path d="M254.13 185.21 L 60.91 359.19 L 78.98 379.25 L 272.2 205.28 Z" fill="#009345"/>
+      <path d="M268.18 200.82 L 74.96 374.79 L 78.98 379.25 L 272.2 205.28 Z" fill="#00753A"/>
+      <path d="M211.03 224.02 L 224.63 248.1 L 220.92 251.45 L 208.05 226.7 Z M93.61 329.75 L 107.22 353.82 L 103.5 357.17 L 90.64 332.42 Z" fill="#00753A" opacity=".8"/>
+      <path d="M255.8 187.07 L 62.58 361.04" stroke="#3DB46F" stroke-width="2.4" opacity=".7"/>
+      <path d="M254.13 185.21 L 60.91 359.19 M272.2 205.28 L 78.98 379.25" stroke="#005C2E" stroke-width="1.6" fill="none"/>
       
     </g>
   </g>

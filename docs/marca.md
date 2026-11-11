@@ -81,7 +81,7 @@ Desde la v3.1, Mixtle trae en el pecho un pin con el logotipo de Eco Urban. Es p
 
 Mixtle trae una banda cruzada en el torso, del hombro izquierdo a la cadera derecha, como la de un guardaparques ("Guardianes del parque"). Lleva "eco urban" escrito y el pin prendido encima, en el pecho.
 
-- **En uso: la blanca**, de color blanco hueso con el logotipo a todo color. Hay también una verde (#009345, con el logotipo en blanco) y la opción de no llevarla. Se cambia con un solo valor: `BANDA` en `src/arte/bandaEcoUrban.ts` (`'ninguna'`, `'blanca'` o `'verde'`). Después se corre `npm run marca:generar` y se publica.
+- **En uso: la verde** (#009345, con el logotipo en blanco), desde la v3.1.3. Hay también una blanca (blanco hueso con el logotipo a todo color) y la opción de no llevarla. Se cambia con un solo valor: `BANDA` en `src/arte/bandaEcoUrban.ts` (`'ninguna'`, `'blanca'` o `'verde'`). Después se corre `npm run marca:generar` y se publica.
 - **El texto sigue la inclinación** de la banda (42°) sin estirarse. Mide 10 de las 440 unidades del cuerpo: es lo más grande que cabe sin que lo tape un brazo, la cabeza o el pin. Queda libre en 11 de las 12 poses. En "celebrando" el brazo levantado cruza la banda, y ahí va sin texto.
 - **El texto solo se ve cuando Mixtle es grande:** con el cuerpo de 250 px o más, donde el logotipo mide 5.7 px o más (inicio y vestidor en una laptop de 1366×768, proyector, vitrina). Más chico (lección, globo, camino, selección de grupo, diploma) va solo la tela de la banda con el pin, para que no quede una mancha.
 - **Convive con los accesorios:** el paliacate y la mochila van encima de la banda y la capa por detrás. Ninguno tapa el texto.

@@ -23,7 +23,7 @@ export type Banda = 'ninguna' | 'blanca' | 'verde';
  * LA banda en uso. Para cambiarla basta con este valor: 'ninguna', 'blanca' o 'verde' (todo Mixtle, en
  * todas sus poses y apariciones, la toma de aquí). Luego: npm run marca:generar y npm run build.
  */
-export const BANDA: Banda = 'blanca';
+export const BANDA: Banda = 'verde';
 
 /** Colores de cada banda: tela, sombra del pliegue, orilla y el logotipo (a todo color o en blanco). */
 const COLORES: Record<Exclude<Banda, 'ninguna'>, { tela: string; sombra: string; orilla: string; brillo: string; logo: 'color' | 'blanco' }> = {

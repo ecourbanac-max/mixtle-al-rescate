@@ -40,8 +40,8 @@ function textoVisible(pose: ExpresionMixtle): number {
 }
 
 describe('la banda de guardián', () => {
-  it('en uso: la blanca', () => {
-    expect(BANDA).toBe('blanca');
+  it('en uso: la verde (v3.1.3)', () => {
+    expect(BANDA).toBe('verde');
   });
 
   it.each(POSES.filter((p) => p !== 'celebrando'))('pose "%s": el texto de la banda se ve completo (ningún brazo, mano, cabeza ni el pin lo tapa)', (pose) => {

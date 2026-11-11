@@ -2,6 +2,21 @@
 
 Fechas de octubre y noviembre de 2026. Las etiquetas de git marcan las versiones que vio Eco Urban.
 
+## v3.1.3 (11 de noviembre) — Ajuste final
+
+La versión anterior queda en la etiqueta `v3.1.2`.
+
+### 1. "¿Quién va a jugar?": el globo de Mixtle ya no tapa las tarjetas
+
+- En el celular acostado, el globo de texto de Mixtle tapaba la parte de abajo de las tarjetas de grupo y la mitad de "Nuevo grupo". La prueba de la v3.1.2 solo medía a Mixtle, no a su globo, y por eso no lo vio.
+- **La pantalla ahora tiene dos zonas que no se enciman.** La lista de grupos se desplaza en su propia área. En pantallas bajas (celular acostado, laptop con zoom al 150 %), Mixtle va en una columna a la izquierda con el globo arriba y más angosto (271 px), y la lista empieza debajo de los botones de sonido. En las demás pantallas, Mixtle y su globo van en un renglón propio abajo. Las tarjetas de los grupos no cambian de tamaño.
+- **Medido** con 2, 4 y 7 grupos, arriba de la lista y desplazada hasta abajo: nada tapa ninguna tarjeta en compu, laptop con zoom al 125 y 150 %, celular acostado, tablet y tablet parada. En el celular parado y en la tablet chica parada el juego pide girar el aparato.
+- **Prueba nueva:** `e2e/grupos.spec.ts` revisa a Mixtle, su globo mientras habla y la marca de Eco Urban. Se comprobó que falla si el globo vuelve a tapar las tarjetas.
+
+### 2. La banda de guardián, verde
+
+- `BANDA = 'verde'`: verde Eco Urban (#009345) con el logotipo en blanco. Logo de la pantalla de carga, hoja de personaje y `docs/marca/banda-variantes.png` regenerados. Los íconos de la app no cambian.
+
 ## v3.1.2 (11 de noviembre) — Ajustes de marca Eco Urban
 
 La versión anterior queda en la etiqueta `v3.1.1-estable`.
