@@ -1,4 +1,4 @@
-import { SelloEcoUrban } from './SelloEcoUrban';
+import { MarcaEcoUrban } from './MarcaEcoUrban';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { TEXTOS_APP } from '../../contenido/textosApp';
@@ -66,7 +66,7 @@ export function DiplomaUnidad({ datos, alCerrar }: Props) {
             </div>
             <div className="diploma-pie">
               <span>{datos.fecha}</span>
-              <SelloEcoUrban texto={TEXTOS_APP.ecoUrban.conElApoyoDe} className="diploma-apoyo" />
+              <MarcaEcoUrban alto="2.2cqi" className="diploma-marca" />
               <span className="diploma-firma">
                 <Arte clave="mixtle-entero-feliz" className="diploma-firma-mixtle" />
                 {t.firma}

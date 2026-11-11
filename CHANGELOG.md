@@ -22,6 +22,18 @@ La versión anterior queda en la etiqueta `v3.1.1-estable`.
 - No tapa ninguna tarjeta de grupo ni "Nuevo grupo", con 2, 4 o 7 grupos, arriba o desplazado hasta abajo, en compu, laptop con zoom al 125 y 150 %, celular y tablet. La lista deja abajo el espacio de Mixtle y, en pantallas bajas, también las franjas de los lados.
 - El Mixtle de la tarjeta "Cacomixtle" lleva su banda y su pin. El texto de la banda no va ahí: la tarjeta es chica.
 
+### 3. La marca de Eco Urban: pequeña, en la esquina y solo el logo
+
+- **Un solo componente**, `MarcaEcoUrban`: solo el logotipo, sin "Un proyecto de" ni "Con el apoyo de", a todo color sobre una pastilla blanca semitransparente. Mide de 14 px (celular) a 22 px de alto (20 px en 1366×768). No se puede tocar ni es un enlace.
+- **Dónde va:**
+  - Pantalla de carga: abajo a la derecha.
+  - Inicio: arriba a la izquierda, sobre la copa del árbol. Abajo a la derecha estorbaba la ardilla, y abajo a la izquierda está el aviso de "Toca la pantalla".
+  - "¿Quién va a jugar?": abajo a la derecha.
+  - Camino de unidades: abajo a la izquierda, fija, sin tapar las paradas.
+  - Diploma: al centro del pie, y sale al imprimir.
+  - No va en las lecciones.
+- **Primera pantalla:** 249.7 KB, dentro del límite de 250 KB.
+
 ### 4. El árbol del parque del grupo, completo
 
 - En "El parque de [grupo]" la copa del árbol grande salía cortada por el borde de arriba: el marco es más ancho que 16:9 y el dibujo del parque se recortaba arriba. Ahora el parque del grupo usa un dibujo a lo ancho (`parque-ancho`, 1920×720), con el árbol grande un poco más chico y el sol más abajo. Cabe completo con cualquier avance, en el camino, al terminar una lección y en la vitrina, en compu y en celular (`tests/parqueGrupo.test.ts`).

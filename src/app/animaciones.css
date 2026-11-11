@@ -167,12 +167,6 @@
 .inicio-sello {
   animation: aparece 0.8s ease-out 2.2s both;
 }
-/* En pantallas bajas (celular acostado) "¡Jugar!" sube un poco para dejarle aire a "Un proyecto de Eco Urban". */
-@media (orientation: landscape) and (max-height: 520px) {
-  .inicio .inicio-boton {
-    bottom: 14%;
-  }
-}
 .inicio-animales {
   animation: aparece 0.8s ease-out 1.2s both;
 }
@@ -834,10 +828,9 @@ html[data-suave] .barra-avance::after {
 .diploma-firma-mixtle {
   height: 7cqi;
 }
-/* "Con el apoyo de [eco urban]": al centro del pie, entre la fecha y la firma de Mixtle. */
-.diploma-apoyo {
-  font-size: 1.7cqi;
-  box-shadow: 0 0.2em 0.6em rgb(18 61 43 / 0.16);
+/* La marca de Eco Urban (solo el logotipo, pequeña) al centro del pie: sale también al imprimir. */
+.diploma-marca {
+  align-self: center;
 }
 
 @media print {

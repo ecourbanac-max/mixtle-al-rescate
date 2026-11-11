@@ -1,3 +1,4 @@
+import { MarcaEcoUrban } from '../componentes/MarcaEcoUrban';
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { TEXTOS_APP } from '../../contenido/textosApp';
@@ -125,7 +126,8 @@ export function Camino() {
   return (
     <main data-pantalla="camino" data-entrada-lista="true" className="flex h-full w-full flex-col bg-gradient-to-b from-cielo to-verde-claro">
       <Encabezado grupo={grupo} alAlbum={abrirAlbum} alCambiarGrupo={irAGrupos} alVestidor={() => setVestidor(true)} alFacilitador={() => setFacilitador(true)} />
-      <div className="relative min-h-0 flex-1 overflow-y-auto">
+      {/* pb: lo último del camino sube por encima de la marca de Eco Urban (fija abajo a la izquierda). */}
+      <div className="relative min-h-0 flex-1 overflow-y-auto pb-[clamp(1.5rem,4vmin,2.5rem)]">
         {/* El parque del grupo es el protagonista: su meta visible, con marco, título y su mascota. */}
         <div className="mx-auto flex max-w-[70rem] flex-col items-center px-4 pt-10 pb-10">
           <section className="parque-protagonista" aria-label={TEXTOS_APP.camino.suParque(nombreDelGrupo(grupo))} data-recorrido="parque">
@@ -224,6 +226,8 @@ export function Camino() {
           }}
         />
       )}
+      {/* Eco Urban, fija abajo a la izquierda: chica, semitransparente y sin toques (no estorba al desplazarse). */}
+      <MarcaEcoUrban esquina="abajo-izquierda" />
       {vestidor && <Vestidor grupo={grupo} alCerrar={() => setVestidor(false)} />}
       {/* Si se acaba de ganar una estampa, primero se celebra y luego empieza el recorrido. */}
       {recorrido && !estampaNueva && <RecorridoGuiado alTerminar={terminarRecorrido} />}

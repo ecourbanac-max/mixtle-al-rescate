@@ -14,7 +14,7 @@ import { sonido } from '../../servicios/sonido';
 import { voz } from '../../servicios/voz';
 import { Arte } from '../componentes/Arte';
 import { BotonesSistema } from '../componentes/BotonesSistema';
-import { SelloEcoUrban } from '../componentes/SelloEcoUrban';
+import { MarcaEcoUrban } from '../componentes/MarcaEcoUrban';
 import { BotonGrande } from '../componentes/BotonGrande';
 import { Logo } from '../componentes/Logo';
 import { useApp } from '../estado/app';
@@ -261,10 +261,11 @@ export function Inicio() {
         </BotonGrande>
       </div>
 
-      {/* Eco Urban, debajo de "¡Jugar!": sin competir con el botón ni con Mixtle, sin tapar a los animales ni el aviso. */}
-      <div className="inicio-sello pointer-events-none absolute bottom-[1.2%] left-[66%] -translate-x-1/2">
-        <SelloEcoUrban texto={TEXTOS_APP.ecoUrban.unProyectoDe} className="text-[clamp(0.85rem,2.5vmin,1.45rem)]" />
-      </div>
+      {/*
+        Eco Urban: arriba a la izquierda, sobre la copa del árbol. Abajo a la derecha está la ardilla (en un
+        celular se encimaban) y abajo a la izquierda, el aviso "Toca la pantalla para escuchar".
+      */}
+      <MarcaEcoUrban esquina="arriba-izquierda" className="inicio-sello" />
 
       <BotonesSistema />
 

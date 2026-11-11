@@ -42,8 +42,8 @@ describe('marca: logo e íconos', () => {
 
   it('los archivos de marca publicados son los mismos que genera el código', () => {
     expect(readFileSync(join(RAIZ, 'public', 'marca', 'logo.svg'), 'utf8').trim()).toBe(logoSvg({ idsEcoUrban: true }).trim());
-    // "Un proyecto de [eco urban]" de la pantalla de carga: reutiliza las piezas del logotipo del logo (sin repetirlas).
-    const sello = readFileSync(join(RAIZ, 'public', 'marca', 'sello-carga.svg'), 'utf8');
+    // La marca de Eco Urban de la pantalla de carga: reutiliza las piezas del logotipo del logo (sin repetirlas).
+    const sello = readFileSync(join(RAIZ, 'public', 'marca', 'marca-carga.svg'), 'utf8');
     for (const id of ['eu-eco', 'eu-urban', 'eu-registrado']) {
       expect(sello).toContain(`<use href="#${id}"/>`);
       expect(logoSvg({ idsEcoUrban: true })).toContain(`id="${id}"`);

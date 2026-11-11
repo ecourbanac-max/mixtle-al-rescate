@@ -1,4 +1,4 @@
-import { SelloEcoUrban } from '../componentes/SelloEcoUrban';
+import { MarcaEcoUrban } from '../componentes/MarcaEcoUrban';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { TEXTOS_APP } from '../../contenido/textosApp';
@@ -75,10 +75,9 @@ export function Grupos() {
           <span className="text-[clamp(1.2rem,2.8vmin,1.8rem)] font-black">{TEXTOS_APP.grupos.nuevo}</span>
         </motion.button>
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        <p className="max-w-[44rem] rounded-2xl bg-white/80 px-4 py-2 text-center font-bold">{guardadoOk ? TEXTOS_APP.grupos.soloAqui : TEXTOS_APP.grupos.sinGuardar}</p>
-        <SelloEcoUrban texto={TEXTOS_APP.ecoUrban.unProyectoDe} className="text-[clamp(0.95rem,2.2vmin,1.25rem)]" />
-      </div>
+      <p className="max-w-[44rem] rounded-2xl bg-white/80 px-4 py-2 text-center font-bold">{guardadoOk ? TEXTOS_APP.grupos.soloAqui : TEXTOS_APP.grupos.sinGuardar}</p>
+      {/* Eco Urban abajo a la derecha (abajo a la izquierda está Mixtle). */}
+      <MarcaEcoUrban esquina="abajo-derecha" />
       {/*
         Mixtle guía, del alto de su globo o un poco más (v3.1.2): así se ven su pin y su banda. pb del main:
         lo último de la lista sube por encima de Mixtle (fijo abajo a la izquierda) y nunca queda tapado.

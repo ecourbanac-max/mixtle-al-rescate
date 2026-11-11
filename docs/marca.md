@@ -87,14 +87,15 @@ Mixtle trae una banda cruzada en el torso, del hombro izquierdo a la cadera dere
 - **Convive con los accesorios:** el paliacate y la mochila van encima de la banda y la capa por detrás. Ninguno tapa el texto.
 - **El ícono de la app y el de la pestaña** no la llevan: se quedan como estaban.
 
-**Dónde más aparece el logotipo de Eco Urban** (v3.1.1). Siempre a todo color y sin deformar, sobre una pastilla blanca con sombra suave, como los demás letreros del juego (`SelloEcoUrban`). Nunca es un enlace, para que nadie salga del juego por accidente:
+**La marca de Eco Urban en las pantallas** (v3.1.2). Es solo el logotipo "eco urban", sin texto que lo acompañe, como una marca de agua discreta. Va a todo color y sin deformar, sobre una pastilla blanca semitransparente, pegada a una esquina con un margen pequeño. Mide 14 px de alto en celular, 20 px en una laptop de 1366×768 y 22 px como mucho. Es un solo componente (`MarcaEcoUrban`) y se ve igual en todas las pantallas. No se puede tocar ni es un enlace, y no va dentro de las lecciones:
 
-| Pantalla | Dónde y qué dice |
+| Pantalla | Dónde |
 |---|---|
-| Pantalla de carga | Debajo del logo del juego: "Un proyecto de [eco urban]". En `index.html` el logotipo reutiliza con `<use>` el del pin del logo, así que no pesa el doble. |
-| Inicio (Mixtle colgado de la rama) | Debajo de "¡Jugar!": "Un proyecto de [eco urban]". No tapa la ardilla, las mariposas ni el aviso de "Toca la pantalla para escuchar". |
-| ¿Quién va a jugar? | Junto al aviso "El avance de cada grupo se guarda solo en este aparato": "Un proyecto de [eco urban]". |
-| Diploma (en pantalla e impreso) | Al centro del pie, entre la fecha y la firma de Mixtle: "Con el apoyo de [eco urban]". |
+| Pantalla de carga | Abajo a la derecha. En `index.html` reutiliza con `<use>` el logotipo del pin del logo, así que no pesa el doble. |
+| Inicio (Mixtle colgado de la rama) | Arriba a la izquierda, sobre la copa del árbol. Abajo a la derecha está la ardilla (en el celular se encimaban) y abajo a la izquierda, el aviso "Toca la pantalla para escuchar". |
+| ¿Quién va a jugar? | Abajo a la derecha (abajo a la izquierda está Mixtle). |
+| Camino de unidades | Abajo a la izquierda, fija. Las paradas del camino nunca llegan a esa esquina y lo último del camino sube por encima de ella. |
+| Diploma (en pantalla e impreso) | Abajo, al centro del pie, entre la fecha y la firma de Mixtle. |
 
 El logotipo de Eco Urban es propiedad de Eco Urban A.C. y se usa con su autorización. Para usarlo en otro lugar, hay que pedir permiso a Eco Urban.
 
