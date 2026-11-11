@@ -25,6 +25,14 @@ Eco Urban aprobó el juego y pidió dos correcciones. La versión anterior queda
 - **Dónde más:** sección "Pin Eco Urban" en la página `?mixtle`; logo, íconos y hoja de personaje regenerados (el favicon de la pestaña queda sin pin: a 16 px sería una mancha); `docs/marca.md` y `CREDITOS.md`. El logotipo es de Eco Urban A.C. y se usa con su autorización.
 - **Pruebas nuevas:** `tests/pinEcoUrban.test.ts`, con 24 casos: presencia en cada aparición, colores, choques con brazos y accesorios, espejo e ids.
 
+### Verificado en producción (10 de noviembre)
+
+- Pruebas unitarias: 1546 de 1546. Pruebas de navegador contra https://mixtle-al-rescate.vercel.app, con un solo navegador sin ventana: 64 de 64, en proyector (1920×1080) y tablet (1024×768).
+- "Toca el árbol grande" se resuelve tocando el árbol que se ve más alto (árbol 182 px, arbolito 96 px y brote 49 px en una compu de 1366×768). En "Ordena cómo crece un árbol", ya ordenado, el crecimiento es progresivo y sobre el mismo suelo.
+- Mixtle trae el pin en el inicio, la lección, el vestidor, el diploma, las aventuras y la galería `?mixtle`.
+- La actualización llega sola a un equipo que ya tenía la versión anterior: toma el control a los 5.9 s y el grupo conserva su avance.
+- Capturas de antes y después para Eco Urban en `docs/capturas/correcciones/`.
+
 ## Entrega (30 de octubre)
 
 - Repositorio limpio para compartirlo con Eco Urban: se quitó el material de trabajo interno, las mediciones pasaron a `docs/mediciones/`, el README se reescribió como documento de entrega y se agregó la licencia MIT.
