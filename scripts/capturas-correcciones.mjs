@@ -7,6 +7,7 @@
 //   8  unidad terminada                 9  diploma (Mixtle con paliacate)
 //   10 "Toca lo que lastima al árbol" (escena completa, y 10-resuelto: todo encontrado)
 //   11 pantalla de carga                12 "¿Quién va a jugar?" (selección de grupo)
+//   13 camino de unidades (el parque del grupo arriba y, en 13b, las paradas)
 //
 // Uso: node scripts/capturas-correcciones.mjs <urlBase> <antes|despues> [carpeta]
 //   SOLO=1,10,11  solo esas capturas (por omisión, todas).
@@ -126,7 +127,7 @@ try {
       await foto('1-mixtle-inicio');
     }
 
-    if (quiero('2', '3', '4', '5', '6', '7', '7b', '8', '9', '10', '12')) {
+    if (quiero('2', '3', '4', '5', '6', '7', '7b', '8', '9', '10', '12', '13')) {
       await p.goto(`${URL_BASE}/?e2e&demo=correcciones${fragmento([grupoArboles(), grupoMixtle()])}`);
       await esperarPantalla(p, 'inicio');
       await tocarBoton(p, /¡Jugar!/);
@@ -209,16 +210,24 @@ try {
         await continuar(p);
         await terminarLeccion(p);
       }
-      if (quiero('7', '7b', '8', '9')) {
+      if (quiero('7', '7b', '8', '9', '13')) {
         await tocarBoton(p, 'Cambiar de grupo');
         await esperarPantalla(p, 'grupos');
       }
     }
 
     // 7 a 9. Vestidor, unidad terminada y diploma con el grupo cuya mascota es Mixtle (con paliacate).
-    if (quiero('7', '7b', '8', '9')) {
+    if (quiero('7', '7b', '8', '9', '13')) {
       await tocarSelector(p, 'button:has-text("Cacomixtle 2°A")');
       await esperarPantalla(p, 'camino');
+      if (quiero('13')) {
+        await p.evaluate(() => document.querySelector('[data-pantalla="camino"] .overflow-y-auto')?.scrollTo(0, 0));
+        await p.waitForTimeout(1500);
+        await foto('13-camino');
+        await p.evaluate(() => { const c = document.querySelector('[data-pantalla="camino"] .overflow-y-auto'); c?.scrollTo(0, c.scrollHeight * 0.3); });
+        await p.waitForTimeout(1200);
+        await foto('13b-camino-paradas');
+      }
       if (quiero('7', '7b')) {
         await tocarBoton(p, 'Vestidor');
         await p.getByRole('dialog', { name: 'Vestidor' }).waitFor();
