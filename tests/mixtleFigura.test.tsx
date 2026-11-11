@@ -16,7 +16,8 @@ describe('MixtleFigura (Mixtle en línea)', () => {
     expect(new Set(ids).size).toBe(6);
     const figuras = container.querySelectorAll('[data-expresion]');
     figuras.forEach((f) => {
-      const propios = new Set([...f.querySelectorAll('radialGradient, linearGradient')].map((g) => g.id));
+      // Los degradados y el recorte de la banda de guardián (clipPath), todos con el sufijo de este Mixtle.
+      const propios = new Set([...f.querySelectorAll('radialGradient, linearGradient, clipPath')].map((g) => g.id));
       const usados = [...(f.innerHTML.matchAll(/url\(#([^)]+)\)/g) ?? [])].map((m) => m[1]!);
       expect(usados.length).toBeGreaterThan(0);
       for (const u of usados) expect(propios).toContain(u);

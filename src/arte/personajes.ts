@@ -1,3 +1,4 @@
+import { BANDA, bandaEcoUrban, type Banda } from './bandaEcoUrban';
 import { LUGAR_PIN, pinEcoUrban, type LugarPin, type VersionPin } from './pinEcoUrban';
 import { arte, type ArteSvg } from './svg';
 
@@ -128,8 +129,14 @@ const ZETAS = `<g fill="none" stroke="#2459A6" stroke-linecap="round" stroke-lin
  * El cuerpo de Mixtle. `pin`: el acomodo del pin de Eco Urban que trae en el pecho (ver pinEcoUrban.ts).
  * `null` solo cuando el pin se pone aparte, encima (React: MixtleFigura y MascotaVestida); Mixtle siempre lo trae.
  */
-/** Las dos capas del cuerpo: lo de atrás del pin (cuerpo, vientre, patas) y lo de adelante (brazos y cabeza). */
-function capasMixtle(expresion: ExpresionMixtle, s = ''): { atras: string; adelante: string } {
+/** Qué hacer con el texto de la banda: hornearlo, quitarlo, o dejarlo a un container query (React). */
+export type TextoBanda = 'si' | 'no' | 'css';
+
+/**
+ * Las dos capas del cuerpo: lo de atrás del pin (cuerpo, vientre, patas y la banda de guardián) y lo de
+ * adelante (brazos y cabeza). En "celebrando" el brazo levantado cruza la banda: va sin texto.
+ */
+function capasMixtle(expresion: ExpresionMixtle, s = '', textoBanda: TextoBanda = 'no', banda: Banda = BANDA, espejo = false): { atras: string; adelante: string } {
   // Cada oreja va en su propio grupo (clase mx-oreja) para que en reposo se mueva sola.
   const oreja = (x: number, giro: number, lado: string) =>
     `<g class="mx-oreja mx-oreja-${lado}"><g transform="rotate(${giro} ${x} 78)">
@@ -161,6 +168,7 @@ function capasMixtle(expresion: ExpresionMixtle, s = ''): { atras: string; adela
     ${pies}
     <path d="M112 318 C 90 352 94 396 122 408 M248 318 C 270 352 266 396 238 408" fill="none" stroke="${C.pielOscura}" stroke-width="5" stroke-linecap="round" opacity=".6"/>
     <ellipse cx="180" cy="242" rx="54" ry="9" fill="#6E5A4A" opacity=".16"/>
+    ${bandaEcoUrban(banda, expresion === 'celebrando' ? 'no' : textoBanda, s, espejo)}
     \u0000${patasDelanteras(expresion)}
     <g${ladeo}>
     <path d="M180 70 C 252 70 282 120 274 166 C 266 206 226 236 180 240 C 134 236 94 206 86 166 C 78 120 108 70 180 70 Z" fill="url(#mx-piel${s})"/>
@@ -188,8 +196,16 @@ function capasMixtle(expresion: ExpresionMixtle, s = ''): { atras: string; adela
 }
 
 /** El cuerpo de Mixtle con el pin entre el cuerpo y los brazos (los brazos que cruzan el pecho le pasan por delante). */
-function cuerpoMixtle(expresion: ExpresionMixtle, s = '', pin: VersionPin | null = 'chico', espejo = false, lugar: LugarPin = LUGAR_PIN): string {
-  const { atras, adelante } = capasMixtle(expresion, s);
+function cuerpoMixtle(
+  expresion: ExpresionMixtle,
+  s = '',
+  pin: VersionPin | null = 'chico',
+  espejo = false,
+  lugar: LugarPin = LUGAR_PIN,
+  textoBanda: TextoBanda = 'no',
+  banda: Banda = BANDA,
+): string {
+  const { atras, adelante } = capasMixtle(expresion, s, textoBanda, banda, espejo);
   return `${atras}${pin ? pinEcoUrban(pin, lugar, s, espejo) : ''}${adelante}`;
 }
 
@@ -197,8 +213,8 @@ function cuerpoMixtle(expresion: ExpresionMixtle, s = '', pin: VersionPin | null
  * Las capas del cuerpo por separado, para poner el pin en medio desde fuera (React: MixtleFigura le
  * da un tamaño mínimo en pantalla). Caja de 360×440, como el cuerpo.
  */
-export function capasDeMixtle(expresion: ExpresionMixtle, sufijo = ''): { atras: string; adelante: string } {
-  return capasMixtle(expresion, sufijo);
+export function capasDeMixtle(expresion: ExpresionMixtle, sufijo = '', textoBanda: TextoBanda = 'css', banda: Banda = BANDA, espejo = false): { atras: string; adelante: string } {
+  return capasMixtle(expresion, sufijo, textoBanda, banda, espejo);
 }
 
 /**
@@ -339,14 +355,29 @@ function mariposa(feliz: boolean): string {
  * `sufijo`: distinto para cada Mixtle que vaya en línea en la misma página (ver defsMixtle).
  * `pin`: versión del pin de Eco Urban; `espejo`: el cuerpo se mostrará volteado (el pin se lee derecho igual).
  */
-export function cuerpoDeMixtle(expresion: ExpresionMixtle, sufijo = '', pin: VersionPin | null = 'chico', espejo = false, lugar: LugarPin = LUGAR_PIN): string {
-  return cuerpoMixtle(expresion, sufijo, pin, espejo, lugar);
+export function cuerpoDeMixtle(
+  expresion: ExpresionMixtle,
+  sufijo = '',
+  pin: VersionPin | null = 'chico',
+  espejo = false,
+  lugar: LugarPin = LUGAR_PIN,
+  textoBanda: TextoBanda = 'no',
+  banda: Banda = BANDA,
+): string {
+  return cuerpoMixtle(expresion, sufijo, pin, espejo, lugar, textoBanda, banda);
 }
 
 /** Mixtle completo, con la cola, para una caja de 472×440 (el logo y la hoja de personaje). */
-export function mixtleCompleto(expresion: ExpresionMixtle, sufijo = '', pin: VersionPin | null = 'chico', lugar: LugarPin = LUGAR_PIN): string {
-  if (expresion === 'colgado') return mixtleColgadoCompleto(sufijo, pin, lugar);
-  return `<g transform="translate(212 0)">${COLA_MIXTLE}</g>${cuerpoMixtle(expresion, sufijo, pin, false, lugar)}`;
+export function mixtleCompleto(
+  expresion: ExpresionMixtle,
+  sufijo = '',
+  pin: VersionPin | null = 'chico',
+  lugar: LugarPin = LUGAR_PIN,
+  textoBanda: TextoBanda = 'no',
+  banda: Banda = BANDA,
+): string {
+  if (expresion === 'colgado') return mixtleColgadoCompleto(sufijo, pin, lugar, textoBanda, banda);
+  return `<g transform="translate(212 0)">${COLA_MIXTLE}</g>${cuerpoMixtle(expresion, sufijo, pin, false, lugar, textoBanda, banda)}`;
 }
 
 /** La paleta de Mixtle (para la prueba que revisa que todas sus apariciones usen la misma). */
@@ -366,8 +397,8 @@ const COLA_COLGANDO = (() => {
 })();
 
 /** Mixtle colgado con su cola, para una caja de 360×600. */
-export function mixtleColgadoCompleto(sufijo = '', pin: VersionPin | null = 'chico', lugar: LugarPin = LUGAR_PIN): string {
-  return `${COLA_COLGANDO}${cuerpoMixtle('colgado', sufijo, pin, false, lugar)}`;
+export function mixtleColgadoCompleto(sufijo = '', pin: VersionPin | null = 'chico', lugar: LugarPin = LUGAR_PIN, textoBanda: TextoBanda = 'no', banda: Banda = BANDA): string {
+  return `${COLA_COLGANDO}${cuerpoMixtle('colgado', sufijo, pin, false, lugar, textoBanda, banda)}`;
 }
 
 export const PERSONAJES: ArteSvg[] = [

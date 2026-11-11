@@ -75,6 +75,18 @@ Desde la v3.1, Mixtle trae en el pecho un pin con el logotipo de Eco Urban. Es p
 - **El ícono de la app** lleva el pin prendido abajo a la derecha. **El favicon de la pestaña** no lo lleva, porque a 16 px sería una mancha.
 - **Dónde revisarlo:** la página `?mixtle` tiene la sección "Pin Eco Urban", con el pin solo, sus dos acomodos, Mixtle en cada pose y los tres tamaños.
 
+### La banda de guardián (v3.1.2)
+
+![Las variantes de la banda](marca/banda-variantes.png)
+
+Mixtle trae una banda cruzada en el torso, del hombro izquierdo a la cadera derecha, como la de un guardaparques ("Guardianes del parque"). Lleva "eco urban" escrito y el pin prendido encima, en el pecho.
+
+- **En uso: la blanca**, de color blanco hueso con el logotipo a todo color. Hay también una verde (#009345, con el logotipo en blanco) y la opción de no llevarla. Se cambia con un solo valor: `BANDA` en `src/arte/bandaEcoUrban.ts` (`'ninguna'`, `'blanca'` o `'verde'`). Después se corre `npm run marca:generar` y se publica.
+- **El texto sigue la inclinación** de la banda (42°) sin estirarse. Mide 10 de las 440 unidades del cuerpo: es lo más grande que cabe sin que lo tape un brazo, la cabeza o el pin. Queda libre en 11 de las 12 poses. En "celebrando" el brazo levantado cruza la banda, y ahí va sin texto.
+- **El texto solo se ve cuando Mixtle es grande:** con el cuerpo de 250 px o más, donde el logotipo mide 5.7 px o más (inicio y vestidor en una laptop de 1366×768, proyector, vitrina). Más chico (lección, globo, camino, selección de grupo, diploma) va solo la tela de la banda con el pin, para que no quede una mancha.
+- **Convive con los accesorios:** el paliacate y la mochila van encima de la banda y la capa por detrás. Ninguno tapa el texto.
+- **El ícono de la app y el de la pestaña** no la llevan: se quedan como estaban.
+
 **Dónde más aparece el logotipo de Eco Urban** (v3.1.1). Siempre a todo color y sin deformar, sobre una pastilla blanca con sombra suave, como los demás letreros del juego (`SelloEcoUrban`). Nunca es un enlace, para que nadie salga del juego por accidente:
 
 | Pantalla | Dónde y qué dice |

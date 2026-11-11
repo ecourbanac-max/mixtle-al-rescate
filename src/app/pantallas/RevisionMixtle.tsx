@@ -1,7 +1,8 @@
 import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { logoSvg } from '../../arte/marca';
-import { PERSONAJES, mixtleCompleto } from '../../arte/personajes';
+import { BANDA, type Banda } from '../../arte/bandaEcoUrban';
+import { PERSONAJES, mixtleColgadoCompleto, mixtleCompleto } from '../../arte/personajes';
 import { TAMANO_PIN, VARIANTES_PIN, type TamanoPin } from '../../arte/pinEcoUrban';
 import { ACCESORIOS, type IdAccesorio } from '../../logica/accesorios';
 import { MASCOTAS } from '../../logica/grupos';
@@ -28,6 +29,12 @@ const LOGO_CARGA = logoSvg({ atributos: 'width="100%" height="100%" aria-hidden=
 /** Mixtle entero (con la cola) con el pin en otro tamaño: para comparar las tres opciones lado a lado. */
 const SVG_VARIANTE = (t: TamanoPin) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 472 440" width="100%" height="100%" aria-hidden="true">${mixtleCompleto('normal', `-variante-${t}`, 'chico', VARIANTES_PIN[t])}</svg>`;
+
+/** La banda en cada variante, con el texto (como se ve en grande): colgado y sentado. */
+const SVG_BANDA_COLGADO = (b: Banda) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 600" width="100%" height="100%" aria-hidden="true">${mixtleColgadoCompleto(`-banda-c-${b}`, 'chico', undefined, 'si', b)}</svg>`;
+const SVG_BANDA_SENTADO = (b: Banda) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 472 440" width="100%" height="100%" aria-hidden="true">${mixtleCompleto('normal', `-banda-s-${b}`, 'chico', undefined, 'si', b)}</svg>`;
 
 function Seccion({ titulo, children, id }: { titulo: string; children: ReactNode; id: string }) {
   return (
@@ -110,6 +117,22 @@ export function RevisionMixtle() {
             <div className="h-60 w-[16rem]" dangerouslySetInnerHTML={{ __html: SVG_VARIANTE(t) }} />
           </Caso>
         ))}
+      </Seccion>
+
+      <Seccion id="banda" titulo={`Banda de guardián (en uso: ${BANDA}): sin banda, blanca y verde`}>
+        {(['ninguna', 'blanca', 'verde'] as Banda[]).map((b) => (
+          <Caso key={b} nombre={`${b}${b === BANDA ? ' (en uso)' : ''}`}>
+            <div className="h-72 w-[10.8rem]" dangerouslySetInnerHTML={{ __html: SVG_BANDA_COLGADO(b) }} />
+            <div className="h-60 w-[16rem]" dangerouslySetInnerHTML={{ __html: SVG_BANDA_SENTADO(b) }} />
+          </Caso>
+        ))}
+        <Caso nombre="En línea, grande (texto visible) y chico (sin texto)">
+          <MixtleFigura alto="18rem" expresion="saluda" />
+          <MixtleFigura alto="8rem" expresion="normal" />
+        </Caso>
+        <Caso nombre="Con todos los accesorios">
+          <MascotaVestida mascota="cacomixtle" puestos={['flor', 'gorra', 'lentes', 'paliacate', 'mochila', 'capa']} className="h-72" />
+        </Caso>
       </Seccion>
 
       <Seccion id="referencia" titulo="Referencia: el logo y el inicio">

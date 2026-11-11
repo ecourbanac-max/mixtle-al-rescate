@@ -6,6 +6,16 @@ Fechas de octubre y noviembre de 2026. Las etiquetas de git marcan las versiones
 
 La versión anterior queda en la etiqueta `v3.1.1-estable`.
 
+### 1. La banda de guardián de Mixtle
+
+- **La banda:** Mixtle trae una banda cruzada del hombro a la cadera, como la de un guardaparques, con "eco urban" escrito a lo largo. El pin va prendido encima (`src/arte/bandaEcoUrban.ts`). Es de tela con su pliegue, su sombra y su orilla, y se recorta con la silueta del torso.
+- **El texto:** el logotipo va a todo color y sin deformar, siguiendo la inclinación de la banda. Queda libre de brazos, cabeza y pin en 11 de las 12 poses; en "celebrando" el brazo levantado la cruza y va sin texto.
+- **Solo donde se lee:** el texto aparece cuando Mixtle es grande (cuerpo de 250 px o más): inicio y vestidor en una laptop de 1366×768, proyector y vitrina. Más chico, va solo la tela con el pin.
+- **Más espacio en el vestidor:** la vista previa creció para que Mixtle mida 277 px en una laptop de 1366×768, sin tocar las tarjetas.
+- **Variantes:** blanca (en uso), verde, o ninguna, en `docs/marca/banda-variantes.png`. Se cambia con un solo valor, `BANDA`.
+- **Revisado:** convive con los 6 accesorios del vestidor y aparece en la galería `?mixtle`. Los ids son únicos por cada Mixtle. El ícono de la app no cambia.
+- **Pruebas:** `tests/bandaEcoUrban.test.tsx`.
+
 ### 4. El árbol del parque del grupo, completo
 
 - En "El parque de [grupo]" la copa del árbol grande salía cortada por el borde de arriba: el marco es más ancho que 16:9 y el dibujo del parque se recortaba arriba. Ahora el parque del grupo usa un dibujo a lo ancho (`parque-ancho`, 1920×720), con el árbol grande un poco más chico y el sol más abajo. Cabe completo con cualquier avance, en el camino, al terminar una lección y en la vitrina, en compu y en celular (`tests/parqueGrupo.test.ts`).

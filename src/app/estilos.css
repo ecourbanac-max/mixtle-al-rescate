@@ -107,3 +107,35 @@ html[data-suave] .mixtle-vivo .mx-oreja { animation: none; }
     padding-left: 0;
   }
 }
+
+/*
+ * ─── La banda de guardián de Mixtle (v3.1.2): su texto "eco urban" solo se ve cuando Mixtle es grande ───
+ * Con el cuerpo de menos de 250 px de alto el logotipo mediría menos de 5.7 px: sería una mancha y se quita
+ * (lección, globo, camino, selección de grupo). Ver src/arte/bandaEcoUrban.ts. Los dibujos que van como
+ * imagen ya traen (o no) el texto horneado (data-horneado).
+ */
+.mixtle-figura,
+.mascota-con-banda {
+  container: cuerpo-mixtle / size;
+}
+.colgado-con-banda {
+  container: colgado-mixtle / size;
+}
+.banda-texto:not([data-horneado]) {
+  display: none;
+}
+@container cuerpo-mixtle (min-height: 250px) {
+  .banda-texto:not([data-horneado]) {
+    display: inline;
+  }
+}
+/*
+ * Colgado de la rama (inicio), el cuerpo mide 440 de los 600 del dibujo, y la capa del inicio se ve ~1.1 veces
+ * más grande que su caja (paralaje): 250 px de cuerpo en pantalla son 310 px de caja.
+ */
+@container colgado-mixtle (min-height: 310px) {
+  .banda-texto:not([data-horneado]) {
+    display: inline;
+  }
+}
+

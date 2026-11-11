@@ -21,6 +21,7 @@
     <ellipse cx="244" cy="414" rx="46" ry="18" fill="#8A7563"/>
     <path d="M112 318 C 90 352 94 396 122 408 M248 318 C 270 352 266 396 238 408" fill="none" stroke="#8A7563" stroke-width="5" stroke-linecap="round" opacity=".6"/>
     <ellipse cx="180" cy="242" rx="54" ry="9" fill="#6E5A4A" opacity=".16"/>
+    
     <path d="M152 326 L 150 396" stroke="#B09C8A" stroke-width="26" stroke-linecap="round"/><ellipse cx="148" cy="402" rx="21" ry="12" fill="#8A7563"/>
      <path d="M141 398 v8 M149 398 v8" stroke="#B09C8A" stroke-width="3" stroke-linecap="round"/><path d="M208 326 L 210 396" stroke="#B09C8A" stroke-width="26" stroke-linecap="round"/><ellipse cx="212" cy="402" rx="21" ry="12" fill="#8A7563"/>
      <path d="M205 398 v8 M213 398 v8" stroke="#B09C8A" stroke-width="3" stroke-linecap="round"/>

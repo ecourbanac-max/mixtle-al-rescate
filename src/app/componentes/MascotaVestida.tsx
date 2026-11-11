@@ -4,6 +4,7 @@ import { estiloPinEncima } from '../../arte/pinEcoUrban';
 import { ANCLAS_MASCOTA, ACCESORIOS, type Ancla, type IdAccesorio } from '../../logica/accesorios';
 import { mascota as datosMascota, type IdMascota } from '../../logica/grupos';
 import { Arte, registrarArte } from './Arte';
+import { TextoBanda } from './TextoBanda';
 
 registrarArte(ARTE_ACCESORIOS);
 
@@ -45,11 +46,18 @@ export function MascotaVestida({ mascota, puestos = [], pinMinimoPx = 16, classN
   // prendido a la tela), y nunca mide menos de 16 px. Por eso aquí se usa su dibujo sin pin y el pin aparte.
   const esMixtle = mascota === 'cacomixtle';
   return (
-    <div className={`relative ${className}`} style={{ aspectRatio: `${PROPORCION.get(arte) ?? 1}` }} data-mascota-vestida={mascota} data-puestos={puestos.join(' ')}>
+    <div
+      className={`relative ${esMixtle ? 'mascota-con-banda' : ''} ${className}`}
+      style={{ aspectRatio: `${PROPORCION.get(arte) ?? 1}` }}
+      data-mascota-vestida={mascota}
+      data-puestos={puestos.join(' ')}
+    >
       {ACCESORIOS.filter((a) => a.detras && !anclas[a.id].encima && puestos.includes(a.id)).map((a) => (
         <Accesorio key={a.id} id={a.id} ancla={anclas[a.id]} />
       ))}
       <Arte clave={esMixtle ? 'mixtle-entero-sin-pin' : arte} className="relative h-full w-full object-contain" />
+      {/* El texto de su banda de guardián (la tela ya viene en el dibujo): solo si se ve grande. */}
+      {esMixtle && <TextoBanda caja={CAJA_ENTERO} />}
       {ACCESORIOS.filter((a) => (!a.detras || anclas[a.id].encima) && puestos.includes(a.id)).map((a) => (
         <Accesorio key={a.id} id={a.id} ancla={anclas[a.id]} />
       ))}

@@ -20,8 +20,9 @@ export type ExpresionMixtle = 'normal' | 'feliz' | 'habla' | 'pensando' | 'sorpr
  * otro en la página: si compartieran id, el navegador tomaría el primero del documento y, cuando ese
  * está en un SVG oculto (el logo de la pantalla de carga), Mixtle saldría sin relleno.
  */
-function svgCapas(expresion: ExpresionMixtle, sufijo: string): { atras: string; adelante: string } {
-  const { atras, adelante } = capasDeMixtle(expresion, sufijo);
+function svgCapas(expresion: ExpresionMixtle, sufijo: string, espejo: boolean): { atras: string; adelante: string } {
+  // La banda de guardián lleva su texto con la clase banda-texto: se ve solo si Mixtle es grande (estilos.css).
+  const { atras, adelante } = capasDeMixtle(expresion, sufijo, 'css', undefined, espejo);
   const svg = (contenido: string) =>
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CUERPO.ancho} ${CUERPO.alto}" width="100%" height="100%" aria-hidden="true">${contenido}</svg>`;
   return { atras: svg(atras), adelante: svg(adelante) };
@@ -69,12 +70,12 @@ export function MixtleFigura({ alto, expresion = 'normal', espejo = false, pin =
   const id = useId();
   const retraso = desfaseDe(id);
   const sufijo = `-${id.replace(/[^a-zA-Z0-9]/g, '')}`;
-  const capas = useMemo(() => svgCapas(expresion, sufijo), [expresion, sufijo]);
+  const capas = useMemo(() => svgCapas(expresion, sufijo, espejo), [expresion, sufijo, espejo]);
   const cuerpo = movimiento(expresion);
   const animado = expresion === 'celebrando';
   return (
     <div
-      className={`${posicion} ${className}`}
+      className={`mixtle-figura ${posicion} ${className}`}
       style={{ height: alto, aspectRatio: `${anchoTotal} / ${CUERPO.alto}`, transform: espejo ? 'scaleX(-1)' : undefined }}
       role="img"
       aria-label="Mixtle, el cacomixtle"

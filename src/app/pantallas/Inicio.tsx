@@ -1,3 +1,4 @@
+import { TextoBanda } from '../componentes/TextoBanda';
 import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { CAJA_COLGADO, MANOS_COLGADO } from '../../arte/escenas';
 import { FRASE_MIXTLE } from '../../arte/marca';
@@ -221,8 +222,9 @@ export function Inicio() {
                 <Arte clave={c.clave} className="absolute inset-0 h-full w-full" />
                 {'mixtle' in c && (
                   <div className="inicio-columpio" style={colgado} role="img" aria-label="Mixtle, el cacomixtle">
-                    <div className="inicio-columpio-vaiven">
+                    <div className="inicio-columpio-vaiven colgado-con-banda relative h-full" style={{ aspectRatio: `${CAJA_COLGADO.ancho} / ${CAJA_COLGADO.alto}` }}>
                       <Arte clave="mixtle-colgado" className="h-full" />
+                      <TextoBanda caja={CAJA_COLGADO} />
                     </div>
                   </div>
                 )}

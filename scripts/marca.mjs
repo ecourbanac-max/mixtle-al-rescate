@@ -73,7 +73,7 @@ const celdas = POSES.map(([pose, nombre], i) => {
   const y = 70 + Math.floor(i / 4) * CELDA.alto;
   return `<g transform="translate(${x} ${y})">
     <rect x="12" y="8" width="${CELDA.ancho - 24}" height="${CELDA.alto - 20}" rx="28" fill="#fff" stroke="#E6E1D3" stroke-width="3"/>
-    <svg x="22" y="34" width="256" height="238" viewBox="0 0 472 440">${mixtleCompleto(pose)}</svg>
+    <svg x="22" y="34" width="256" height="238" viewBox="0 0 472 440">${mixtleCompleto(pose, '', 'chico', undefined, 'si')}</svg>
     <path d="${trazoTexto(nunito, nombre, { x: CELDA.ancho / 2, y: 326, tamano: 26 })}" fill="#1F6B4A"/>
   </g>`;
 }).join('\n');

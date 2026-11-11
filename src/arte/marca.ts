@@ -93,7 +93,7 @@ export function iconoSvg({ aSangre = false, conPin = true }: { aSangre?: boolean
     : `<rect width="512" height="512" rx="112" fill="${COLORES_MARCA.verde}"/><circle cx="256" cy="256" r="216" fill="${COLORES_MARCA.cielo}"/>`;
   const cara = aSangre ? { x: 100, y: 92, lado: 312 } : { x: 62, y: 56, lado: 388 };
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">${fondo}
-  <svg x="${cara.x}" y="${cara.y}" width="${cara.lado}" height="${cara.lado}" viewBox="62 6 236 236">${cuerpoDeMixtle('feliz', '', null)}</svg>
+  <svg x="${cara.x}" y="${cara.y}" width="${cara.lado}" height="${cara.lado}" viewBox="62 6 236 236">${cuerpoDeMixtle('feliz', '', null, false, undefined, 'no', 'ninguna')}</svg>
   ${conPin ? pinEcoUrban('chico', aSangre ? { x: 352, y: 356, r: 52 } : { x: 384, y: 390, r: 66 }, '-icono') : ''}
 </svg>`;
 }
