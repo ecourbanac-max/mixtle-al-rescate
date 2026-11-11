@@ -17,6 +17,11 @@ La versión anterior queda en la etiqueta `v3.1.2`.
 
 - `BANDA = 'verde'`: verde Eco Urban (#009345) con el logotipo en blanco. Logo de la pantalla de carga, hoja de personaje y `docs/marca/banda-variantes.png` regenerados. Los íconos de la app no cambian.
 
+### Verificado (11 de noviembre)
+
+- Pruebas unitarias: 1599 de 1599. Pruebas de navegador contra producción, con un solo navegador sin ventana: selección de grupo 8, camino 4, ficha 18, vestidor 12, recorrido completo 14 y aventuras 8. Todas pasaron.
+- La actualización llega sola a un equipo que tenía la v3.1.2: la versión nueva toma el control a los 5.7 s y el grupo conserva su avance.
+
 ## v3.1.2 (11 de noviembre) — Ajustes de marca Eco Urban
 
 La versión anterior queda en la etiqueta `v3.1.1-estable`.
