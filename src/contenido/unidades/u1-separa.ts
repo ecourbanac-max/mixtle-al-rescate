@@ -110,9 +110,10 @@ export const U1: Unidad = {
           id: 'u1-l2-e1',
           consigna: 'Toca la basura que está tirada en el parque.',
           pista: 'Busca cosas que no deberían estar en el pasto.',
+          // Lugares medidos (v3.1.1): en un celular, cada objeto se toca en 48 px y ninguno se encima (e2e/encuentra.spec.ts).
           escena: 'parque',
           objetos: [
-            { id: 'lata', arte: 'residuo-lata', nombre: 'la lata', x: 30, y: 78, ancho: 9, mal: true },
+            { id: 'lata', arte: 'lata-tirada', nombre: 'la lata', x: 30, y: 78, ancho: 10, mal: true },
             { id: 'frituras', arte: 'residuo-frituras', nombre: 'la envoltura', x: 72, y: 84, ancho: 9, mal: true },
             { id: 'arbusto', arte: 'arbusto', nombre: 'el arbusto', x: 55, y: 68, ancho: 16, mal: false },
             { id: 'flores', arte: 'flores-morada', nombre: 'las flores', x: 88, y: 76, ancho: 10, mal: false },
@@ -295,14 +296,15 @@ export const U1: Unidad = {
           id: 'u1-l4-e3',
           consigna: 'Toca la basura que cayó en el bote equivocado.',
           pista: 'Mira el dibujo de cada bote y lo que tiene encima.',
+          // Lugares medidos (v3.1.1): en un celular, cada objeto se toca en 48 px y ninguno se encima (e2e/encuentra.spec.ts).
           escena: 'parque',
           objetos: [
-            { id: 'bote-verde', arte: 'bote-organico', nombre: 'el bote verde de orgánico', x: 24, y: 74, ancho: 13, mal: false },
-            { id: 'lata-en-verde', arte: 'residuo-lata', nombre: 'la lata', x: 24, y: 48, ancho: 8, mal: true },
-            { id: 'bote-azul', arte: 'bote-reciclable', nombre: 'el bote azul de reciclable', x: 50, y: 74, ancho: 13, mal: false },
-            { id: 'botella-en-azul', arte: 'residuo-botella', nombre: 'la botella', x: 50, y: 48, ancho: 8, mal: false },
-            { id: 'bote-naranja', arte: 'bote-no-reciclable', nombre: 'el bote naranja de no reciclable', x: 76, y: 74, ancho: 13, mal: false },
-            { id: 'platano-en-naranja', arte: 'residuo-platano', nombre: 'la cáscara de plátano', x: 76, y: 48, ancho: 8, mal: true },
+            { id: 'bote-verde', arte: 'bote-organico', nombre: 'el bote verde de orgánico', x: 32, y: 76, ancho: 16, mal: false },
+            { id: 'lata-en-verde', arte: 'residuo-lata', nombre: 'la lata', x: 32, y: 47, ancho: 10, mal: true },
+            { id: 'bote-azul', arte: 'bote-reciclable', nombre: 'el bote azul de reciclable', x: 56, y: 76, ancho: 16, mal: false },
+            { id: 'botella-en-azul', arte: 'residuo-botella', nombre: 'la botella', x: 56, y: 47, ancho: 10, mal: false },
+            { id: 'bote-naranja', arte: 'bote-no-reciclable', nombre: 'el bote naranja de no reciclable', x: 82, y: 76, ancho: 16, mal: false },
+            { id: 'platano-en-naranja', arte: 'residuo-platano', nombre: 'la cáscara de plátano', x: 82, y: 47, ancho: 10, mal: true },
           ],
         },
         {

@@ -83,11 +83,13 @@ export const U3: Unidad = {
           consigna: 'Toca lo que lastima al árbol.',
           pista: 'Busca una rama rota y basura.',
           escena: 'parque',
+          // Todo en el árbol del parque (v3.1.1): la rama rota cuelga de su tronco, la lata está tirada al pie,
+          // el nido y la ardilla viven en su copa. Lugares medidos para que nada se encime ni en un celular.
           objetos: [
-            { id: 'rama', arte: 'rama-rota', nombre: 'la rama rota', x: 30, y: 66, ancho: 14, mal: true },
-            { id: 'lata', arte: 'residuo-lata', nombre: 'la lata', x: 64, y: 84, ancho: 8, mal: true },
-            { id: 'nido', arte: 'nido', nombre: 'el nido', x: 48, y: 60, ancho: 9, mal: false },
-            { id: 'ardilla', arte: 'ardilla-feliz', nombre: 'la ardilla', x: 82, y: 74, ancho: 10, mal: false },
+            { id: 'rama', arte: 'rama-colgando', nombre: 'la rama rota', x: 32.8, y: 58.6, ancho: 13, mal: true },
+            { id: 'lata', arte: 'lata-tirada', nombre: 'la lata', x: 17, y: 76, ancho: 11, mal: true },
+            { id: 'nido', arte: 'nido', nombre: 'el nido', x: 36, y: 22, ancho: 9, mal: false },
+            { id: 'ardilla', arte: 'ardilla-feliz', nombre: 'la ardilla', x: 17, y: 33, ancho: 9, mal: false },
           ],
         },
         {
@@ -204,13 +206,14 @@ export const U3: Unidad = {
           id: 'u3-l3-e2',
           consigna: 'Toca lo que está mal en el parque.',
           pista: 'Busca agua que se tira, una rama rota y basura.',
+          // Lugares medidos (v3.1.1): en un celular, cada objeto se toca en 48 px y ninguno se encima (e2e/encuentra.spec.ts).
           escena: 'parque',
           objetos: [
-            { id: 'llave', arte: 'llave-goteando', nombre: 'la llave goteando', x: 18, y: 66, ancho: 11, mal: true },
-            { id: 'rama', arte: 'rama-rota', nombre: 'la rama rota', x: 46, y: 64, ancho: 13, mal: true },
-            { id: 'frituras', arte: 'residuo-frituras', nombre: 'la envoltura', x: 70, y: 86, ancho: 8, mal: true },
-            { id: 'arbolito', arte: 'arbolito', nombre: 'el arbolito', x: 86, y: 70, ancho: 11, mal: false },
-            { id: 'flores', arte: 'flores-morada', nombre: 'las flores', x: 32, y: 86, ancho: 9, mal: false },
+            { id: 'llave', arte: 'llave-goteando', nombre: 'la llave goteando', x: 12, y: 72, ancho: 11, mal: true },
+            { id: 'rama', arte: 'rama-colgando', nombre: 'la rama rota', x: 32.8, y: 58.6, ancho: 13, mal: true },
+            { id: 'frituras', arte: 'residuo-frituras', nombre: 'la envoltura', x: 67, y: 86, ancho: 8, mal: true },
+            { id: 'arbolito', arte: 'arbolito', nombre: 'el arbolito', x: 86, y: 72, ancho: 11, mal: false },
+            { id: 'flores', arte: 'flores-morada', nombre: 'las flores', x: 50, y: 86, ancho: 9, mal: false },
           ],
         },
         {

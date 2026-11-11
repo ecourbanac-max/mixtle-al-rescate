@@ -10,6 +10,8 @@ const CLAVE_SUAVE = 'mixtle-al-rescate:suave';
 interface EstadoApp {
   pantalla: Pantalla;
   leccionId?: string;
+  /** Solo pruebas (?e2e): la lección empieza en este ejercicio (src/servicios/pruebas.ts). */
+  ejercicioInicial?: string;
   unidadId?: string;
   /** Escena donde empieza la aventura (la intro si no se indica). */
   escenaInicial?: string;
@@ -22,7 +24,7 @@ interface EstadoApp {
   jugar: () => void;
   volverAlInicio: () => void;
   alCamino: (estampaNueva?: string) => void;
-  abrirLeccion: (leccionId: string) => void;
+  abrirLeccion: (leccionId: string, ejercicioInicial?: string) => void;
   abrirAventura: (unidadId: string) => void;
   abrirAlbum: () => void;
   irAGrupos: () => void;
@@ -75,7 +77,7 @@ export const useApp = create<EstadoApp>((set, get) => {
     jugar: () => set({ pantalla: 'grupos', escenaInicial: undefined }),
     volverAlInicio: () => set({ pantalla: 'inicio', escenaInicial: undefined, leccionId: undefined, unidadId: undefined }),
     alCamino: (estampaNueva) => set({ pantalla: 'camino', escenaInicial: undefined, leccionId: undefined, estampaNueva }),
-    abrirLeccion: (leccionId) => set({ pantalla: 'leccion', leccionId }),
+    abrirLeccion: (leccionId, ejercicioInicial) => set({ pantalla: 'leccion', leccionId, ejercicioInicial }),
     abrirAventura: (unidadId) => set({ pantalla: 'aventura', unidadId, escenaInicial: undefined }),
     abrirAlbum: () => set({ pantalla: 'album' }),
     irAGrupos: () => set({ pantalla: 'grupos' }),

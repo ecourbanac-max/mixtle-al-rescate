@@ -81,3 +81,29 @@ html[data-proyector] {
   .mixtle-vivo .mx-oreja { animation: none; }
 }
 html[data-suave] .mixtle-vivo .mx-oreja { animation: none; }
+
+/*
+ * ─── Lección: "encuentra el error" (una escena con cosas que se tocan) ───
+ * La barra de respuesta (BannerRespuesta) mide lo que su Mixtle más su relleno y su borde: abajo se
+ * aparta ese alto para que la barra nunca tape nada de la escena (v3.1.1). En pantallas bajas (laptop,
+ * laptop con zoom al 125 o 150 %, celular acostado), Mixtle y su globo van a un lado de la escena y no
+ * arriba: así la escena usa todo el alto que queda.
+ */
+:root {
+  --alto-barra-respuesta: calc(clamp(5.5rem, 15vmin, 9rem) + 2 * clamp(0.75rem, 2.5vmin, 1.5rem) + 6px);
+}
+.leccion-cuerpo[data-tipo='encuentra-error'] {
+  padding-bottom: calc(var(--alto-barra-respuesta) + 0.5rem);
+}
+@media (orientation: landscape) and (max-height: 800px) {
+  .leccion-cuerpo[data-tipo='encuentra-error'] {
+    flex-direction: row;
+    gap: clamp(0.75rem, 2vmin, 1.5rem);
+    --ancho-globo-leccion: min(19rem, 28vw);
+  }
+  .leccion-cuerpo[data-tipo='encuentra-error'] > .leccion-guia {
+    height: auto;
+    align-items: flex-start;
+    padding-left: 0;
+  }
+}

@@ -26,6 +26,8 @@ interface Gancho {
   estampaNueva(id: string): void;
   /** Un grupo con esa mascota, todos los accesorios comprados y los indicados puestos, ya en el camino. */
   grupoVestido(mascota: string, puestos?: string[]): Promise<string>;
+  /** Abre la lección que tiene ese ejercicio, empezando en él. */
+  abrirEjercicio(id: string): Promise<void>;
   /** Deja puestos exactamente esos accesorios en el grupo actual. */
   ponerse(puestos: string[]): Promise<void>;
 }

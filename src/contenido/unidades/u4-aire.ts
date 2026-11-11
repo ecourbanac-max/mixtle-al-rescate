@@ -139,12 +139,13 @@ export const U4: Unidad = {
           id: 'u4-l2-e4',
           consigna: 'Toca lo que ensucia el aire.',
           pista: 'Busca de dónde sale humo.',
+          // Lugares medidos (v3.1.1): en un celular, cada objeto se toca en 48 px y ninguno se encima (e2e/encuentra.spec.ts).
           escena: 'calle',
           objetos: [
             { id: 'quemar', arte: 'quemar-basura', nombre: 'la basura quemándose', x: 22, y: 50, ancho: 11, mal: true },
             { id: 'coche', arte: 'coche', nombre: 'el coche echando humo', x: 62, y: 72, ancho: 14, mal: true },
             { id: 'bici', arte: 'bici', nombre: 'la bici', x: 40, y: 82, ancho: 11, mal: false },
-            { id: 'arbol', arte: 'arbol', nombre: 'el árbol', x: 82, y: 44, ancho: 12, mal: false },
+            { id: 'arbol', arte: 'arbol', nombre: 'el árbol', x: 44, y: 46, ancho: 12, mal: false },
           ],
         },
         {

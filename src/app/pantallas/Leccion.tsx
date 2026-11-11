@@ -56,7 +56,14 @@ export function Leccion() {
   const leccionId = useApp((s) => s.leccionId);
   const alCamino = useApp((s) => s.alCamino);
   const datos = leccionId ? leccionPorId(leccionId) : undefined;
-  const [sesion, setSesion] = useState<SesionLeccion | null>(() => (datos ? iniciarLeccion(datos.leccion) : null));
+  const ejercicioInicial = useApp((s) => s.ejercicioInicial);
+  const [sesion, setSesion] = useState<SesionLeccion | null>(() => {
+    if (!datos) return null;
+    const s = iniciarLeccion(datos.leccion);
+    // Solo pruebas (?e2e): empezar en un ejercicio dado (las pruebas de escenas no juegan la lección entera).
+    const i = ejercicioInicial ? s.cola.findIndex((e) => e.id === ejercicioInicial) : -1;
+    return i > 0 ? { ...s, cola: s.cola.slice(i) } : s;
+  });
   const [banner, setBanner] = useState<DatosBanner | null>(null);
   const [preguntaSalir, setPreguntaSalir] = useState(false);
   const animos = useRef(0);
@@ -191,15 +198,20 @@ export function Leccion() {
         <BotonesSistema enLinea />
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col px-4 pb-[clamp(3rem,8vmin,6rem)]">
+      {/*
+        Encuentra el error (una escena con cosas que se tocan): abajo se aparta el alto de la barra de
+        respuesta, para que nunca tape nada, y en pantallas bajas Mixtle y su globo van a un lado de la
+        escena (no arriba), para que la escena use todo el alto. Ver .leccion-cuerpo en estilos.css.
+      */}
+      <div className="leccion-cuerpo flex min-h-0 flex-1 flex-col px-4 pb-[clamp(3rem,8vmin,6rem)]" data-tipo={actual?.tipo}>
         {/* Mixtle y su globo siempre en el mismo lugar, sin importar el tamaño del ejercicio. */}
-        <div className="flex h-[clamp(7rem,19vmin,12rem)] shrink-0 items-center pl-[2vw]">
-          <MixtleGuia alto="clamp(6rem,17vmin,11rem)" sinGlobo={!!banner} />
+        <div className="leccion-guia flex h-[clamp(7rem,19vmin,12rem)] shrink-0 items-center pl-[2vw]">
+          <MixtleGuia alto="clamp(6rem,17vmin,11rem)" anchoGlobo="var(--ancho-globo-leccion, min(38rem,60vw))" sinGlobo={!!banner} />
         </div>
         {/* El ejercicio ocupa y se centra en todo el espacio que queda. */}
         <div className="flex min-h-0 flex-1 items-center justify-center">
           {actual && (
-            <div className="flex w-full justify-center" data-ejercicio-id={actual.id} data-repaso={esRepaso}>
+            <div className={`flex w-full justify-center ${actual.tipo === 'encuentra-error' ? 'h-full' : ''}`} data-ejercicio-id={actual.id} data-repaso={esRepaso}>
               <Ejercicio key={claveEjercicio} ejercicio={actual} responder={responder} bloqueado={!!banner} />
             </div>
           )}

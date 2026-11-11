@@ -123,6 +123,13 @@ export function exponerParaPruebas(): void {
       useApp.getState().alCamino();
       return grupo.id;
     },
+    /** Abre la lección que tiene ese ejercicio, empezando en él (para revisar escenas sin jugar la lección). */
+    abrirEjercicio: async (id: string) => {
+      const { UNIDADES } = await import('../contenido/unidades');
+      const leccion = UNIDADES.flatMap((u) => u.lecciones).find((l) => l.ejercicios.some((e) => e.id === id));
+      if (!leccion) throw new Error(`No existe el ejercicio ${id}`);
+      useApp.getState().abrirLeccion(leccion.id, id);
+    },
     /** Deja puestos exactamente esos accesorios en el grupo actual (los demás, guardados). */
     ponerse: async (puestos: IdAccesorio[]) => {
       const { useGrupos } = await modulosDeGrupos();

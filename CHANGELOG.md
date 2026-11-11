@@ -19,6 +19,14 @@ La versión anterior queda en las etiquetas `v3.1-pin-chico` y `v3.1-antes-ajust
 - **Presupuesto:** el trazo del logotipo se aligeró de 3.9 a 2.3 KB comprimido, con píxeles enteros y menos puntos. Coincide en 98.4 a 98.6 % con el original. La primera pantalla quedó en 246.8 KB, dentro del límite de 250 KB.
 - **Pruebas:** `tests/pinEcoUrban.test.tsx` mide lo que se ve del pin en cada pose y revisa que vaya encima de cada accesorio y que nunca mida menos de 16 px.
 
+### 2. "Toca lo que lastima al árbol" y las demás escenas de "encuentra el error"
+
+- **La escena cabe completa y la barra no tapa nada.** La escena usa todo el espacio que le deja la lección. Abajo se aparta el alto de la barra de respuesta. En pantallas bajas (laptop, laptop con zoom al 125 y 150 %, celular), Mixtle y su globo van a un lado y no arriba. El marcador de lo encontrado va sobre el cielo.
+- **Dibujos nuevos:** una rama gruesa del mismo árbol, quebrada con su astilla clara, colgando de una tira de corteza y con las hojas marchitas (`rama-colgando` en la escena, `rama-rota` con un pedazo de tronco en la tarjeta). Una lata de refresco roja, tirada de lado y abollada (`lata-tirada`).
+- **u3-l1-e5:** todo está en el árbol del parque. La rama cuelga del tronco, la lata está al pie, y el nido y la ardilla en la copa, fuera del camino.
+- **Las 9 escenas de las 5 unidades revisadas:** u1-l2-e1, u1-l4-e3, u2-l2-e3, u2-l3-e6, u3-l1-e5, u3-l3-e2, u4-l2-e4, u5-l2-e3 y u5-l4-e6. Cada objeto se toca en al menos 48 px y ninguno se encima ni en un celular. Se reacomodaron 8 de ellas: las ardillas salieron del camino, los botes crecieron con su basura encima, el árbol de la calle ya no tapa la casa y la lata en el pasto ahora es la lata tirada.
+- **Pruebas:** `e2e/encuentra.spec.ts` revisa las 9 escenas en 1366×768, en laptop con zoom al 125 y 150 %, en celular y en proyector: todo dentro de la pantalla, en 48 px, sin encimarse y sin quedar bajo la barra. `tests/encuentraError.test.ts` hace la misma cuenta en papel.
+
 ## v3.1 (9 de noviembre) — Correcciones solicitadas por Eco Urban
 
 Eco Urban aprobó el juego y pidió dos correcciones. La versión anterior queda en la etiqueta `v3-antes-correcciones`.
