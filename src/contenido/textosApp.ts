@@ -6,6 +6,11 @@ import type { Locucion } from '../voz/locucion';
  * TODO(Eco Urban): revisar redacción con las educadoras y educadores.
  */
 export const TEXTOS_APP = {
+  /** Eco Urban en las pantallas (no se narra): junto a su logotipo, en una pastilla blanca. */
+  ecoUrban: {
+    unProyectoDe: 'Un proyecto de',
+    conElApoyoDe: 'Con el apoyo de',
+  },
   inicio: {
     /** La frase de Mixtle (marca): la dice al tocar "¡Jugar!". */
     /** Indicio mientras el navegador aún no deja sonar nada (no se narra: no hay audio todavía). */

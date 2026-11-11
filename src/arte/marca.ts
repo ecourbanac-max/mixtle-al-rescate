@@ -1,7 +1,8 @@
 import { TEXTOS_APP } from '../contenido/textosApp';
 import { TEXTO_LOGO } from './logoTexto.generado';
 import { cuerpoDeMixtle, mixtleCompleto } from './personajes';
-import { pinEcoUrban } from './pinEcoUrban';
+import { ECO_URBAN } from './ecoUrban.generado';
+import { CAJA_LOGOTIPO, pinEcoUrban } from './pinEcoUrban';
 
 /*
  * Marca de "Mixtle al rescate" (dirección visual A, "Parque de día"). El logo es SVG puro: las letras
@@ -40,14 +41,31 @@ interface OpcionesLogo {
   sufijo?: string;
   /** Atributos extra para el <svg> (clase, aria). */
   atributos?: string;
+  /**
+   * Ponerle id a las piezas del logotipo de Eco Urban del pin de Mixtle (eu-eco, eu-urban, eu-registrado):
+   * así el sello "Un proyecto de" de la pantalla de carga las reutiliza con <use> y no pesa el doble.
+   * Solo en el logo de index.html (uno por página).
+   */
+  idsEcoUrban?: boolean;
 }
+
+/** Ids de las piezas del logotipo de Eco Urban en el logo de la pantalla de carga. */
+export const IDS_ECO_URBAN = { eco: 'eu-eco', urban: 'eu-urban', registrado: 'eu-registrado' } as const;
 
 /**
  * El logo completo: "Mixtle" en arco (blanco con borde verde y sombra), Mixtle asomándose al final de
  * la palabra, el listón "al rescate" y el lema. Las partes llevan clases (logo-palabra, logo-mixtle,
  * logo-liston, logo-lema) para animar su entrada.
  */
-export function logoSvg({ sinMixtle = false, atributos = '', sufijo = '' }: OpcionesLogo = {}): string {
+export function logoSvg({ sinMixtle = false, atributos = '', sufijo = '', idsEcoUrban = false }: OpcionesLogo = {}): string {
+  const svg = logoSinIds({ sinMixtle, atributos, sufijo });
+  if (!idsEcoUrban || sinMixtle) return svg;
+  let conIds = svg;
+  for (const [pieza, id] of Object.entries(IDS_ECO_URBAN)) conIds = conIds.replace(`<path d="${ECO_URBAN[pieza as keyof typeof IDS_ECO_URBAN]}"`, `<path id="${id}" d="${ECO_URBAN[pieza as keyof typeof IDS_ECO_URBAN]}"`);
+  return conIds;
+}
+
+function logoSinIds({ sinMixtle = false, atributos = '', sufijo = '' }: OpcionesLogo): string {
   const mixtle = sinMixtle
     ? ''
     : `<g class="logo-mixtle"><svg x="456" y="0" width="194" height="181" viewBox="0 0 472 440">${mixtleCompleto('feliz', sufijo)}</svg></g>`;
@@ -78,4 +96,15 @@ export function iconoSvg({ aSangre = false, conPin = true }: { aSangre?: boolean
   <svg x="${cara.x}" y="${cara.y}" width="${cara.lado}" height="${cara.lado}" viewBox="62 6 236 236">${cuerpoDeMixtle('feliz', '', null)}</svg>
   ${conPin ? pinEcoUrban('chico', aSangre ? { x: 352, y: 356, r: 52 } : { x: 384, y: 390, r: 66 }, '-icono') : ''}
 </svg>`;
+}
+
+/**
+ * El logotipo de Eco Urban para la pantalla de carga de index.html: <use> a las piezas del pin del logo de
+ * esa misma página (logoSvg con idsEcoUrban), así no pesa el doble. El texto "Un proyecto de" va en HTML,
+ * con Nunito (la misma fuente de la primera pantalla). Caja: la del logotipo.
+ */
+export function selloCargaSvg(): string {
+  const { x, y, ancho, alto } = CAJA_LOGOTIPO;
+  const usos = Object.values(IDS_ECO_URBAN).map((id) => `<use href="#${id}"/>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${y} ${ancho} ${alto}">${usos}</svg>`;
 }

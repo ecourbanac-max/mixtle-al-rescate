@@ -1,3 +1,4 @@
+import { SelloEcoUrban } from '../componentes/SelloEcoUrban';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { TEXTOS_APP } from '../../contenido/textosApp';
@@ -71,7 +72,10 @@ export function Grupos() {
           <span className="text-[clamp(1.2rem,2.8vmin,1.8rem)] font-black">{TEXTOS_APP.grupos.nuevo}</span>
         </motion.button>
       </div>
-      <p className="max-w-[44rem] rounded-2xl bg-white/80 px-4 py-2 text-center font-bold">{guardadoOk ? TEXTOS_APP.grupos.soloAqui : TEXTOS_APP.grupos.sinGuardar}</p>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <p className="max-w-[44rem] rounded-2xl bg-white/80 px-4 py-2 text-center font-bold">{guardadoOk ? TEXTOS_APP.grupos.soloAqui : TEXTOS_APP.grupos.sinGuardar}</p>
+        <SelloEcoUrban texto={TEXTOS_APP.ecoUrban.unProyectoDe} className="text-[clamp(0.95rem,2.2vmin,1.25rem)]" />
+      </div>
       <div className="fixed bottom-3 left-3">
         <MixtleGuia alto="clamp(5rem,12vmin,8rem)" soloMientrasHabla />
       </div>

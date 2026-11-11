@@ -13,6 +13,7 @@ import { sonido } from '../../servicios/sonido';
 import { voz } from '../../servicios/voz';
 import { Arte } from '../componentes/Arte';
 import { BotonesSistema } from '../componentes/BotonesSistema';
+import { SelloEcoUrban } from '../componentes/SelloEcoUrban';
 import { BotonGrande } from '../componentes/BotonGrande';
 import { Logo } from '../componentes/Logo';
 import { useApp } from '../estado/app';
@@ -256,6 +257,11 @@ export function Inicio() {
         >
           {TEXTOS.inicio.jugar}
         </BotonGrande>
+      </div>
+
+      {/* Eco Urban, debajo de "¡Jugar!": sin competir con el botón ni con Mixtle, sin tapar a los animales ni el aviso. */}
+      <div className="inicio-sello pointer-events-none absolute bottom-[1.2%] left-[66%] -translate-x-1/2">
+        <SelloEcoUrban texto={TEXTOS_APP.ecoUrban.unProyectoDe} className="text-[clamp(0.85rem,2.5vmin,1.45rem)]" />
       </div>
 
       <BotonesSistema />

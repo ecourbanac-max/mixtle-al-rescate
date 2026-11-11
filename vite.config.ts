@@ -15,7 +15,14 @@ function logoDeCarga(): Plugin {
     name: 'mixtle-logo-de-carga',
     transformIndexHtml: (html) => {
       const logo = readFileSync(new URL('./public/marca/logo.svg', import.meta.url), 'utf8').trim();
-      return html.replace('<!--logo-carga-->', logo.replace('<svg ', '<svg class="pantalla-carga-logo" aria-hidden="true" '));
+      // "Un proyecto de [eco urban]": reutiliza con <use> las piezas del logotipo del pin del logo (misma página).
+      const sello = readFileSync(new URL('./public/marca/sello-carga.svg', import.meta.url), 'utf8').trim();
+      return html
+        .replace('<!--logo-carga-->', logo.replace('<svg ', '<svg class="pantalla-carga-logo" aria-hidden="true" '))
+        .replace(
+          '<!--sello-carga-->',
+          `<div class="pantalla-carga-sello" role="img" aria-label="Un proyecto de Eco Urban"><span aria-hidden="true">Un proyecto de</span>${sello.replace('<svg ', '<svg aria-hidden="true" ')}</div>`,
+        );
     },
   };
 }

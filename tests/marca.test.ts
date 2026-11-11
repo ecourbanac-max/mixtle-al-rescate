@@ -41,7 +41,15 @@ describe('marca: logo e íconos', () => {
   });
 
   it('los archivos de marca publicados son los mismos que genera el código', () => {
-    expect(readFileSync(join(RAIZ, 'public', 'marca', 'logo.svg'), 'utf8').trim()).toBe(logoSvg().trim());
+    expect(readFileSync(join(RAIZ, 'public', 'marca', 'logo.svg'), 'utf8').trim()).toBe(logoSvg({ idsEcoUrban: true }).trim());
+    // "Un proyecto de [eco urban]" de la pantalla de carga: reutiliza las piezas del logotipo del logo (sin repetirlas).
+    const sello = readFileSync(join(RAIZ, 'public', 'marca', 'sello-carga.svg'), 'utf8');
+    for (const id of ['eu-eco', 'eu-urban', 'eu-registrado']) {
+      expect(sello).toContain(`<use href="#${id}"/>`);
+      expect(logoSvg({ idsEcoUrban: true })).toContain(`id="${id}"`);
+      expect(logoSvg()).not.toContain(`id="${id}"`);
+    }
+    expect(sello).not.toMatch(/<text|font-family/);
     expect(readFileSync(join(RAIZ, 'public', 'favicon.svg'), 'utf8').trim()).toBe(iconoSvg({ conPin: false }).trim());
     for (const icono of ['icono-192.png', 'icono-512.png', 'icono-maskable-512.png', 'apple-touch-icon.png']) {
       expect(existsSync(join(RAIZ, 'public', 'iconos', icono))).toBe(true);

@@ -1,6 +1,5 @@
 import { ALTO, ANCHO } from '../config';
 import { etapaColocada } from './arboles';
-import { DIBUJOS_LASTIMADOS } from './lastimados';
 import { BOTELLA_LLENA } from './residuos';
 import { arte, type ArteSvg } from './svg';
 
@@ -130,7 +129,8 @@ const DIBUJOS: Record<string, string> = {
     <path d="M70 140 H 130" stroke="#4A4440" stroke-width="4"/>
     <ellipse cx="100" cy="119" rx="39" ry="6" fill="#6E4A2E" stroke="#000" stroke-width="3"/>
     ${etapaColocada('arbolito', 100, 124, 0.72)}`,
-  // La rama rota (y la que cuelga del árbol del parque) están en src/arte/lastimados.ts.
+  // La rama rota (y la que cuelga del árbol del parque) y la lata tirada están en src/arte/lastimados.ts:
+  // solo las usan las lecciones, así que se registran con ellas (no pesan en la primera pantalla).
   'llave-goteando': `${sombra(56)}
     <rect x="20" y="52" width="100" height="34" rx="10" fill="#B7C3CA" stroke="#5B6770" stroke-width="6"/>
     <path d="M110 60 H 150 C 166 60 172 72 172 86 V 104 H 146 V 92 C 146 88 144 86 140 86 H 110 Z" fill="#B7C3CA" stroke="#5B6770" stroke-width="6" stroke-linejoin="round"/>
@@ -291,6 +291,6 @@ const CALLE = `
   <circle cx="1050" cy="460" r="90" fill="#3E8E5E"/><rect x="1038" y="520" width="24" height="90" fill="#7A5236"/>`;
 
 export const OBJETOS: ArteSvg[] = [
-  ...Object.entries({ ...DIBUJOS, ...DIBUJOS_LASTIMADOS }).map(([clave, contenido]) => arte(clave, 200, 200, contenido, 1.2)),
+  ...Object.entries(DIBUJOS).map(([clave, contenido]) => arte(clave, 200, 200, contenido, 1.2)),
   arte('calle', ANCHO, ALTO, CALLE),
 ];

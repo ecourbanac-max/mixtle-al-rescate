@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { catalogoArte } from '../src/arte/catalogo';
+import { ARTE_LASTIMADOS } from '../src/arte/lastimados';
 import { CATEGORIAS } from '../src/data/categorias';
 import { RESIDUOS } from '../src/data/residuos';
 import type { Ejercicio, Leccion } from '../src/contenido/tipos';
@@ -9,7 +10,8 @@ import { UNIDADES_CON_AVENTURA } from '../src/aventuras';
 import { categoriaDe } from '../src/logica/clasificacion';
 import { todosLosEjercicios } from '../src/voz/frases';
 
-const ARTE = new Set(catalogoArte().map((a) => a.clave));
+// Lo del catálogo más lo que se registra con las lecciones (src/app/ejercicios/Ejercicio.tsx).
+const ARTE = new Set([...catalogoArte(), ...ARTE_LASTIMADOS].map((a) => a.clave));
 const LECCIONES = UNIDADES.flatMap((u) => u.lecciones.map((l) => [u.id, l] as [string, Leccion]));
 const EJERCICIOS = UNIDADES.flatMap((u) => u.lecciones.flatMap((l) => todosLosEjercicios(l.ejercicios).map((e) => [u.id, e] as [string, Ejercicio])));
 

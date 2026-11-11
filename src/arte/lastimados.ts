@@ -9,6 +9,8 @@
  * - La lata es una lata de refresco tirada en el pasto: roja, de lado, abollada y con su anillo.
  * Todo en cajas de 200×200, como el resto de los objetos de las lecciones (src/arte/objetos.ts).
  */
+import { arte, type ArteSvg } from './svg';
+
 const TRONCO = '#7A5236';
 const TRONCO_OSCURO = '#5E3E28';
 const MADERA = '#EBC892';
@@ -48,7 +50,7 @@ function ramaQuebrada(s: string): string {
 
 const sombra = (cx: number, rx: number, cy = 190) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="7" fill="#000" opacity=".12"/>`;
 
-export const DIBUJOS_LASTIMADOS: Record<string, string> = {
+const DIBUJOS_LASTIMADOS: Record<string, string> = {
   // Pegada al tronco del parque: el muñón (0..46, 14..54) se encima al costado del tronco.
   'rama-colgando': ramaQuebrada('-c'),
   // Con su pedazo de tronco, para la tarjeta "romper ramas".
@@ -73,3 +75,6 @@ export const DIBUJOS_LASTIMADOS: Record<string, string> = {
     <path d="M154 86 C 166 92 168 146 154 152" fill="none" stroke="#C7CED6" stroke-width="5" stroke-linecap="round"/>
     <g fill="#5DA64E"><path d="M20 162 l 6 -18 l 4 16 l 6 -20 l 4 22 z"/><path d="M150 162 l 6 -16 l 4 14 l 6 -18 l 4 20 z"/><path d="M96 166 l 5 -12 l 4 10 l 5 -13 l 3 15 z"/></g>`,
 };
+
+/** Solo React, con las lecciones (src/app/ejercicios/Ejercicio.tsx los registra): no van en la primera pantalla. */
+export const ARTE_LASTIMADOS: ArteSvg[] = Object.entries(DIBUJOS_LASTIMADOS).map(([clave, contenido]) => arte(clave, 200, 200, contenido, 1.2));

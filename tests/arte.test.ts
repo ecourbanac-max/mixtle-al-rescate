@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { catalogoArte } from '../src/arte/catalogo';
+import { ARTE_LASTIMADOS } from '../src/arte/lastimados';
 import { aDataUri } from '../src/arte/svg';
 
 describe('arte SVG', () => {
-  const piezas = catalogoArte();
+  const piezas = [...catalogoArte(), ...ARTE_LASTIMADOS];
 
   it('no repite claves de textura', () => {
     const claves = piezas.map((p) => p.clave);

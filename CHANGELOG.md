@@ -27,6 +27,16 @@ La versión anterior queda en las etiquetas `v3.1-pin-chico` y `v3.1-antes-ajust
 - **Las 9 escenas de las 5 unidades revisadas:** u1-l2-e1, u1-l4-e3, u2-l2-e3, u2-l3-e6, u3-l1-e5, u3-l3-e2, u4-l2-e4, u5-l2-e3 y u5-l4-e6. Cada objeto se toca en al menos 48 px y ninguno se encima ni en un celular. Se reacomodaron 8 de ellas: las ardillas salieron del camino, los botes crecieron con su basura encima, el árbol de la calle ya no tapa la casa y la lata en el pasto ahora es la lata tirada.
 - **Pruebas:** `e2e/encuentra.spec.ts` revisa las 9 escenas en 1366×768, en laptop con zoom al 125 y 150 %, en celular y en proyector: todo dentro de la pantalla, en 48 px, sin encimarse y sin quedar bajo la barra. `tests/encuentraError.test.ts` hace la misma cuenta en papel.
 
+### 3. Eco Urban en las pantallas
+
+- **El logotipo** va a todo color y sin deformar, sobre una pastilla blanca con sombra suave. No es un enlace. Aparece en cuatro lugares:
+  - **Pantalla de carga:** "Un proyecto de [eco urban]", debajo del logo.
+  - **Inicio:** debajo de "¡Jugar!". En pantallas bajas, el botón sube un poco para dejarle aire.
+  - **"¿Quién va a jugar?":** junto al aviso de dónde se guarda el avance.
+  - **Diploma:** "Con el apoyo de [eco urban]" en el pie. Se ve también al imprimir.
+- **Sin pesar de más:** el logotipo es el mismo trazo del pin. En la pantalla de carga se reutiliza con `<use>`. La rama y la lata nuevas se cargan con las lecciones, no en la primera pantalla. Primera pantalla: 248.1 KB, dentro del límite de 250 KB.
+- **El diploma:** el Mixtle del grupo y su firma crecieron un poco, para que el pin se vea en papel.
+
 ## v3.1 (9 de noviembre) — Correcciones solicitadas por Eco Urban
 
 Eco Urban aprobó el juego y pidió dos correcciones. La versión anterior queda en la etiqueta `v3-antes-correcciones`.

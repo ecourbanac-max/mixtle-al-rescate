@@ -30,10 +30,13 @@ export const TEXTO_LOGO = ${JSON.stringify(texto, null, 2)} as const;
 );
 
 // 2. Logo e ícono como archivos.
-const { logoSvg, iconoSvg } = (await runnerImport('./src/arte/marca.ts')).module;
+const { logoSvg, iconoSvg, selloCargaSvg } = (await runnerImport('./src/arte/marca.ts')).module;
 const { mixtleCompleto } = (await runnerImport('./src/arte/personajes.ts')).module;
 mkdirSync(join(RAIZ, 'public', 'marca'), { recursive: true });
-writeFileSync(join(RAIZ, 'public', 'marca', 'logo.svg'), `${logoSvg()}\n`);
+writeFileSync(join(RAIZ, 'public', 'marca', 'logo.svg'), `${logoSvg({ idsEcoUrban: true })}\n`);
+// El logotipo de Eco Urban de "Un proyecto de" en la pantalla de carga: <use> a las piezas del pin del logo
+// (en la misma página), así casi no pesa. vite.config.ts lo pone en index.html con el texto en HTML.
+writeFileSync(join(RAIZ, 'public', 'marca', 'sello-carga.svg'), `${selloCargaSvg()}\n`);
 writeFileSync(join(RAIZ, 'public', 'favicon.svg'), `${iconoSvg({ conPin: false })}\n`);
 
 // 3. Íconos PNG.

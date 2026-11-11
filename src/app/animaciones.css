@@ -164,6 +164,15 @@
     transform: scale(0);
   }
 }
+.inicio-sello {
+  animation: aparece 0.8s ease-out 2.2s both;
+}
+/* En pantallas bajas (celular acostado) "¡Jugar!" sube un poco para dejarle aire a "Un proyecto de Eco Urban". */
+@media (orientation: landscape) and (max-height: 520px) {
+  .inicio .inicio-boton {
+    bottom: 14%;
+  }
+}
 .inicio-animales {
   animation: aparece 0.8s ease-out 1.2s both;
 }
@@ -763,7 +772,8 @@ html[data-suave] .barra-avance::after {
   color: var(--color-verde-oscuro);
 }
 .diploma-mascota {
-  height: 11cqi;
+  /* Más grande (v3.1.1): si la mascota es Mixtle, su pin de Eco Urban se lee también en papel. */
+  height: 14cqi;
 }
 .diploma-porque {
   margin: 0;
@@ -822,7 +832,12 @@ html[data-suave] .barra-avance::after {
   color: var(--color-verde);
 }
 .diploma-firma-mixtle {
-  height: 6cqi;
+  height: 7cqi;
+}
+/* "Con el apoyo de [eco urban]": al centro del pie, entre la fecha y la firma de Mixtle. */
+.diploma-apoyo {
+  font-size: 1.7cqi;
+  box-shadow: 0 0.2em 0.6em rgb(18 61 43 / 0.16);
 }
 
 @media print {

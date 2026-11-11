@@ -75,6 +75,15 @@ Desde la v3.1, Mixtle trae en el pecho un pin con el logotipo de Eco Urban. Es p
 - **El ícono de la app** lleva el pin prendido abajo a la derecha. **El favicon de la pestaña** no lo lleva, porque a 16 px sería una mancha.
 - **Dónde revisarlo:** la página `?mixtle` tiene la sección "Pin Eco Urban", con el pin solo, sus dos acomodos, Mixtle en cada pose y los tres tamaños.
 
+**Dónde más aparece el logotipo de Eco Urban** (v3.1.1). Siempre a todo color y sin deformar, sobre una pastilla blanca con sombra suave, como los demás letreros del juego (`SelloEcoUrban`). Nunca es un enlace, para que nadie salga del juego por accidente:
+
+| Pantalla | Dónde y qué dice |
+|---|---|
+| Pantalla de carga | Debajo del logo del juego: "Un proyecto de [eco urban]". En `index.html` el logotipo reutiliza con `<use>` el del pin del logo, así que no pesa el doble. |
+| Inicio (Mixtle colgado de la rama) | Debajo de "¡Jugar!": "Un proyecto de [eco urban]". No tapa la ardilla, las mariposas ni el aviso de "Toca la pantalla para escuchar". |
+| ¿Quién va a jugar? | Junto al aviso "El avance de cada grupo se guarda solo en este aparato": "Un proyecto de [eco urban]". |
+| Diploma (en pantalla e impreso) | Al centro del pie, entre la fecha y la firma de Mixtle: "Con el apoyo de [eco urban]". |
+
 El logotipo de Eco Urban es propiedad de Eco Urban A.C. y se usa con su autorización. Para usarlo en otro lugar, hay que pedir permiso a Eco Urban.
 
 ## Tono de Mixtle
