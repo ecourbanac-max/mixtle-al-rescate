@@ -139,14 +139,3 @@ html[data-suave] .mixtle-vivo .mx-oreja { animation: none; }
   }
 }
 
-/*
- * ─── "¿Quién va a jugar?" en pantallas bajas (celular acostado, laptop con zoom) ───
- * Mixtle guía va fijo abajo a la izquierda y la marca de Eco Urban abajo a la derecha: la lista de grupos
- * deja libres esas dos franjas, para que ninguna tarjeta pase por debajo al desplazarse (v3.1.2).
- */
-@media (orientation: landscape) and (max-height: 560px) {
-  main[data-pantalla='grupos'] {
-    padding-left: calc(clamp(6.5rem, 19vmin, 11rem) * 472 / 440 + 1.25rem);
-    padding-right: calc(clamp(14px, 2.6vmin, 22px) * 6.35 + 2.25rem);
-  }
-}

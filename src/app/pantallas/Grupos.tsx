@@ -1,6 +1,6 @@
 import { MarcaEcoUrban } from '../componentes/MarcaEcoUrban';
 import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { TEXTOS_APP } from '../../contenido/textosApp';
 import { accesoriosPuestos } from '../../logica/accesorios';
 import { COLORES_GRUPO, LARGO_ETIQUETA, limpiarEtiqueta, MASCOTAS, nombreDelGrupo, type IdMascota } from '../../logica/grupos';
@@ -18,10 +18,29 @@ import { callar, decir } from '../estado/narrador';
 /** Alto de Mixtle guía en "¿Quién va a jugar?": del alto de su globo o un poco más (se ven su pin y su banda). */
 const ALTO_MIXTLE_GRUPOS = 'clamp(6.5rem,19vmin,11rem)';
 
+/**
+ * Pantalla baja (celular acostado, laptop con zoom al 150 %): Mixtle y su globo van en una columna a la
+ * izquierda, el globo arriba de Mixtle. En las demás, abajo, en un renglón propio. En los dos casos la
+ * lista de grupos se desplaza en su propia área y nunca pasa por debajo de Mixtle ni de su globo (v3.1.3).
+ */
+const CONSULTA_BAJA = '(orientation: landscape) and (max-height: 560px)';
+function usePantallaBaja(): boolean {
+  return useSyncExternalStore(
+    (avisar) => {
+      const m = window.matchMedia?.(CONSULTA_BAJA);
+      m?.addEventListener('change', avisar);
+      return () => m?.removeEventListener('change', avisar);
+    },
+    () => !!window.matchMedia?.(CONSULTA_BAJA).matches,
+    () => false,
+  );
+}
+
 export function Grupos() {
   const { grupos, cargado, guardadoOk, cargar, elegir } = useGrupos();
   const alCamino = useApp((s) => s.alCamino);
   const [creando, setCreando] = useState(false);
+  const baja = usePantallaBaja();
 
   useEffect(() => {
     if (!cargado) void cargar();
@@ -34,7 +53,19 @@ export function Grupos() {
   }, []);
 
   return (
-    <main data-pantalla="grupos" data-entrada-lista="true" className="textura relative flex h-full w-full flex-col items-center gap-[clamp(1rem,3vmin,2rem)] overflow-y-auto bg-gradient-to-b from-cielo to-verde-claro px-4 pt-6 pb-[calc(clamp(6.5rem,19vmin,11rem)+1.5rem)]">
+    <main
+      data-pantalla="grupos"
+      data-entrada-lista="true"
+      data-pantalla-baja={baja || undefined}
+      className={`textura relative flex h-full w-full overflow-hidden bg-gradient-to-b from-cielo to-verde-claro ${baja ? 'flex-row' : 'flex-col'}`}
+    >
+      {baja && <GuiaGrupos baja />}
+      <div
+        // En pantalla baja, la lista empieza debajo de los botones de sonido y pantalla completa (arriba a la
+        // derecha) y deja libre la columna de la marca de Eco Urban: nada se encima.
+        className={`grupos-lista flex min-h-0 min-w-0 flex-1 flex-col items-center gap-[clamp(1rem,3vmin,2rem)] overflow-y-auto px-4 pb-4 ${baja ? 'pt-[5.75rem] pr-[calc(clamp(14px,2.6vmin,22px)*6.35+2.25rem)]' : 'pt-6'}`}
+        data-lista-grupos
+      >
       <BotonesSistema />
       <h1 className="text-[clamp(2.2rem,6vmin,4.5rem)] font-black text-white" style={{ WebkitTextStroke: '0.1em var(--color-verde)', paintOrder: 'stroke fill' }}>
         {TEXTOS_APP.grupos.titulo}
@@ -76,17 +107,28 @@ export function Grupos() {
         </motion.button>
       </div>
       <p className="max-w-[44rem] rounded-2xl bg-white/80 px-4 py-2 text-center font-bold">{guardadoOk ? TEXTOS_APP.grupos.soloAqui : TEXTOS_APP.grupos.sinGuardar}</p>
-      {/* Eco Urban abajo a la derecha (abajo a la izquierda está Mixtle). */}
-      <MarcaEcoUrban esquina="abajo-derecha" />
-      {/*
-        Mixtle guía, del alto de su globo o un poco más (v3.1.2): así se ven su pin y su banda. pb del main:
-        lo último de la lista sube por encima de Mixtle (fijo abajo a la izquierda) y nunca queda tapado.
-      */}
-      <div className="fixed bottom-3 left-3" data-mixtle-grupos>
-        <MixtleGuia alto={ALTO_MIXTLE_GRUPOS} soloMientrasHabla />
       </div>
+      {!baja && <GuiaGrupos baja={false} />}
+      {/* Eco Urban abajo a la derecha (Mixtle va a la izquierda). */}
+      <MarcaEcoUrban esquina="abajo-derecha" />
       {creando && <CrearGrupo alCerrar={() => setCreando(false)} />}
     </main>
+  );
+}
+
+/**
+ * Mixtle guía, del alto de su globo o un poco más (v3.1.2): se ven su pin y su banda. En pantalla baja va en
+ * su columna con el globo arriba y más angosto; si no, en un renglón abajo con el globo a su derecha.
+ */
+function GuiaGrupos({ baja }: { baja: boolean }) {
+  return baja ? (
+    <div className="flex h-full w-[clamp(15rem,34vw,22rem)] shrink-0 flex-col justify-end pb-3 pl-3" data-mixtle-grupos>
+      <MixtleGuia alto={ALTO_MIXTLE_GRUPOS} globo="arriba" anchoGlobo="calc(clamp(15rem,34vw,22rem) - 1rem)" soloMientrasHabla />
+    </div>
+  ) : (
+    <div className="flex w-full shrink-0 items-end pb-3 pl-3" style={{ minHeight: `calc(${ALTO_MIXTLE_GRUPOS} + 0.75rem)` }} data-mixtle-grupos>
+      <MixtleGuia alto={ALTO_MIXTLE_GRUPOS} soloMientrasHabla />
+    </div>
   );
 }
 
