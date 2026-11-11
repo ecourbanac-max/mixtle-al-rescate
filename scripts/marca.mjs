@@ -1,8 +1,8 @@
 // Genera la marca de "Mixtle al rescate" (dirección visual A):
 //   1. src/arte/logoTexto.generado.ts: las letras del logo convertidas en trazos (Baloo 2 y Nunito).
-//   2. public/marca/logo.svg y public/favicon.svg.
+//   2. public/marca/logo.svg y public/favicon.svg (el favicon, sin el pin de Eco Urban: a 16 px sería una mancha).
 //   3. Los íconos de la app instalable: public/iconos/ (192, 512, maskable 512 y Apple 180).
-//   4. docs/marca/hoja-de-personaje.svg: las 8 poses de Mixtle con su nombre.
+//   4. docs/marca/hoja-de-personaje.svg: las 8 poses de Mixtle con su nombre (y su pin de Eco Urban).
 // Uso: npm run marca:generar   (usa el Chrome instalado para los PNG; no descarga nada)
 import { chromium } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -34,7 +34,7 @@ const { logoSvg, iconoSvg } = (await runnerImport('./src/arte/marca.ts')).module
 const { mixtleCompleto } = (await runnerImport('./src/arte/personajes.ts')).module;
 mkdirSync(join(RAIZ, 'public', 'marca'), { recursive: true });
 writeFileSync(join(RAIZ, 'public', 'marca', 'logo.svg'), `${logoSvg()}\n`);
-writeFileSync(join(RAIZ, 'public', 'favicon.svg'), `${iconoSvg()}\n`);
+writeFileSync(join(RAIZ, 'public', 'favicon.svg'), `${iconoSvg({ conPin: false })}\n`);
 
 // 3. Íconos PNG.
 const iconos = [

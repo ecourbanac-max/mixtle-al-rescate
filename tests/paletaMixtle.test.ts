@@ -83,7 +83,7 @@ describe('cada Mixtle en línea trae sus propios degradados', () => {
     const a = referencias(cuerpoDeMixtle('senalando', '-a'));
     const b = referencias(cuerpoDeMixtle('feliz', '-b'));
     for (const id of a.define) expect(b.define).not.toContain(id);
-    expect(a.define.size).toBe(3);
+    expect(a.define.size).toBe(6); // 3 del cuerpo y 3 del pin de Eco Urban
     expect([...a.usa].every((u) => u.endsWith('-a'))).toBe(true);
   });
 

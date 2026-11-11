@@ -6,6 +6,7 @@ import { FAUNA } from './fauna';
 import { ICONOS } from './iconos';
 import { OBJETOS } from './objetos';
 import { PERSONAJES } from './personajes';
+import { ARTE_PIN } from './pinEcoUrban';
 import { ARTE_RESIDUOS } from './residuos';
 import type { ArteSvg } from './svg';
 
@@ -14,6 +15,7 @@ export function catalogoArte(): ArteSvg[] {
   return [
     ...ICONOS,
     ...PERSONAJES,
+    ...ARTE_PIN,
     ...FAUNA,
     ...OBJETOS,
     ...ARBOLES,

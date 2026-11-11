@@ -1,6 +1,6 @@
 import { ARTE_ACCESORIOS } from '../../arte/accesorios';
 import { catalogoArte } from '../../arte/catalogo';
-import { ANCLAS_MASCOTA, ACCESORIOS, type Ancla, type IdAccesorio } from '../../logica/accesorios';
+import { ANCLAS_MASCOTA, ACCESORIOS, vaDetras, type Ancla, type IdAccesorio } from '../../logica/accesorios';
 import { mascota as datosMascota, type IdMascota } from '../../logica/grupos';
 import { Arte, registrarArte } from './Arte';
 
@@ -37,11 +37,11 @@ export function MascotaVestida({ mascota, puestos = [], className = '' }: Props)
   const anclas = ANCLAS_MASCOTA[mascota];
   return (
     <div className={`relative ${className}`} style={{ aspectRatio: `${PROPORCION.get(arte) ?? 1}` }} data-mascota-vestida={mascota} data-puestos={puestos.join(' ')}>
-      {ACCESORIOS.filter((a) => a.detras && !anclas[a.id].encima && puestos.includes(a.id)).map((a) => (
+      {ACCESORIOS.filter((a) => vaDetras(a, anclas[a.id]) && puestos.includes(a.id)).map((a) => (
         <Accesorio key={a.id} id={a.id} ancla={anclas[a.id]} />
       ))}
       <Arte clave={arte} className="relative h-full w-full object-contain" />
-      {ACCESORIOS.filter((a) => (!a.detras || anclas[a.id].encima) && puestos.includes(a.id)).map((a) => (
+      {ACCESORIOS.filter((a) => !vaDetras(a, anclas[a.id]) && puestos.includes(a.id)).map((a) => (
         <Accesorio key={a.id} id={a.id} ancla={anclas[a.id]} />
       ))}
     </div>

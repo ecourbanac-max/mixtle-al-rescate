@@ -24,8 +24,17 @@ export function conArticulo(id: IdAccesorio): string {
   return `${a.articulo} ${a.nombre.toLowerCase()}`;
 }
 
-/** `encima`: dibujarlo delante de la mascota aunque normalmente vaya detrás (la capa en la mariposa). */
-export type Ancla = { x: number; y: number; w: number; r?: number; encima?: boolean };
+/**
+ * `encima`: dibujarlo delante de la mascota aunque normalmente vaya detrás (la capa en la mariposa).
+ * `atras`: dibujarlo detrás de la mascota aunque normalmente vaya delante (la mochila de Mixtle, para que
+ * no tape su pin de Eco Urban).
+ */
+export type Ancla = { x: number; y: number; w: number; r?: number; encima?: boolean; atras?: boolean };
+
+/** ¿Este accesorio va detrás de esta mascota? */
+export function vaDetras(accesorio: { detras: boolean }, ancla: Ancla): boolean {
+  return ancla.atras === true || (accesorio.detras && !ancla.encima);
+}
 
 /**
  * Dónde va cada accesorio en el dibujo de cada mascota (fracciones de su caja; `w` es el ancho del
@@ -80,7 +89,9 @@ export const ANCLAS_MASCOTA: Record<IdMascota, Record<IdAccesorio, Ancla>> = {
     gorra: { x: 0.38, y: 0.22, w: 0.37 },
     lentes: { x: 0.38, y: 0.34, w: 0.38 },
     paliacate: { x: 0.38, y: 0.53, w: 0.32 },
-    mochila: { x: 0.56, y: 0.64, w: 0.23 },
+    // La mochila va a la espalda (detrás) y se asoma por un lado: Mixtle trae en el pecho el pin de Eco
+    // Urban, que no se tapa (v3.1). Antes iba encima, justo sobre ese lugar del pecho.
+    mochila: { x: 0.6, y: 0.58, w: 0.23, r: 8, atras: true },
     capa: { x: 0.38, y: 0.48, w: 0.69 },
   },
 };

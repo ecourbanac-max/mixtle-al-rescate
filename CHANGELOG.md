@@ -15,6 +15,16 @@ Eco Urban aprobó el juego y pidió dos correcciones. La versión anterior queda
 - **Revisión de las 5 unidades** (124 ejercicios) buscando la misma clase de confusión. Se corrigieron cuatro más: la "botella llena de jugo" se dibujaba vacía; el "cielo gris" era beige y competía con el humo, que sí es gris; la botella desechable traía una etiqueta verde frente a la pista "es verde y tiene tapa"; y la pista de "Ordena el viaje de la botella" invitaba a tocar primero el bote (se cambió el texto y se regeneró solo esa frase de voz). El arbolito en su bolsa de vivero es ahora el mismo arbolito de las lecciones.
 - **Pruebas nuevas:** `e2e/arboles.spec.ts` mide en pantalla, en píxeles reales, que brote < arbolito < árbol grande con margen (cada etapa, como mucho dos tercios de la siguiente) y resuelve el ejercicio tocando el dibujo que se ve más alto; `tests/escalaArte.test.tsx` cuida las proporciones y que el motor use la versión en escala.
 
+### 2. El pin de Eco Urban en Mixtle
+
+- **El logotipo "eco urban"** se calcó en trazos del archivo de Eco Urban (`scripts/marca/trazar-eco-urban.py`): coincide en 99.3 % de los píxeles y conserva los colores del original (verde #009345 y azul petróleo #1E4959), sin fuentes del sistema, sin deformarlo y sin efectos encima.
+- **El pin:** un botón blanco abombado, con contorno fino, brillo en la orilla y sombra sobre el pelaje (`src/arte/pinEcoUrban.ts`). Tiene dos versiones: la **grande** lleva el logotipo completo (inicio, diploma, vestidor, pantalla de carga, festejos) y la **chica** pone "eco" sobre "urban" (lección, globo, camino, aventuras e ícono de la app).
+- **Mixtle lo trae siempre** en el pecho, del lado izquierdo de él: en las 12 poses y en todas sus apariciones (logo, pantalla de carga, inicio, globo, lección, recorrido guiado, diploma, transición, vestidor, vitrina y aventuras). Sigue al cuerpo al respirar, brincar y saludar. En espejo se sigue leyendo derecho y cada Mixtle trae sus propios degradados.
+- **Convive con los brazos y los accesorios:** ningún brazo lo toca en ninguna pose y el paliacate queda arriba. En Mixtle, la mochila del vestidor va a la espalda (antes tapaba ese lugar).
+- **Tres tamaños** para que Eco Urban elija (`docs/marca/pin-variantes.png`). Queda "medio"; se cambia con un solo valor, `TAMANO_PIN`.
+- **Dónde más:** sección "Pin Eco Urban" en la página `?mixtle`; logo, íconos y hoja de personaje regenerados (el favicon de la pestaña queda sin pin: a 16 px sería una mancha); `docs/marca.md` y `CREDITOS.md`. El logotipo es de Eco Urban A.C. y se usa con su autorización.
+- **Pruebas nuevas:** `tests/pinEcoUrban.test.ts`, con 24 casos: presencia en cada aparición, colores, choques con brazos y accesorios, espejo e ids.
+
 ## Entrega (30 de octubre)
 
 - Repositorio limpio para compartirlo con Eco Urban: se quitó el material de trabajo interno, las mediciones pasaron a `docs/mediciones/`, el README se reescribió como documento de entrega y se agregó la licencia MIT.

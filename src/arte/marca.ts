@@ -1,6 +1,7 @@
 import { TEXTOS_APP } from '../contenido/textosApp';
 import { TEXTO_LOGO } from './logoTexto.generado';
 import { cuerpoDeMixtle, mixtleCompleto } from './personajes';
+import { pinEcoUrban } from './pinEcoUrban';
 
 /*
  * Marca de "Mixtle al rescate" (dirección visual A, "Parque de día"). El logo es SVG puro: las letras
@@ -63,15 +64,18 @@ export function logoSvg({ sinMixtle = false, atributos = '', sufijo = '' }: Opci
 }
 
 /**
- * Ícono de la app: la cabeza de Mixtle sobre un círculo de cielo. `aSangre` llena todo el cuadro de
- * verde y deja la cara dentro de la zona segura (íconos "maskable" de Android).
+ * Ícono de la app: la cabeza de Mixtle sobre un círculo de cielo, con el pin de Eco Urban (versión
+ * chica) prendido abajo a la derecha. `aSangre` llena todo el cuadro de verde y deja la cara y el pin
+ * dentro de la zona segura (íconos "maskable" de Android). `conPin: false` para el favicon de la
+ * pestaña (16 a 32 px): ahí el pin sería una mancha.
  */
-export function iconoSvg({ aSangre = false }: { aSangre?: boolean } = {}): string {
+export function iconoSvg({ aSangre = false, conPin = true }: { aSangre?: boolean; conPin?: boolean } = {}): string {
   const fondo = aSangre
     ? `<rect width="512" height="512" fill="${COLORES_MARCA.verde}"/><circle cx="256" cy="256" r="196" fill="${COLORES_MARCA.cielo}"/>`
     : `<rect width="512" height="512" rx="112" fill="${COLORES_MARCA.verde}"/><circle cx="256" cy="256" r="216" fill="${COLORES_MARCA.cielo}"/>`;
   const cara = aSangre ? { x: 100, y: 92, lado: 312 } : { x: 62, y: 56, lado: 388 };
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">${fondo}
   <svg x="${cara.x}" y="${cara.y}" width="${cara.lado}" height="${cara.lado}" viewBox="62 6 236 236">${cuerpoDeMixtle('feliz')}</svg>
+  ${conPin ? pinEcoUrban('chico', aSangre ? { x: 352, y: 356, r: 52 } : { x: 384, y: 390, r: 66 }, '-icono') : ''}
 </svg>`;
 }

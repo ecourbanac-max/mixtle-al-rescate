@@ -1,3 +1,4 @@
+import { LUGAR_PIN, pinEcoUrban, type LugarPin, type VersionPin } from './pinEcoUrban';
 import { arte, type ArteSvg } from './svg';
 
 /*
@@ -123,7 +124,11 @@ const ZETAS = `<g fill="none" stroke="#2459A6" stroke-linecap="round" stroke-lin
     <path d="M42 70 h24 l-24 26 h24" stroke-width="7"/><path d="M20 36 h16 l-16 17 h16" stroke-width="5"/><path d="M6 10 h11 l-11 12 h11" stroke-width="4"/>
   </g>`;
 
-function cuerpoMixtle(expresion: ExpresionMixtle, s = ''): string {
+/**
+ * El cuerpo de Mixtle. `pin`: la versión del pin de Eco Urban que trae en el pecho (siempre lo trae; ver
+ * pinEcoUrban.ts): "grande" donde Mixtle se ve grande y "chico" donde se ve chico.
+ */
+function cuerpoMixtle(expresion: ExpresionMixtle, s = '', pin: VersionPin = 'chico', espejo = false, lugar: LugarPin = LUGAR_PIN): string {
   // Cada oreja va en su propio grupo (clase mx-oreja) para que en reposo se mueva sola.
   const oreja = (x: number, giro: number, lado: string) =>
     `<g class="mx-oreja mx-oreja-${lado}"><g transform="rotate(${giro} ${x} 78)">
@@ -155,6 +160,7 @@ function cuerpoMixtle(expresion: ExpresionMixtle, s = ''): string {
     ${pies}
     <path d="M112 318 C 90 352 94 396 122 408 M248 318 C 270 352 266 396 238 408" fill="none" stroke="${C.pielOscura}" stroke-width="5" stroke-linecap="round" opacity=".6"/>
     <ellipse cx="180" cy="242" rx="54" ry="9" fill="#6E5A4A" opacity=".16"/>
+    ${pinEcoUrban(pin, lugar, s, espejo)}
     ${patasDelanteras(expresion)}
     <g${ladeo}>
     <path d="M180 70 C 252 70 282 120 274 166 C 266 206 226 236 180 240 C 134 236 94 206 86 166 C 78 120 108 70 180 70 Z" fill="url(#mx-piel${s})"/>
@@ -315,15 +321,16 @@ function mariposa(feliz: boolean): string {
 /**
  * Cuerpo de Mixtle (sin cola) para dibujarlo en línea, por ejemplo en React (caja de 360×440).
  * `sufijo`: distinto para cada Mixtle que vaya en línea en la misma página (ver defsMixtle).
+ * `pin`: versión del pin de Eco Urban; `espejo`: el cuerpo se mostrará volteado (el pin se lee derecho igual).
  */
-export function cuerpoDeMixtle(expresion: ExpresionMixtle, sufijo = ''): string {
-  return cuerpoMixtle(expresion, sufijo);
+export function cuerpoDeMixtle(expresion: ExpresionMixtle, sufijo = '', pin: VersionPin = 'chico', espejo = false, lugar: LugarPin = LUGAR_PIN): string {
+  return cuerpoMixtle(expresion, sufijo, pin, espejo, lugar);
 }
 
 /** Mixtle completo, con la cola, para una caja de 472×440 (el logo y la hoja de personaje). */
-export function mixtleCompleto(expresion: ExpresionMixtle, sufijo = ''): string {
-  if (expresion === 'colgado') return mixtleColgadoCompleto(sufijo);
-  return `<g transform="translate(212 0)">${COLA_MIXTLE}</g>${cuerpoMixtle(expresion, sufijo)}`;
+export function mixtleCompleto(expresion: ExpresionMixtle, sufijo = '', pin: VersionPin = 'grande', lugar: LugarPin = LUGAR_PIN): string {
+  if (expresion === 'colgado') return mixtleColgadoCompleto(sufijo, pin, lugar);
+  return `<g transform="translate(212 0)">${COLA_MIXTLE}</g>${cuerpoMixtle(expresion, sufijo, pin, false, lugar)}`;
 }
 
 /** La paleta de Mixtle (para la prueba que revisa que todas sus apariciones usen la misma). */
@@ -343,8 +350,8 @@ const COLA_COLGANDO = (() => {
 })();
 
 /** Mixtle colgado con su cola, para una caja de 360×600. */
-export function mixtleColgadoCompleto(sufijo = ''): string {
-  return `${COLA_COLGANDO}${cuerpoMixtle('colgado', sufijo)}`;
+export function mixtleColgadoCompleto(sufijo = '', pin: VersionPin = 'grande', lugar: LugarPin = LUGAR_PIN): string {
+  return `${COLA_COLGANDO}${cuerpoMixtle('colgado', sufijo, pin, false, lugar)}`;
 }
 
 export const PERSONAJES: ArteSvg[] = [
@@ -362,6 +369,8 @@ export const PERSONAJES: ArteSvg[] = [
   arte('mixtle-cola', 260, 440, COLA_MIXTLE, ESCALA_MIXTLE),
   // Mixtle entero (con su cola anillada) para todo lo que no se anima por partes: estampa, mascota,
   // parque del grupo, tarjetas, diploma y transición. Sin la cola parecería conejo.
+  // Con el pin grande: se usan donde Mixtle se ve grande (vestidor, diploma, festejos). Las poses de arriba
+  // (lección, globo, aventuras) llevan el pin chico.
   arte('mixtle-entero', 472, 440, mixtleCompleto('normal'), ESCALA_MIXTLE),
   arte('mixtle-entero-feliz', 472, 440, mixtleCompleto('feliz'), ESCALA_MIXTLE),
   arte('mixtle-entero-celebrando', 472, 440, mixtleCompleto('celebrando'), ESCALA_MIXTLE),

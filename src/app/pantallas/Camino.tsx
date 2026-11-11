@@ -196,7 +196,7 @@ export function Camino() {
         {/* Camino terminado: no hay parada que señalar; Mixtle habla al final del camino. */}
         {indiceSiguiente === null && (
           <div ref={siguiente} className="flex w-full justify-center pt-4 pb-16">
-            <MixtleGuia alto="clamp(7rem,17vmin,11rem)" globo="arriba" anchoGlobo="min(28rem,60vw)" expresionFija="celebrando" soloMientrasHabla />
+            <MixtleGuia alto="clamp(7rem,17vmin,11rem)" globo="arriba" anchoGlobo="min(28rem,60vw)" expresionFija="celebrando" pin="grande" soloMientrasHabla />
           </div>
         )}
       </div>

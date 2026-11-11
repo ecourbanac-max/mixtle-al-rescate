@@ -11,8 +11,9 @@ describe('MixtleFigura (Mixtle en línea)', () => {
       </>,
     );
     const ids = [...container.querySelectorAll('radialGradient, linearGradient')].map((g) => g.id);
-    expect(ids).toHaveLength(6);
-    expect(new Set(ids).size).toBe(6);
+    // 3 degradados del cuerpo y 3 del pin de Eco Urban, por cada Mixtle.
+    expect(ids).toHaveLength(12);
+    expect(new Set(ids).size).toBe(12);
     const figuras = container.querySelectorAll('[data-expresion]');
     figuras.forEach((f) => {
       const propios = new Set([...f.querySelectorAll('radialGradient, linearGradient')].map((g) => g.id));

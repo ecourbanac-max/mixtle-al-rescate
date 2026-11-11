@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { useId, useMemo } from 'react';
+import type { VersionPin } from '../../arte/pinEcoUrban';
 import { cuerpoDeMixtle } from '../../arte/personajes';
 import { Arte } from './Arte';
 
@@ -19,8 +20,8 @@ export type ExpresionMixtle = 'normal' | 'feliz' | 'habla' | 'pensando' | 'sorpr
  * otro en la página: si compartieran id, el navegador tomaría el primero del documento y, cuando ese
  * está en un SVG oculto (el logo de la pantalla de carga), Mixtle saldría sin relleno.
  */
-function svgCuerpo(expresion: ExpresionMixtle, sufijo: string): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CUERPO.ancho} ${CUERPO.alto}" width="100%" height="100%" aria-hidden="true">${cuerpoDeMixtle(expresion, sufijo)}</svg>`;
+function svgCuerpo(expresion: ExpresionMixtle, sufijo: string, pin: VersionPin, espejo: boolean): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CUERPO.ancho} ${CUERPO.alto}" width="100%" height="100%" aria-hidden="true">${cuerpoDeMixtle(expresion, sufijo, pin, espejo)}</svg>`;
 }
 
 /** Desfase estable (de 0 a -4 s) a partir de un texto, para que cada Mixtle tenga su propio ritmo. */
@@ -45,10 +46,15 @@ interface Props {
   expresion?: ExpresionMixtle;
   /** Mirar hacia la izquierda (por ejemplo, para señalar algo que está a su izquierda). */
   espejo?: boolean;
+  /**
+   * Versión del pin de Eco Urban que trae en el pecho (siempre lo trae): "chico" (por omisión) donde Mixtle
+   * se ve chico, como en la lección o el globo; "grande" donde se ve grande (vitrina, festejos).
+   */
+  pin?: VersionPin;
   className?: string;
 }
 
-export function MixtleFigura({ alto, expresion = 'normal', espejo = false, className = '' }: Props) {
+export function MixtleFigura({ alto, expresion = 'normal', espejo = false, pin = 'chico', className = '' }: Props) {
   const anchoTotal = COLA.x + COLA.ancho;
   const pct = (v: number, total: number) => `${(v / total) * 100}%`;
   // Las partes van en posición absoluta: el contenedor necesita estar posicionado (relative si no se indica otra).
@@ -57,7 +63,7 @@ export function MixtleFigura({ alto, expresion = 'normal', espejo = false, class
   const id = useId();
   const retraso = desfaseDe(id);
   const sufijo = `-${id.replace(/[^a-zA-Z0-9]/g, '')}`;
-  const svg = useMemo(() => svgCuerpo(expresion, sufijo), [expresion, sufijo]);
+  const svg = useMemo(() => svgCuerpo(expresion, sufijo, pin, espejo), [expresion, sufijo, pin, espejo]);
   const cuerpo = movimiento(expresion);
   const animado = expresion === 'celebrando';
   return (

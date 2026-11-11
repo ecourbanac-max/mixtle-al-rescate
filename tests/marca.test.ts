@@ -42,7 +42,7 @@ describe('marca: logo e íconos', () => {
 
   it('los archivos de marca publicados son los mismos que genera el código', () => {
     expect(readFileSync(join(RAIZ, 'public', 'marca', 'logo.svg'), 'utf8').trim()).toBe(logoSvg().trim());
-    expect(readFileSync(join(RAIZ, 'public', 'favicon.svg'), 'utf8').trim()).toBe(iconoSvg().trim());
+    expect(readFileSync(join(RAIZ, 'public', 'favicon.svg'), 'utf8').trim()).toBe(iconoSvg({ conPin: false }).trim());
     for (const icono of ['icono-192.png', 'icono-512.png', 'icono-maskable-512.png', 'apple-touch-icon.png']) {
       expect(existsSync(join(RAIZ, 'public', 'iconos', icono))).toBe(true);
     }

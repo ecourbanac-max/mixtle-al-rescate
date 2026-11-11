@@ -1,7 +1,8 @@
 import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { logoSvg } from '../../arte/marca';
-import { PERSONAJES } from '../../arte/personajes';
+import { PERSONAJES, mixtleCompleto } from '../../arte/personajes';
+import { TAMANO_PIN, VARIANTES_PIN, type TamanoPin } from '../../arte/pinEcoUrban';
 import { ACCESORIOS, type IdAccesorio } from '../../logica/accesorios';
 import { MASCOTAS } from '../../logica/grupos';
 import { Arte } from '../componentes/Arte';
@@ -14,7 +15,8 @@ import { useNarrador } from '../estado/narrador';
 /*
  * Página de revisión (`?mixtle`): todas las apariciones de Mixtle lado a lado, tal como las pinta el
  * juego (el mismo componente o el mismo dibujo en cada caso), para comparar paleta, trazo y
- * proporciones de un vistazo; y los accesorios puestos en las seis mascotas. No es parte del juego:
+ * proporciones de un vistazo; el pin de Eco Urban que trae en el pecho (v3.1); y los accesorios puestos
+ * en las seis mascotas. No es parte del juego:
  * sirve para revisar el arte (y para las capturas de antes y después).
  */
 
@@ -22,6 +24,10 @@ import { useNarrador } from '../estado/narrador';
 const POSES: ExpresionMixtle[] = ['normal', 'habla', 'feliz', 'pensando', 'sorprendido', 'celebrando', 'senalando', 'saluda', 'animo', 'duerme'];
 // El mismo SVG que index.html pone en la pantalla de carga (los id sin sufijo), a tamaño de muestra.
 const LOGO_CARGA = logoSvg({ atributos: 'width="100%" height="100%" aria-hidden="true"' });
+
+/** Mixtle entero (con la cola) con el pin en otro tamaño: para comparar las tres opciones lado a lado. */
+const SVG_VARIANTE = (t: TamanoPin) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 472 440" width="100%" height="100%" aria-hidden="true">${mixtleCompleto('normal', `-variante-${t}`, 'grande', VARIANTES_PIN[t])}</svg>`;
 
 function Seccion({ titulo, children, id }: { titulo: string; children: ReactNode; id: string }) {
   return (
@@ -63,6 +69,48 @@ export function RevisionMixtle() {
   return (
     <main data-pantalla="revision" data-entrada-lista="true" className="flex h-full w-full flex-col gap-8 overflow-y-auto bg-white p-6 text-verde-oscuro">
       <h1 className="text-3xl font-black text-verde">Revisión de Mixtle y de los accesorios</h1>
+
+      <Seccion id="pin" titulo="Pin Eco Urban">
+        <Caso nombre="El pin, grande (logotipo completo)">
+          <Arte clave="pin-eco-urban" className="size-64" data-pin-solo="grande" />
+        </Caso>
+        <Caso nombre="Las dos versiones: grande y chica">
+          <span className="flex items-end gap-4">
+            <Arte clave="pin-eco-urban" className="size-28" />
+            <Arte clave="pin-eco-urban-chico" className="size-28" data-pin-solo="chico" />
+            <Arte clave="pin-eco-urban" className="size-10" />
+            <Arte clave="pin-eco-urban-chico" className="size-10" />
+            <Arte clave="pin-eco-urban-chico" className="size-6" />
+          </span>
+        </Caso>
+        <Caso nombre="El logotipo de Eco Urban (en trazos)">
+          <Arte clave="logotipo-eco-urban" className="h-16" />
+        </Caso>
+      </Seccion>
+
+      <Seccion id="pin-poses" titulo="Mixtle con su pin en cada pose (pin chico; en espejo se sigue leyendo derecho)">
+        {POSES.map((p) => (
+          <Caso key={p} nombre={p}>
+            <MixtleFigura alto="13rem" expresion={p} />
+          </Caso>
+        ))}
+        <Caso nombre="señalando, en espejo">
+          <MixtleFigura alto="13rem" expresion="senalando" espejo />
+        </Caso>
+        <Caso nombre="pin grande: entero y colgado">
+          <MixtleFigura alto="13rem" expresion="celebrando" pin="grande" />
+          <Arte clave="mixtle-entero-feliz" className="h-[13rem]" />
+          <Arte clave="mixtle-colgado" className="h-[16rem]" />
+        </Caso>
+      </Seccion>
+
+      <Seccion id="pin-tamanos" titulo={`Tres tamaños posibles (en uso: ${TAMANO_PIN})`}>
+        {(Object.keys(VARIANTES_PIN) as TamanoPin[]).map((t) => (
+          <Caso key={t} nombre={`${t}${t === TAMANO_PIN ? ' (en uso)' : ''}`}>
+            <div className="h-60 w-[16rem]" dangerouslySetInnerHTML={{ __html: SVG_VARIANTE(t) }} />
+          </Caso>
+        ))}
+      </Seccion>
 
       <Seccion id="referencia" titulo="Referencia: el logo y el inicio">
         <Caso nombre="Logo (en línea)" fondo="bg-cielo">

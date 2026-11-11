@@ -1,3 +1,4 @@
+import type { VersionPin } from '../../arte/pinEcoUrban';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { TEXTOS_APP } from '../../contenido/textosApp';
@@ -55,6 +56,8 @@ interface Props {
   globoDesdeArriba?: boolean;
   /** Mixtle mirando al otro lado. */
   espejo?: boolean;
+  /** Versión del pin de Eco Urban (ver MixtleFigura). */
+  pin?: VersionPin;
   /** Expresión fija (por ejemplo, señalando en el camino); la boca se sigue moviendo al hablar. */
   expresionFija?: ExpresionMixtle;
   className?: string;
@@ -73,6 +76,7 @@ export function MixtleGuia({
   anchoGlobo = 'min(38rem,60vw)',
   globoDesdeArriba = false,
   espejo = false,
+  pin = 'chico',
   expresionFija,
   className = '',
 }: Props) {
@@ -87,7 +91,7 @@ export function MixtleGuia({
       } gap-3 ${className}`}
     >
       <button type="button" aria-label="Mixtle: escuchar otra vez" className="pointer-events-auto shrink-0 cursor-pointer" onClick={repetir}>
-        <MixtleFigura alto={alto} expresion={cara} espejo={espejo} />
+        <MixtleFigura alto={alto} expresion={cara} espejo={espejo} pin={pin} />
       </button>
       <AnimatePresence mode="wait">
         {subtitulo && visible && !sinGlobo && (

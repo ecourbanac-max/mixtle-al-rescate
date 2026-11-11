@@ -28,7 +28,7 @@ function usePasos(pasos: [number, () => void][]): void {
 function EscenaHola() {
   return (
     <div className="flex h-full items-center justify-center gap-[4vmin] px-[6vmin]">
-      <MixtleFigura alto="58vmin" expresion="saluda" />
+      <MixtleFigura alto="58vmin" expresion="saluda" pin="grande" />
       <Logo sinMixtle className="vitrina-entra w-[min(60vw,110vmin)]" />
     </div>
   );
@@ -119,7 +119,7 @@ function EscenaCofre() {
   return (
     <div className="flex h-full items-center justify-center gap-[6vmin]">
       <CofreAnimado fase={fase} hojitas={15} className="h-[52vmin] w-[60vmin]" />
-      <MixtleFigura alto="40vmin" expresion={fase === 'abierto' ? 'celebrando' : 'sorprendido'} />
+      <MixtleFigura alto="40vmin" expresion={fase === 'abierto' ? 'celebrando' : 'sorprendido'} pin="grande" />
     </div>
   );
 }
