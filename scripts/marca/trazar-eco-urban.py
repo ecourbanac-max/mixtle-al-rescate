@@ -11,6 +11,7 @@ Uso (una vez: pip install potracer pillow numpy scipy):
     python scripts/marca/trazar-eco-urban.py
 """
 import json
+import os
 import pathlib
 import sys
 from collections import Counter
@@ -22,12 +23,18 @@ from scipy.ndimage import gaussian_filter
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 REFERENCIA = RAIZ / 'docs' / 'marca' / 'referencias-eco-urban' / 'logo-eco-urban.jpg'
-SALIDA = RAIZ / 'src' / 'arte' / 'ecoUrban.generado.ts'
+SALIDA = pathlib.Path(os.environ['SALIDA']) if os.environ.get('SALIDA') else RAIZ / 'src' / 'arte' / 'ecoUrban.generado.ts'
 
 K = 4           # agrandado antes de calcar
 SIGMA = 0.6     # suavizado del ruido del JPG (en píxeles del original)
-TOLERANCIA = 0.5
-ALFA = 1.0
+# Tolerancia 1.0 y píxeles enteros (v3.1.1): el trazo pesa 2.3 KB comprimido en lugar de 3.9 KB y coincide
+# en 98.4 % (verde) y 98.6 % (azul) con el original; en el juego el logotipo se dibuja a menos de un tercio
+# de su tamaño original, donde la diferencia (menos de medio píxel del original) no se ve.
+TOLERANCIA = float(os.environ.get('TOLERANCIA', 1.0))
+ALFA = float(os.environ.get('ALFA', 1.0))
+# Decimales de las coordenadas (1 = décimas de píxel del original; 0 = píxeles enteros).
+DECIMALES = int(os.environ.get('DECIMALES', 0))
+PASO = 10 ** DECIMALES
 
 im = Image.open(REFERENCIA).convert('RGB')
 a0 = np.asarray(im).astype(float)
@@ -57,7 +64,7 @@ mascaras = {'verde': mitad(VERDE) & (dV < dA), 'azul': mitad(AZUL) & (dA <= dV)}
 
 def numero(v):
     """0.1 de precisión, sin ceros de sobra: 12.0 → "12", 0.5 → ".5", -0.5 → "-.5"."""
-    t = f'{round(v, 1):.1f}'.rstrip('0').rstrip('.')
+    t = f'{round(v, DECIMALES):.{DECIMALES}f}'.rstrip('0').rstrip('.') if DECIMALES else str(int(round(v)))
     t = '0' if t in ('', '-0') else t
     return t.replace('0.', '.', 1) if t.startswith('0.') else t.replace('-0.', '-.', 1)
 
@@ -79,16 +86,16 @@ def calcar(m):
     """
     curvas = []
     for c in potrace.Bitmap(~m).trace(turdsize=40 * K, alphamax=ALFA, opticurve=True, opttolerance=TOLERANCIA):
-        r = lambda p: (round(p.x / K * 10), round(p.y / K * 10))  # en décimas de píxel (enteros: sin error al restar)
+        r = lambda p: (round(p.x / K * PASO), round(p.y / K * PASO))  # en décimas (o enteros) de píxel: sin error al restar
         x0, y0 = r(c.start_point)
         actual = (x0, y0)
         puntos = [actual]
-        rel = lambda q: [numero((q[0] - actual[0]) / 10), numero((q[1] - actual[1]) / 10)]
-        d = 'M' + unir([numero(x0 / 10), numero(y0 / 10)])
+        rel = lambda q: [numero((q[0] - actual[0]) / PASO), numero((q[1] - actual[1]) / PASO)]
+        d = 'M' + unir([numero(x0 / PASO), numero(y0 / PASO)])
         for s in c.segments:
             if s.is_corner:
                 q1, q2 = r(s.c), r(s.end_point)
-                d += 'l' + unir(rel(q1) + [numero((q2[0] - q1[0]) / 10), numero((q2[1] - q1[1]) / 10)])
+                d += 'l' + unir(rel(q1) + [numero((q2[0] - q1[0]) / PASO), numero((q2[1] - q1[1]) / PASO)])
                 actual = q2
                 puntos += [q1, q2]
             else:
@@ -97,8 +104,8 @@ def calcar(m):
                 actual = q3
                 puntos.append(q3)
         d += 'z'
-        cx = [p[0] / 10 for p in puntos]
-        cy = [p[1] / 10 for p in puntos]
+        cx = [p[0] / PASO for p in puntos]
+        cy = [p[1] / PASO for p in puntos]
         curvas.append({'d': d, 'caja': [min(cx), min(cy), max(cx), max(cy)]})
     return curvas
 

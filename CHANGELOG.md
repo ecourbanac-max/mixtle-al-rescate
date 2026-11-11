@@ -2,6 +2,23 @@
 
 Fechas de octubre y noviembre de 2026. Las etiquetas de git marcan las versiones que vio Eco Urban.
 
+## v3.1.1 (10 de noviembre) — Ajustes finales para Eco Urban
+
+La versión anterior queda en las etiquetas `v3.1-pin-chico` y `v3.1-antes-ajustes`.
+
+### 1. El pin de Mixtle se ve
+
+- **Lugar nuevo:** en el pecho, arriba y al centro, sobre la parte clara, justo debajo de la barbilla. Antes iba en un costado del vientre.
+- **Tamaño:** 16 % del alto del cuerpo ("destacado"). Antes medía 8 %. Hay tres opciones, "visible" (14 %), "destacado" (16 %) y "grande" (18 %), en `docs/marca/pin-variantes.png`.
+- **En pantalla:** nunca mide menos de 16 px. En React, el pin va aparte del dibujo, entre el cuerpo y los brazos (`MixtleFigura`).
+- **Legible:** en el inicio y en el vestidor se lee "eco urban" en una compu de 1366×768. El juego usa el acomodo apilado, cuyas letras miden 1.6 veces las de una línea. La vista previa del vestidor creció, de 200 a 353 px de alto en 1366×768.
+- **Siempre encima de los accesorios:** queda por arriba del paliacate y de lo que se ponga en el cuello, como prendido a la tela. Se revisaron los 6 accesorios uno por uno. La mochila volvió a su lugar original, porque ya no tapa nada.
+- **En las 12 poses:** los brazos que cruzan el pecho le tapan, cuando mucho, una orilla. Siempre se ve al menos el 70 % (lo menos, "pensando": 74.5 %), y colgado de la rama se ve completo.
+- **Borde:** uno gris muy claro, para que no se pierda sobre la panza.
+- **Sin cambios:** el ícono de la app y el de la pestaña se ven igual que antes.
+- **Presupuesto:** el trazo del logotipo se aligeró de 3.9 a 2.3 KB comprimido, con píxeles enteros y menos puntos. Coincide en 98.4 a 98.6 % con el original. La primera pantalla quedó en 246.8 KB, dentro del límite de 250 KB.
+- **Pruebas:** `tests/pinEcoUrban.test.tsx` mide lo que se ve del pin en cada pose y revisa que vaya encima de cada accesorio y que nunca mida menos de 16 px.
+
 ## v3.1 (9 de noviembre) — Correcciones solicitadas por Eco Urban
 
 Eco Urban aprobó el juego y pidió dos correcciones. La versión anterior queda en la etiqueta `v3-antes-correcciones`.

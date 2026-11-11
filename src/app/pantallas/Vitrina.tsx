@@ -119,7 +119,7 @@ function EscenaCofre() {
   return (
     <div className="flex h-full items-center justify-center gap-[6vmin]">
       <CofreAnimado fase={fase} hojitas={15} className="h-[52vmin] w-[60vmin]" />
-      <MixtleFigura alto="40vmin" expresion={fase === 'abierto' ? 'celebrando' : 'sorprendido'} pin="grande" />
+      <MixtleFigura alto="40vmin" expresion={fase === 'abierto' ? 'celebrando' : 'sorprendido'} />
     </div>
   );
 }

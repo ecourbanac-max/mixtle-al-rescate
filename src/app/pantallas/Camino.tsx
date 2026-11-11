@@ -130,7 +130,7 @@ export function Camino() {
         <div className="mx-auto flex max-w-[70rem] flex-col items-center px-4 pt-10 pb-10">
           <section className="parque-protagonista" aria-label={TEXTOS_APP.camino.suParque(nombreDelGrupo(grupo))} data-recorrido="parque">
             <h2 className="parque-protagonista-titulo">
-              <MascotaVestida mascota={grupo.mascota} puestos={accesoriosPuestos(progreso)} className="h-[1.9em]" />
+              <MascotaVestida mascota={grupo.mascota} puestos={accesoriosPuestos(progreso)} pinMinimoPx={0} className="h-[1.9em]" />
               <span>{TEXTOS_APP.camino.suParque(nombreDelGrupo(grupo))}</span>
             </h2>
             <ParqueGrupo progreso={progreso} className="aspect-[16/6] w-full" />
@@ -196,7 +196,7 @@ export function Camino() {
         {/* Camino terminado: no hay parada que señalar; Mixtle habla al final del camino. */}
         {indiceSiguiente === null && (
           <div ref={siguiente} className="flex w-full justify-center pt-4 pb-16">
-            <MixtleGuia alto="clamp(7rem,17vmin,11rem)" globo="arriba" anchoGlobo="min(28rem,60vw)" expresionFija="celebrando" pin="grande" soloMientrasHabla />
+            <MixtleGuia alto="clamp(7rem,17vmin,11rem)" globo="arriba" anchoGlobo="min(28rem,60vw)" expresionFija="celebrando" soloMientrasHabla />
           </div>
         )}
       </div>

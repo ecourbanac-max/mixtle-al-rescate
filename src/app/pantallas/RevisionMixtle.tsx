@@ -27,7 +27,7 @@ const LOGO_CARGA = logoSvg({ atributos: 'width="100%" height="100%" aria-hidden=
 
 /** Mixtle entero (con la cola) con el pin en otro tamaño: para comparar las tres opciones lado a lado. */
 const SVG_VARIANTE = (t: TamanoPin) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 472 440" width="100%" height="100%" aria-hidden="true">${mixtleCompleto('normal', `-variante-${t}`, 'grande', VARIANTES_PIN[t])}</svg>`;
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 472 440" width="100%" height="100%" aria-hidden="true">${mixtleCompleto('normal', `-variante-${t}`, 'chico', VARIANTES_PIN[t])}</svg>`;
 
 function Seccion({ titulo, children, id }: { titulo: string; children: ReactNode; id: string }) {
   return (
@@ -71,10 +71,10 @@ export function RevisionMixtle() {
       <h1 className="text-3xl font-black text-verde">Revisión de Mixtle y de los accesorios</h1>
 
       <Seccion id="pin" titulo="Pin Eco Urban">
-        <Caso nombre="El pin, grande (logotipo completo)">
+        <Caso nombre="El pin (logotipo en una línea)">
           <Arte clave="pin-eco-urban" className="size-64" data-pin-solo="grande" />
         </Caso>
-        <Caso nombre="Las dos versiones: grande y chica">
+        <Caso nombre="Los dos acomodos: en una línea y apilado (el del juego)">
           <span className="flex items-end gap-4">
             <Arte clave="pin-eco-urban" className="size-28" />
             <Arte clave="pin-eco-urban-chico" className="size-28" data-pin-solo="chico" />
@@ -88,7 +88,7 @@ export function RevisionMixtle() {
         </Caso>
       </Seccion>
 
-      <Seccion id="pin-poses" titulo="Mixtle con su pin en cada pose (pin chico; en espejo se sigue leyendo derecho)">
+      <Seccion id="pin-poses" titulo="Mixtle con su pin en cada pose (en espejo se sigue leyendo derecho)">
         {POSES.map((p) => (
           <Caso key={p} nombre={p}>
             <MixtleFigura alto="13rem" expresion={p} />
@@ -97,7 +97,7 @@ export function RevisionMixtle() {
         <Caso nombre="señalando, en espejo">
           <MixtleFigura alto="13rem" expresion="senalando" espejo />
         </Caso>
-        <Caso nombre="pin grande: entero y colgado">
+        <Caso nombre="en una línea (vitrina), entero y colgado">
           <MixtleFigura alto="13rem" expresion="celebrando" pin="grande" />
           <Arte clave="mixtle-entero-feliz" className="h-[13rem]" />
           <Arte clave="mixtle-colgado" className="h-[16rem]" />

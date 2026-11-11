@@ -51,7 +51,7 @@ export function Encabezado({ grupo, alAlbum, alCambiarGrupo, alVestidor, alFacil
       </button>
 
       <div className="flex min-w-0 items-center gap-2 rounded-full border-4 border-white px-3 py-1" style={{ backgroundColor: grupo.color }} data-grupo={grupo.id}>
-        <MascotaVestida mascota={grupo.mascota} puestos={accesoriosPuestos(grupo.progreso)} className="h-[clamp(2.5rem,6vmin,3.5rem)]" />
+        <MascotaVestida mascota={grupo.mascota} puestos={accesoriosPuestos(grupo.progreso)} pinMinimoPx={0} className="h-[clamp(2.5rem,6vmin,3.5rem)]" />
         <span className="truncate text-[clamp(1.1rem,2.6vmin,1.8rem)] font-black">{nombreDelGrupo(grupo)}</span>
       </div>
 

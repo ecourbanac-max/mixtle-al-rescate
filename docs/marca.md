@@ -62,16 +62,18 @@ Contraste medido (WCAG 2.x): blanco sobre naranja barro 5.21:1, verde bosque sob
 
 ## El pin de Eco Urban y el uso de su logotipo
 
-Desde la v3.1, Mixtle trae en el pecho, del lado izquierdo de él, un pin con el logotipo de Eco Urban. Es parte fija del personaje: no es un accesorio del vestidor y no se puede quitar.
+Desde la v3.1, Mixtle trae en el pecho un pin con el logotipo de Eco Urban. Es parte fija del personaje: no es un accesorio del vestidor y no se puede quitar. En la v3.1.1 se cambió de lugar y de tamaño para que se vea.
 
 ![Los tres tamaños del pin](marca/pin-variantes.png)
 
-- **El logotipo** es el de Eco Urban A.C., calcado en trazos de su archivo (`scripts/marca/trazar-eco-urban.py` genera `src/arte/ecoUrban.generado.ts`; coincide en 99.3 % de los píxeles con el original). Colores tomados de ese archivo: verde **#009345** y azul petróleo **#1E4959**. No se deforma, no se le cambian los colores y no se le pone nada encima: ni sombras, ni brillos, ni contornos.
-- **El botón:** blanco y abombado, con un contorno fino, un brillo en la orilla (arriba a la izquierda, como la luz de todo el juego) y una sombra suave sobre el pelaje.
-- **Dos versiones:** la **grande** lleva el logotipo completo en una línea (inicio, diploma, vestidor, pantalla de carga, festejos). La **chica** pone "eco" sobre "urban", y así las letras quedan 1.6 veces más grandes en el mismo botón (lección, globo, camino, aventuras, ícono de la app). El favicon de la pestaña no lo lleva: a 16 px sería una mancha.
-- **Tamaño:** "medio" (8.2 % del alto de Mixtle: el más grande que cabe sin que ningún brazo ni accesorio lo tape). Para cambiarlo basta un valor: `TAMANO_PIN` en `src/arte/pinEcoUrban.ts` (`'discreto'`, `'medio'` o `'protagonista'`). Después se corre `npm run marca:generar` y se publica. El lugar está medido para que ningún brazo lo tape en ninguna pose y para que conviva con el paliacate. En Mixtle, la mochila del vestidor va a la espalda.
-- **Dónde revisarlo:** la página `?mixtle` tiene la sección "Pin Eco Urban", con el pin solo, sus dos versiones, Mixtle en cada pose y los tres tamaños.
-- **Límite honesto:** donde Mixtle se ve chico (la lección en un celular), el pin mide unos 10 px. Ahí se reconoce como el botón blanco de Eco Urban con sus dos colores, pero las letras no se alcanzan a leer.
+- **El logotipo** es el de Eco Urban A.C., calcado en trazos de su archivo: `scripts/marca/trazar-eco-urban.py` genera `src/arte/ecoUrban.generado.ts` y coincide con el original en 98.4 % (verde) y 98.6 % (azul) de los píxeles. Los colores vienen del mismo archivo: verde **#009345** y azul petróleo **#1E4959**. No se deforma, no se le cambian los colores y no se le pone nada encima: ni sombras, ni brillos, ni contornos.
+- **El botón:** blanco y abombado, con un borde gris muy claro para que no se pierda sobre la panza, un brillo en la orilla y una sombra suave sobre el pelaje.
+- **Dónde va:** en el pecho, arriba y al centro, sobre la parte clara, justo debajo de la barbilla. Los brazos se dibujan encima. Cuando uno cruza el pecho le tapa una orilla, y siempre se ve al menos el 70 %. El peor caso es "pensando", con la mano en la barbilla: se ve el 74.5 %. Colgado de la rama, en el inicio, se ve completo.
+- **Encima de los accesorios:** va siempre por arriba del paliacate y de cualquier cosa del vestidor, como prendido a la tela.
+- **Tamaño:** "destacado", con un diámetro del 16 % del alto del cuerpo, sin la cola. Las otras dos opciones son "visible" (14 %) y "grande" (18 %). Se cambia con un solo valor, `TAMANO_PIN` en `src/arte/pinEcoUrban.ts`. Después se corre `npm run marca:generar` y se publica. En pantalla, el pin nunca mide menos de 16 px. Solo en las fichas del tamaño de un ícono (el encabezado y el nombre del grupo en el camino) va a su escala.
+- **Dos acomodos del logotipo:** el **apilado** pone "eco" sobre "urban" y es el que se lee al tamaño real del juego, así que lo usa Mixtle en todas partes. El de **una línea** es como lo usa Eco Urban, pero sus letras miden 0.6 veces las del apilado: solo se usa donde el pin mide unos 60 px o más (vitrina, galería, documentos).
+- **El ícono de la app** lleva el pin prendido abajo a la derecha. **El favicon de la pestaña** no lo lleva, porque a 16 px sería una mancha.
+- **Dónde revisarlo:** la página `?mixtle` tiene la sección "Pin Eco Urban", con el pin solo, sus dos acomodos, Mixtle en cada pose y los tres tamaños.
 
 El logotipo de Eco Urban es propiedad de Eco Urban A.C. y se usa con su autorización. Para usarlo en otro lugar, hay que pedir permiso a Eco Urban.
 

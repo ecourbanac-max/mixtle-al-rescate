@@ -74,7 +74,8 @@ export function Vestidor({ grupo, alCerrar }: { grupo: Grupo; alCerrar: () => vo
         <div className="flex flex-col items-center gap-3">
           <div
             ref={figura}
-            className="relative grid h-[clamp(9rem,26vmin,15rem)] w-[clamp(11rem,30vmin,17rem)] place-items-center rounded-[1.5rem] bg-white/50"
+            // Grande, para que se lea el pin de Eco Urban de Mixtle (v3.1.1); en pantallas anchas cabe junto a las dos filas de tarjetas.
+            className="relative grid h-[clamp(9rem,46vmin,26rem)] w-[clamp(11rem,46vmin,26rem)] place-items-center rounded-[1.5rem] bg-white/50"
             style={{ containerType: 'size' }}
             data-vestidor-figura
           >

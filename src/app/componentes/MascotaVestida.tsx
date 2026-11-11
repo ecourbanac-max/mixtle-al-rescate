@@ -1,6 +1,7 @@
 import { ARTE_ACCESORIOS } from '../../arte/accesorios';
 import { catalogoArte } from '../../arte/catalogo';
-import { ANCLAS_MASCOTA, ACCESORIOS, vaDetras, type Ancla, type IdAccesorio } from '../../logica/accesorios';
+import { estiloPinEncima } from '../../arte/pinEcoUrban';
+import { ANCLAS_MASCOTA, ACCESORIOS, type Ancla, type IdAccesorio } from '../../logica/accesorios';
 import { mascota as datosMascota, type IdMascota } from '../../logica/grupos';
 import { Arte, registrarArte } from './Arte';
 
@@ -25,6 +26,11 @@ interface Props {
   mascota: IdMascota;
   /** Accesorios puestos (se dibujan encima; la capa, detrás). */
   puestos?: readonly IdAccesorio[];
+  /**
+   * Diámetro mínimo en pantalla del pin de Eco Urban de Mixtle (16 px). 0 en los íconos del tamaño de
+   * una ficha (encabezado, nombre del grupo en el camino): ahí sería un botón gigante, como en el ícono de la app.
+   */
+  pinMinimoPx?: number;
   className?: string;
 }
 
@@ -32,21 +38,37 @@ interface Props {
  * La mascota del grupo con sus accesorios. Cada accesorio se coloca en su ancla (cabeza, ojos,
  * cuello, espalda…) medida sobre el dibujo de esa mascota, en % de su caja.
  */
-export function MascotaVestida({ mascota, puestos = [], className = '' }: Props) {
+export function MascotaVestida({ mascota, puestos = [], pinMinimoPx = 16, className = '' }: Props) {
   const arte = datosMascota(mascota).arte;
   const anclas = ANCLAS_MASCOTA[mascota];
+  // Mixtle trae su pin de Eco Urban prendido al pecho: va encima de todo, también del paliacate (como
+  // prendido a la tela), y nunca mide menos de 16 px. Por eso aquí se usa su dibujo sin pin y el pin aparte.
+  const esMixtle = mascota === 'cacomixtle';
   return (
     <div className={`relative ${className}`} style={{ aspectRatio: `${PROPORCION.get(arte) ?? 1}` }} data-mascota-vestida={mascota} data-puestos={puestos.join(' ')}>
-      {ACCESORIOS.filter((a) => vaDetras(a, anclas[a.id]) && puestos.includes(a.id)).map((a) => (
+      {ACCESORIOS.filter((a) => a.detras && !anclas[a.id].encima && puestos.includes(a.id)).map((a) => (
         <Accesorio key={a.id} id={a.id} ancla={anclas[a.id]} />
       ))}
-      <Arte clave={arte} className="relative h-full w-full object-contain" />
-      {ACCESORIOS.filter((a) => !vaDetras(a, anclas[a.id]) && puestos.includes(a.id)).map((a) => (
+      <Arte clave={esMixtle ? 'mixtle-entero-sin-pin' : arte} className="relative h-full w-full object-contain" />
+      {ACCESORIOS.filter((a) => (!a.detras || anclas[a.id].encima) && puestos.includes(a.id)).map((a) => (
         <Accesorio key={a.id} id={a.id} ancla={anclas[a.id]} />
       ))}
+      {esMixtle && (
+        <Arte
+          clave="pin-eco-urban-chico"
+          className="pointer-events-none absolute max-w-none"
+          style={{ left: PIN_MIXTLE.left, top: PIN_MIXTLE.top, width: pinMinimoPx === 16 ? PIN_MIXTLE.width : estiloPinEncima(CAJA_ENTERO, undefined, pinMinimoPx).width, translate: `-${PIN_MIXTLE.origen.split(' ')[0]} -${PIN_MIXTLE.origen.split(' ')[1]}` }}
+          data-pin-mixtle="chico"
+          data-pin-minimo={pinMinimoPx}
+        />
+      )}
     </div>
   );
 }
+
+/** El pin en el dibujo de Mixtle entero (472×440: el cuerpo en el mismo lugar que en su dibujo solo). */
+const CAJA_ENTERO = { ancho: 472, alto: 440 };
+const PIN_MIXTLE = estiloPinEncima(CAJA_ENTERO);
 
 function Accesorio({ id, ancla }: { id: IdAccesorio; ancla: Ancla }) {
   const datos = ACCESORIOS.find((a) => a.id === id)!;

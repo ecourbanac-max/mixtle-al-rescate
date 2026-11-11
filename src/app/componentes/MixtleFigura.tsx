@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { useId, useMemo } from 'react';
-import type { VersionPin } from '../../arte/pinEcoUrban';
-import { cuerpoDeMixtle } from '../../arte/personajes';
+import { estiloPinEncima, type VersionPin } from '../../arte/pinEcoUrban';
+import { capasDeMixtle } from '../../arte/personajes';
 import { Arte } from './Arte';
 
 /*
@@ -20,9 +20,15 @@ export type ExpresionMixtle = 'normal' | 'feliz' | 'habla' | 'pensando' | 'sorpr
  * otro en la página: si compartieran id, el navegador tomaría el primero del documento y, cuando ese
  * está en un SVG oculto (el logo de la pantalla de carga), Mixtle saldría sin relleno.
  */
-function svgCuerpo(expresion: ExpresionMixtle, sufijo: string, pin: VersionPin, espejo: boolean): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CUERPO.ancho} ${CUERPO.alto}" width="100%" height="100%" aria-hidden="true">${cuerpoDeMixtle(expresion, sufijo, pin, espejo)}</svg>`;
+function svgCapas(expresion: ExpresionMixtle, sufijo: string): { atras: string; adelante: string } {
+  const { atras, adelante } = capasDeMixtle(expresion, sufijo);
+  const svg = (contenido: string) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CUERPO.ancho} ${CUERPO.alto}" width="100%" height="100%" aria-hidden="true">${contenido}</svg>`;
+  return { atras: svg(atras), adelante: svg(adelante) };
 }
+
+/** El pin va aparte, entre el cuerpo y los brazos, en su lugar del pecho y con un mínimo de 16 px en pantalla. */
+const PIN = estiloPinEncima(CUERPO);
 
 /** Desfase estable (de 0 a -4 s) a partir de un texto, para que cada Mixtle tenga su propio ritmo. */
 function desfaseDe(texto: string): string {
@@ -63,7 +69,7 @@ export function MixtleFigura({ alto, expresion = 'normal', espejo = false, pin =
   const id = useId();
   const retraso = desfaseDe(id);
   const sufijo = `-${id.replace(/[^a-zA-Z0-9]/g, '')}`;
-  const svg = useMemo(() => svgCuerpo(expresion, sufijo, pin, espejo), [expresion, sufijo, pin, espejo]);
+  const capas = useMemo(() => svgCapas(expresion, sufijo), [expresion, sufijo]);
   const cuerpo = movimiento(expresion);
   const animado = expresion === 'celebrando';
   return (
@@ -92,8 +98,17 @@ export function MixtleFigura({ alto, expresion = 'normal', espejo = false, pin =
         style={{ width: pct(CUERPO.ancho, anchoTotal), ['--mx-retraso' as string]: retraso }}
         animate={cuerpo.animate}
         transition={cuerpo.transition}
-        dangerouslySetInnerHTML={{ __html: svg }}
-      />
+      >
+        <div className="absolute inset-0" dangerouslySetInnerHTML={{ __html: capas.atras }} />
+        {/* El pin de Eco Urban: parte fija de Mixtle. En espejo se voltea de vuelta para que se lea derecho. */}
+        <Arte
+          clave={pin === 'grande' ? 'pin-eco-urban' : 'pin-eco-urban-chico'}
+          className="pointer-events-none absolute max-w-none"
+          style={{ left: PIN.left, top: PIN.top, width: PIN.width, transformOrigin: PIN.origen, translate: `-${PIN.origen.split(' ')[0]} -${PIN.origen.split(' ')[1]}`, transform: espejo ? 'scaleX(-1)' : undefined }}
+          data-pin-mixtle={pin}
+        />
+        <div className="absolute inset-0" dangerouslySetInnerHTML={{ __html: capas.adelante }} />
+      </motion.div>
     </div>
   );
 }

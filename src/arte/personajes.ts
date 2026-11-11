@@ -125,10 +125,11 @@ const ZETAS = `<g fill="none" stroke="#2459A6" stroke-linecap="round" stroke-lin
   </g>`;
 
 /**
- * El cuerpo de Mixtle. `pin`: la versión del pin de Eco Urban que trae en el pecho (siempre lo trae; ver
- * pinEcoUrban.ts): "grande" donde Mixtle se ve grande y "chico" donde se ve chico.
+ * El cuerpo de Mixtle. `pin`: el acomodo del pin de Eco Urban que trae en el pecho (ver pinEcoUrban.ts).
+ * `null` solo cuando el pin se pone aparte, encima (React: MixtleFigura y MascotaVestida); Mixtle siempre lo trae.
  */
-function cuerpoMixtle(expresion: ExpresionMixtle, s = '', pin: VersionPin = 'chico', espejo = false, lugar: LugarPin = LUGAR_PIN): string {
+/** Las dos capas del cuerpo: lo de atrás del pin (cuerpo, vientre, patas) y lo de adelante (brazos y cabeza). */
+function capasMixtle(expresion: ExpresionMixtle, s = ''): { atras: string; adelante: string } {
   // Cada oreja va en su propio grupo (clase mx-oreja) para que en reposo se mueva sola.
   const oreja = (x: number, giro: number, lado: string) =>
     `<g class="mx-oreja mx-oreja-${lado}"><g transform="rotate(${giro} ${x} 78)">
@@ -151,7 +152,7 @@ function cuerpoMixtle(expresion: ExpresionMixtle, s = '', pin: VersionPin = 'chi
     ? `<ellipse cx="136" cy="414" rx="20" ry="24" fill="${C.pielOscura}"/><ellipse cx="224" cy="414" rx="20" ry="24" fill="${C.pielOscura}"/>`
     : `<ellipse cx="116" cy="414" rx="46" ry="18" fill="${C.pielOscura}"/>
     <ellipse cx="244" cy="414" rx="46" ry="18" fill="${C.pielOscura}"/>`;
-  return `${defsMixtle(s)}
+  const svg = `${defsMixtle(s)}
     ${colgado ? '' : '<ellipse cx="180" cy="428" rx="125" ry="12" fill="#000" opacity=".12"/>'}
     <g${ladeo}>${oreja(104, -22, 'izq')}${oreja(256, 22, 'der')}</g>
     ${brazosArriba}
@@ -160,8 +161,7 @@ function cuerpoMixtle(expresion: ExpresionMixtle, s = '', pin: VersionPin = 'chi
     ${pies}
     <path d="M112 318 C 90 352 94 396 122 408 M248 318 C 270 352 266 396 238 408" fill="none" stroke="${C.pielOscura}" stroke-width="5" stroke-linecap="round" opacity=".6"/>
     <ellipse cx="180" cy="242" rx="54" ry="9" fill="#6E5A4A" opacity=".16"/>
-    ${pinEcoUrban(pin, lugar, s, espejo)}
-    ${patasDelanteras(expresion)}
+    \u0000${patasDelanteras(expresion)}
     <g${ladeo}>
     <path d="M180 70 C 252 70 282 120 274 166 C 266 206 226 236 180 240 C 134 236 94 206 86 166 C 78 120 108 70 180 70 Z" fill="url(#mx-piel${s})"/>
     <path d="M88 172 l-14 8 l16 4 l-10 10 l18 -2 M272 172 l14 8 l-16 4 l10 10 l-18 -2" fill="${C.piel}" stroke="${C.piel}" stroke-width="3" stroke-linejoin="round"/>
@@ -183,6 +183,22 @@ function cuerpoMixtle(expresion: ExpresionMixtle, s = '', pin: VersionPin = 'chi
     ${expresion === 'pensando' ? `<ellipse cx="200" cy="238" rx="22" ry="15" fill="${C.pielOscura}"/><path d="M190 232 v8 M200 232 v9 M210 232 v8" stroke="${C.piel}" stroke-width="3" stroke-linecap="round"/>` : ''}
     </g>
     ${expresion === 'duerme' ? ZETAS : ''}`;
+  const [atras, adelante] = svg.split('\u0000');
+  return { atras: atras!, adelante: adelante! };
+}
+
+/** El cuerpo de Mixtle con el pin entre el cuerpo y los brazos (los brazos que cruzan el pecho le pasan por delante). */
+function cuerpoMixtle(expresion: ExpresionMixtle, s = '', pin: VersionPin | null = 'chico', espejo = false, lugar: LugarPin = LUGAR_PIN): string {
+  const { atras, adelante } = capasMixtle(expresion, s);
+  return `${atras}${pin ? pinEcoUrban(pin, lugar, s, espejo) : ''}${adelante}`;
+}
+
+/**
+ * Las capas del cuerpo por separado, para poner el pin en medio desde fuera (React: MixtleFigura le
+ * da un tamaño mínimo en pantalla). Caja de 360×440, como el cuerpo.
+ */
+export function capasDeMixtle(expresion: ExpresionMixtle, sufijo = ''): { atras: string; adelante: string } {
+  return capasMixtle(expresion, sufijo);
 }
 
 /**
@@ -323,12 +339,12 @@ function mariposa(feliz: boolean): string {
  * `sufijo`: distinto para cada Mixtle que vaya en línea en la misma página (ver defsMixtle).
  * `pin`: versión del pin de Eco Urban; `espejo`: el cuerpo se mostrará volteado (el pin se lee derecho igual).
  */
-export function cuerpoDeMixtle(expresion: ExpresionMixtle, sufijo = '', pin: VersionPin = 'chico', espejo = false, lugar: LugarPin = LUGAR_PIN): string {
+export function cuerpoDeMixtle(expresion: ExpresionMixtle, sufijo = '', pin: VersionPin | null = 'chico', espejo = false, lugar: LugarPin = LUGAR_PIN): string {
   return cuerpoMixtle(expresion, sufijo, pin, espejo, lugar);
 }
 
 /** Mixtle completo, con la cola, para una caja de 472×440 (el logo y la hoja de personaje). */
-export function mixtleCompleto(expresion: ExpresionMixtle, sufijo = '', pin: VersionPin = 'grande', lugar: LugarPin = LUGAR_PIN): string {
+export function mixtleCompleto(expresion: ExpresionMixtle, sufijo = '', pin: VersionPin | null = 'chico', lugar: LugarPin = LUGAR_PIN): string {
   if (expresion === 'colgado') return mixtleColgadoCompleto(sufijo, pin, lugar);
   return `<g transform="translate(212 0)">${COLA_MIXTLE}</g>${cuerpoMixtle(expresion, sufijo, pin, false, lugar)}`;
 }
@@ -350,7 +366,7 @@ const COLA_COLGANDO = (() => {
 })();
 
 /** Mixtle colgado con su cola, para una caja de 360×600. */
-export function mixtleColgadoCompleto(sufijo = '', pin: VersionPin = 'grande', lugar: LugarPin = LUGAR_PIN): string {
+export function mixtleColgadoCompleto(sufijo = '', pin: VersionPin | null = 'chico', lugar: LugarPin = LUGAR_PIN): string {
   return `${COLA_COLGANDO}${cuerpoMixtle('colgado', sufijo, pin, false, lugar)}`;
 }
 
@@ -369,8 +385,6 @@ export const PERSONAJES: ArteSvg[] = [
   arte('mixtle-cola', 260, 440, COLA_MIXTLE, ESCALA_MIXTLE),
   // Mixtle entero (con su cola anillada) para todo lo que no se anima por partes: estampa, mascota,
   // parque del grupo, tarjetas, diploma y transición. Sin la cola parecería conejo.
-  // Con el pin grande: se usan donde Mixtle se ve grande (vestidor, diploma, festejos). Las poses de arriba
-  // (lección, globo, aventuras) llevan el pin chico.
   arte('mixtle-entero', 472, 440, mixtleCompleto('normal'), ESCALA_MIXTLE),
   arte('mixtle-entero-feliz', 472, 440, mixtleCompleto('feliz'), ESCALA_MIXTLE),
   arte('mixtle-entero-celebrando', 472, 440, mixtleCompleto('celebrando'), ESCALA_MIXTLE),

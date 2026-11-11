@@ -10,11 +10,15 @@ import { arte, type ArteSvg } from './svg';
  *   sin efectos encima del logotipo. Se usa con su autorización (CREDITOS.md, docs/marca.md).
  * - El botón: blanco, con borde fino, un brillo suave de botón metálico y una sombrita que lo deja
  *   "prendido" al pelaje, con la misma luz que el resto del arte (desde arriba a la izquierda).
- * - Dos versiones según el tamaño en pantalla:
- *     "grande": el logotipo completo en una línea, como lo usa Eco Urban (inicio, diploma, vestidor,
- *               pantalla de carga, festejos);
- *     "chico":  "eco" sobre "urban", apilados: las letras quedan 1.6 veces más grandes en el mismo
- *               botón y se siguen leyendo cuando Mixtle es chico (lección, globo, camino, aventuras).
+ * - Dos acomodos del logotipo:
+ *     "chico":  "eco" sobre "urban", apilados. Las letras quedan 1.6 veces más grandes en el mismo
+ *               botón: es el que se lee en el tamaño real del juego (el pin mide de 16 a ~60 px en
+ *               pantalla), así que es el que usa Mixtle en todas partes: inicio, carga, lección, globo,
+ *               camino, vestidor, diploma, festejos y aventuras.
+ *     "grande": el logotipo en una línea, como lo usa Eco Urban. En una línea las letras miden 0.6 veces
+ *               lo del apilado: solo se lee cuando el pin mide ~60 px o más (vitrina, galería, docs).
+ * - En React, el pin del cuerpo va aparte del dibujo (MixtleFigura, MascotaVestida) para que nunca mida
+ *   menos de 16 px en pantalla y para ir siempre encima de los accesorios del cuello.
  */
 
 export type VersionPin = 'grande' | 'chico';
@@ -26,29 +30,31 @@ export interface LugarPin {
   r: number;
 }
 
+/** Alto del cuerpo de Mixtle dibujado (de la punta de las orejas a las patas, sin la cola), en la caja de 360×440. */
+export const ALTO_CUERPO_MIXTLE = 411.5;
+
 /**
- * Las tres opciones de tamaño que se le mostraron a Eco Urban (docs/marca/pin-variantes.png). Todas
- * van del lado izquierdo de Mixtle (a la derecha de quien lo ve), debajo del paliacate del vestidor.
- * Discreto y medio: ningún brazo los toca en ninguna pose (medido contra los brazos de cada pose en
- * tests/pinEcoUrban.test.ts). Protagonista: el brazo en reposo le pasa por delante de la orilla.
+ * Las tres opciones de tamaño (docs/marca/pin-variantes.png), en la posición que pidió Eco Urban
+ * (v3.1.1): en el pecho, arriba y al centro, sobre la parte clara, justo debajo de la barbilla. El
+ * diámetro es el 14, 16 o 18 % del alto del cuerpo. Los brazos se dibujan encima: en las poses donde uno
+ * cruza el pecho le tapan una orilla (lo más, "pensando", con la mano en la barbilla), y siempre se ve
+ * al menos el 70 % (medido en tests/pinEcoUrban.test.ts); colgado de la rama se ve completo.
  */
+const radio = (fraccion: number) => Number(((ALTO_CUERPO_MIXTLE * fraccion) / 2).toFixed(2));
 export const VARIANTES_PIN = {
-  discreto: { x: 241, y: 327, r: 12 },
-  // El más grande que cabe sin que nada lo tape: entre el brazo en reposo y la orilla del cuerpo hay 37 de ancho.
-  medio: { x: 240.5, y: 330, r: 18 },
-  // Entre el brazo en reposo y la orilla del cuerpo caben 37 de ancho (radio 18.5): el protagonista se
-  // mete un poco bajo ese brazo, que le tapa solo el canto, nunca el logotipo.
-  protagonista: { x: 240.5, y: 345, r: 21 },
+  visible: { x: 178, y: 278, r: radio(0.14) },
+  destacado: { x: 178, y: 280, r: radio(0.16) },
+  grande: { x: 178, y: 283, r: radio(0.18) },
 } as const satisfies Record<string, LugarPin>;
 
 export type TamanoPin = keyof typeof VARIANTES_PIN;
 
 /**
- * EL tamaño en uso. Para cambiarlo basta con este valor: 'discreto', 'medio' o 'protagonista'
- * (todo Mixtle, en todas sus poses y apariciones, lo toma de aquí). Luego: npm run marca:generar
- * (logo de la pantalla de carga, íconos y hoja de personaje) y npm run build.
+ * EL tamaño en uso. Para cambiarlo basta con este valor: 'visible', 'destacado' o 'grande' (todo
+ * Mixtle, en todas sus poses y apariciones, lo toma de aquí). Luego: npm run marca:generar (logo de la
+ * pantalla de carga y hoja de personaje) y npm run build.
  */
-export const TAMANO_PIN: TamanoPin = 'medio';
+export const TAMANO_PIN: TamanoPin = 'destacado';
 
 export const LUGAR_PIN: LugarPin = VARIANTES_PIN[TAMANO_PIN];
 
@@ -123,8 +129,9 @@ function pinUnitario(version: VersionPin, s: string): string {
     logo = `<g transform="translate(${n((-APILADO.ancho * k) / 2)} ${n((-APILADO.alto * k) / 2)}) scale(${n(k)})">${APILADO.svg}</g>`;
   }
   return `${defsPin(s)}
-    <circle cx="6" cy="11" r="102" fill="#3A2A1F" opacity=".1"/>
-    <circle cx="3" cy="6" r="100" fill="#3A2A1F" opacity=".2"/>
+    <circle cx="6" cy="12" r="105" fill="#3A2A1F" opacity=".1"/>
+    <circle cx="3" cy="7" r="103" fill="#3A2A1F" opacity=".18"/>
+    <circle r="104" fill="#E3E8EC"/>
     <circle r="100" fill="url(#pin-cara${s})"/>
     <circle r="94" fill="none" stroke="url(#pin-bisel${s})" stroke-width="9"/>
     <circle r="99" fill="none" stroke="#AEB9C0" stroke-width="2"/>
@@ -142,9 +149,31 @@ export function pinEcoUrban(version: VersionPin, lugar: LugarPin, s = '', espejo
   return `<g class="pin-eco-urban" data-pin="${version}" transform="translate(${lugar.x} ${lugar.y}) scale(${espejo ? -k : k} ${k})">${pinUnitario(version, s)}</g>`;
 }
 
-/** El pin solo (galería ?mixtle, docs). Caja de 240×240 con el pin al centro. */
+/**
+ * Dónde queda el pin dentro de su dibujo solo (ARTE_PIN): caja de 240×240, centro en (116, 114) y radio
+ * 100. Sirve para encimarlo sobre Mixtle en React en el mismo lugar que tendría dentro de su dibujo.
+ */
+export const CAJA_ARTE_PIN = { lado: 240, x: 116, y: 114, r: 100 } as const;
+
+/**
+ * El pin encima de un dibujo de Mixtle, en % de la caja del dibujo (ancho × alto en las unidades del
+ * dibujo; el cuerpo está en (0, 0)). `minimoPx`: el pin nunca mide menos que eso de diámetro en pantalla.
+ */
+export function estiloPinEncima(caja: { ancho: number; alto: number }, lugar: LugarPin = LUGAR_PIN, minimoPx = 16) {
+  const escala = lugar.r / CAJA_ARTE_PIN.r;
+  const ancho = (CAJA_ARTE_PIN.lado * escala * 100) / caja.ancho;
+  const minimo = (minimoPx * CAJA_ARTE_PIN.lado) / (2 * CAJA_ARTE_PIN.r);
+  return {
+    left: `${((lugar.x * 100) / caja.ancho).toFixed(3)}%`,
+    top: `${((lugar.y * 100) / caja.alto).toFixed(3)}%`,
+    width: `max(${minimo.toFixed(1)}px, ${ancho.toFixed(3)}%)`,
+    origen: `${((CAJA_ARTE_PIN.x * 100) / CAJA_ARTE_PIN.lado).toFixed(3)}% ${((CAJA_ARTE_PIN.y * 100) / CAJA_ARTE_PIN.lado).toFixed(3)}%`,
+  };
+}
+
+/** El pin solo (galería ?mixtle, docs, y encima de Mixtle en React). Caja de 240×240 con el pin al centro. */
 export const ARTE_PIN: ArteSvg[] = [
-  arte('pin-eco-urban', 240, 240, pinEcoUrban('grande', { x: 116, y: 114, r: 100 }), 2),
-  arte('pin-eco-urban-chico', 240, 240, pinEcoUrban('chico', { x: 116, y: 114, r: 100 }), 2),
+  arte('pin-eco-urban', CAJA_ARTE_PIN.lado, CAJA_ARTE_PIN.lado, pinEcoUrban('grande', CAJA_ARTE_PIN), 2),
+  arte('pin-eco-urban-chico', CAJA_ARTE_PIN.lado, CAJA_ARTE_PIN.lado, pinEcoUrban('chico', CAJA_ARTE_PIN), 2),
   arte('logotipo-eco-urban', Math.ceil(CAJA_LOGOTIPO.ancho), Math.ceil(CAJA_LOGOTIPO.alto), `<g transform="translate(${n(-CAJA_LOGOTIPO.x)} ${n(-CAJA_LOGOTIPO.y)})">${logotipoEcoUrban()}</g>`, 1),
 ];

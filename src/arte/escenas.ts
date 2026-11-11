@@ -1,4 +1,4 @@
-import { CAJA_COLGADO, mixtleColgadoCompleto } from './personajes';
+import { CAJA_COLGADO, mixtleColgadoCompleto, mixtleCompleto } from './personajes';
 import { arte, type ArteSvg } from './svg';
 
 /*
@@ -103,4 +103,6 @@ export const ARTE_ESCENAS: ArteSvg[] = [
   arte('inicio-arbol', ANCHO, ALTO, ARBOL),
   arte('inicio-frente', ANCHO, ALTO, FRENTE),
   arte('mixtle-colgado', CAJA_COLGADO.ancho, CAJA_COLGADO.alto, mixtleColgadoCompleto(), 1.3),
+  // Mixtle entero sin el pin: MascotaVestida se lo pone encima, por arriba de los accesorios del cuello.
+  arte('mixtle-entero-sin-pin', 472, 440, mixtleCompleto('normal', '', null), 1.3),
 ];
