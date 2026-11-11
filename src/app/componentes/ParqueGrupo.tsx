@@ -56,7 +56,7 @@ export function ParqueGrupo({ progreso, className = '' }: Props) {
       <AnimatePresence>
         {ARBOLES.slice(0, etapa.arboles).map(([x, y], i) => (
           <motion.div key={`a${i}`} className="absolute h-[38%] -translate-x-1/2 -translate-y-full" style={{ left: `${x}%`, top: `${y}%` }} initial={{ scale: 0 }} animate={{ scale: [0, 1.15, 1] }} transition={{ delay: 1 + i * 0.08, duration: 0.7 }}>
-            <Arte clave="arbol-frutal" className="h-full origin-bottom" />
+            <Arte clave="arbol" className="h-full origin-bottom" />
           </motion.div>
         ))}
         {FLORES.slice(0, etapa.flores).map(([x, y], i) => (

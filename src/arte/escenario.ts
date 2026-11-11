@@ -115,7 +115,8 @@ const HOYO = `
 /*
  * Árbol frutal (naranjo): tres copas con frutas. Hasta la v3 se llamaba "arbolito"; en la v3.1 el arbolito
  * de las lecciones es un árbol joven sin frutas (src/arte/arboles.ts) y este queda como árbol del parque.
- * Se usa donde el árbol es parte del paisaje o el contenido habla de frutos.
+ * Se conserva para usarse solo donde el contenido hable de frutos (hoy ninguna lección ni aventura lo hace;
+ * se ve en la galería ?galeria).
  */
 const ARBOL_FRUTAL = `${LUZ}
   <ellipse cx="130" cy="336" rx="96" ry="12" fill="#000" opacity=".14"/>

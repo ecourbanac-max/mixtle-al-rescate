@@ -98,9 +98,12 @@ export class Nivel3Scene extends Phaser.Scene {
       ease: 'Back.easeOut',
       onComplete: () => {
         sonido.tocar('brote');
-        const clave = lugar.que === 'arbol' ? 'arbol-frutal' : FLORES[this.flores % FLORES.length]!;
-        const escala = lugar.que === 'arbol' ? 0.78 / 1.2 : 0.85 / 1.2;
-        const planta = this.add.image(lugar.x, lugar.y + 10, clave).setOrigin(0.5, 0.96).setScale(0).setDepth(9 + lugar.y / 1000);
+        // Lo que se siembra es un arbolito (joven, sin frutas): el árbol con frutas solo va donde el contenido
+        // habla de frutos (v3.1). Mide lo mismo que el árbol que se sembraba antes (~270 px de alto).
+        const esArbol = lugar.que === 'arbol';
+        const clave = esArbol ? 'arbolito' : FLORES[this.flores % FLORES.length]!;
+        const escala = esArbol ? 270 / 240 : 0.85 / 1.2;
+        const planta = this.add.image(lugar.x, lugar.y + 10, clave).setOrigin(0.5, esArbol ? 0.94 : 0.96).setScale(0).setDepth(9 + lugar.y / 1000);
         planta.setName(`planta-${lugar.que}`);
         brote.destroy();
         chispas(this, lugar.x, lugar.y - 80, 8, 120);
