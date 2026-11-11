@@ -73,7 +73,8 @@ for (const mascota of MASCOTAS) {
         await page.waitForTimeout(120);
         const m = await medir(page);
         const caso = `${mascota.nombre}, ${nombre}, puestos: ${puestos.join('+') || 'ninguno'}`;
-        expect(m.dibujos.length, caso).toBe(1 + puestos.length);
+        // La mascota y un dibujo por accesorio; Mixtle además trae su pin de Eco Urban encima (v3.1.1).
+        expect(m.dibujos.length, caso).toBe(1 + puestos.length + (mascota.id === 'cacomixtle' ? 1 : 0));
         expect.soft(m.dentro, `${caso}: la mascota se sale del recuadro (${JSON.stringify(m.dibujos)} vs ${JSON.stringify(m.recuadro)})`).toBe(true);
         expect.soft(m.recuadroLibre, `${caso}: el recuadro toca una tarjeta`).toBe(true);
         expect.soft(m.cruza, `${caso}: la mascota tapa una tarjeta`).toBe(false);
