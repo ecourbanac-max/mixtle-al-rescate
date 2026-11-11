@@ -48,8 +48,9 @@ export function ParqueGrupo({ progreso, className = '' }: Props) {
       data-parque-flores={etapa.flores}
       data-parque-color={etapa.avance.toFixed(2)}
     >
+      {/* El parque a lo ancho: el árbol grande cabe completo en el marco (antes su copa salía cortada). */}
       <Arte
-        clave="parque"
+        clave="parque-ancho"
         className="absolute inset-0 h-full w-full object-cover object-bottom transition-[filter] delay-300 duration-[2000ms] ease-out"
         style={{ filter: `grayscale(${gris}) saturate(${1 + etapa.avance * 0.25}) brightness(${1 - gris * 0.15})` }}
       />

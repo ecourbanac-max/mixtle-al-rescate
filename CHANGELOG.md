@@ -2,6 +2,14 @@
 
 Fechas de octubre y noviembre de 2026. Las etiquetas de git marcan las versiones que vio Eco Urban.
 
+## v3.1.2 (11 de noviembre) — Ajustes de marca Eco Urban
+
+La versión anterior queda en la etiqueta `v3.1.1-estable`.
+
+### 4. El árbol del parque del grupo, completo
+
+- En "El parque de [grupo]" la copa del árbol grande salía cortada por el borde de arriba: el marco es más ancho que 16:9 y el dibujo del parque se recortaba arriba. Ahora el parque del grupo usa un dibujo a lo ancho (`parque-ancho`, 1920×720), con el árbol grande un poco más chico y el sol más abajo. Cabe completo con cualquier avance, en el camino, al terminar una lección y en la vitrina, en compu y en celular (`tests/parqueGrupo.test.ts`).
+
 ## v3.1.1 (10 de noviembre) — Ajustes finales para Eco Urban
 
 La versión anterior queda en las etiquetas `v3.1-pin-chico` y `v3.1-antes-ajustes`.

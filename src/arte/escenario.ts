@@ -32,8 +32,8 @@ function mata(x: number, y: number): string {
   return `<path d="M${x - 22} ${y} q 6 -30 12 -4 q 4 -34 10 -2 q 8 -28 12 6 z" fill="${PASTO_OSCURO}"/>`;
 }
 
-const PARQUE = `
-  <defs>
+/** El parque por partes: así sale entero (16:9, escenas de las lecciones) y a lo ancho (parque del grupo). */
+const PARQUE_DEFS = `  <defs>
     <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#B7E0F5"/><stop offset="1" stop-color="#EEF8FC"/>
     </linearGradient>
@@ -44,13 +44,11 @@ const PARQUE = `
     <linearGradient id="nevado" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9DB6CC"/><stop offset="1" stop-color="#BFD1DF"/></linearGradient>
     <radialGradient id="halo"><stop offset="0" stop-color="#FFF6CF"/><stop offset=".5" stop-color="#FFF6CF" stop-opacity=".5"/><stop offset="1" stop-color="#FFF6CF" stop-opacity="0"/></radialGradient>
   </defs>
-  ${LUZ}
-  <rect width="${ANCHO}" height="${ALTO}" fill="url(#cielo)"/>
-  <circle cx="1680" cy="170" r="230" fill="url(#halo)"/>
-  <circle cx="1680" cy="170" r="74" fill="#FFE07A"/>
-  <circle cx="1660" cy="150" r="24" fill="#fff" opacity=".35"/>
-
-  <!-- Nevado de Toluca -->
+  ${LUZ}`;
+const PARQUE_SOL = (cy: number) => `  <circle cx="1680" cy="${cy}" r="230" fill="url(#halo)"/>
+  <circle cx="1680" cy="${cy}" r="74" fill="#FFE07A"/>
+  <circle cx="1660" cy="${cy - 20}" r="24" fill="#fff" opacity=".35"/>`;
+const PARQUE_ESCENA = `  <!-- Nevado de Toluca -->
   <path d="M700 640 L 1000 410 Q 1022 394 1046 400 L 1104 420 Q 1136 392 1170 404 L 1250 430 L 1580 640 Z" fill="url(#nevado)"/>
   <path d="M1000 410 Q 1022 394 1046 400 L 1104 420 Q 1136 392 1170 404 L 1250 430 L 1214 456 L 1182 438 L 1150 462 L 1112 442 L 1076 466 L 1044 440 L 988 462 L 966 438 Z" fill="#fff"/>
   <path d="M1170 404 L 1250 430 L 1214 456 L 1182 438 Z" fill="#DCE7F1"/>
@@ -72,19 +70,37 @@ const PARQUE = `
   <rect x="1282" y="470" width="14" height="290" rx="6" fill="#2E4A3D"/>
   <rect x="1266" y="752" width="46" height="16" rx="6" fill="#2E4A3D"/>
   <path d="M1264 470 L 1314 470 L 1304 420 L 1274 420 Z" fill="#FFE9A8" stroke="#2E4A3D" stroke-width="7" stroke-linejoin="round"/>
-  <path d="M1262 420 L 1316 420 L 1289 396 Z" fill="#2E4A3D"/>
-
-  <!-- Árbol grande de Mixtle -->
+  <path d="M1262 420 L 1316 420 L 1289 396 Z" fill="#2E4A3D"/>`;
+const PARQUE_ARBOL = `  <!-- Árbol grande de Mixtle -->
   <ellipse cx="478" cy="784" rx="150" ry="18" fill="#2C5E2E" opacity=".18"/>
   <path d="M420 780 C 432 660 424 520 446 420 L 512 420 C 528 520 522 660 536 780 Z" fill="url(#esc-tronco)"/>
   <path d="M436 780 C 450 700 446 600 460 520" stroke="${TRONCO_OSCURO}" stroke-width="8" fill="none" stroke-linecap="round" opacity=".5"/>
   <path d="M470 480 C 420 440 380 430 340 420" stroke="${TRONCO}" stroke-width="22" fill="none" stroke-linecap="round"/>
   <ellipse cx="478" cy="560" rx="16" ry="22" fill="${TRONCO_OSCURO}"/>
-  ${copa(330, 360, 120)}${copa(620, 360, 120)}${copa(470, 250, 150)}${copa(340, 230, 100)}${copa(610, 220, 100)}${copa(470, 400, 110)}
+  ${copa(330, 360, 120)}${copa(620, 360, 120)}${copa(470, 250, 150)}${copa(340, 230, 100)}${copa(610, 220, 100)}${copa(470, 400, 110)}`;
+const PARQUE_MATAS = `  <!-- Matas de pasto -->
+  ${mata(160, 1040)}${mata(860, 1060)}${mata(1210, 1000)}${mata(1660, 1050)}${mata(1880, 930)}${mata(700, 860)}${mata(1580, 860)}`;
 
-  <!-- Matas de pasto -->
-  ${mata(160, 1040)}${mata(860, 1060)}${mata(1210, 1000)}${mata(1660, 1050)}${mata(1880, 930)}${mata(700, 860)}${mata(1580, 860)}
-`;
+const PARQUE = `${PARQUE_DEFS}
+  <rect width="${ANCHO}" height="${ALTO}" fill="url(#cielo)"/>
+  ${PARQUE_SOL(170)}
+  ${PARQUE_ESCENA}
+  ${PARQUE_ARBOL}
+  ${PARQUE_MATAS}`;
+
+/**
+ * El parque a lo ancho (1920×720), para el parque del grupo (marcos de 16:6 y 16:7). Es la franja de abajo
+ * del parque entero (lo que antes dejaba ver el recorte), pero con el árbol grande más chico y el sol más
+ * abajo: antes la copa del árbol salía cortada por el borde de arriba (v3.1.2). La base del árbol queda en
+ * su lugar; los demás dibujos del parque del grupo (árboles, flores, basura, animales) no se mueven.
+ */
+const ALTO_ANCHO = 720;
+const PARQUE_ANCHO = `${PARQUE_DEFS}
+  <rect width="${ANCHO}" height="${ALTO_ANCHO}" fill="url(#cielo)"/>
+  ${PARQUE_SOL(120)}
+  <g transform="translate(0 ${ALTO_ANCHO - ALTO})">${PARQUE_ESCENA}${PARQUE_MATAS}</g>
+  <g transform="translate(478 ${784 + ALTO_ANCHO - ALTO}) scale(.56) translate(-478 -784)">${PARQUE_ARBOL}</g>`;
+
 
 const NUBE = `<g fill="#fff">
   <ellipse cx="150" cy="80" rx="130" ry="36"/>
@@ -146,6 +162,7 @@ const BRILLO = `<path d="M32 2 C 35 22 42 29 62 32 C 42 35 35 42 32 62 C 29 42 2
 
 export const ESCENARIO: ArteSvg[] = [
   arte('parque', ANCHO, ALTO, PARQUE),
+  arte('parque-ancho', ANCHO, ALTO_ANCHO, PARQUE_ANCHO),
   arte('nube', 300, 130, NUBE),
   arte('arbusto', 300, 200, ARBUSTO, 1.2),
   arte('bolsa', 200, 222, BOLSA, 1.2),
