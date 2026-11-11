@@ -16,6 +16,12 @@ La versión anterior queda en la etiqueta `v3.1.1-estable`.
 - **Revisado:** convive con los 6 accesorios del vestidor y aparece en la galería `?mixtle`. Los ids son únicos por cada Mixtle. El ícono de la app no cambia.
 - **Pruebas:** `tests/bandaEcoUrban.test.tsx`.
 
+### 2. Mixtle más grande en "¿Quién va a jugar?"
+
+- Mixtle guía, abajo a la izquierda, mide ahora lo que su globo de texto o un poco más: 146 px en una laptop de 1366×768 (antes 85), 117 px con zoom al 125 %, y 104 px con zoom al 150 % y en celular. Se ven su pin y su banda.
+- No tapa ninguna tarjeta de grupo ni "Nuevo grupo", con 2, 4 o 7 grupos, arriba o desplazado hasta abajo, en compu, laptop con zoom al 125 y 150 %, celular y tablet. La lista deja abajo el espacio de Mixtle y, en pantallas bajas, también las franjas de los lados.
+- El Mixtle de la tarjeta "Cacomixtle" lleva su banda y su pin. El texto de la banda no va ahí: la tarjeta es chica.
+
 ### 4. El árbol del parque del grupo, completo
 
 - En "El parque de [grupo]" la copa del árbol grande salía cortada por el borde de arriba: el marco es más ancho que 16:9 y el dibujo del parque se recortaba arriba. Ahora el parque del grupo usa un dibujo a lo ancho (`parque-ancho`, 1920×720), con el árbol grande un poco más chico y el sol más abajo. Cabe completo con cualquier avance, en el camino, al terminar una lección y en la vitrina, en compu y en celular (`tests/parqueGrupo.test.ts`).

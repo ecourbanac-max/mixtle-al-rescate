@@ -15,6 +15,9 @@ import { useGrupos } from '../estado/grupos';
 import { callar, decir } from '../estado/narrador';
 
 /** Elegir o crear el grupo que va a jugar. El progreso es por grupo, nunca por niño. */
+/** Alto de Mixtle guía en "¿Quién va a jugar?": del alto de su globo o un poco más (se ven su pin y su banda). */
+const ALTO_MIXTLE_GRUPOS = 'clamp(6.5rem,19vmin,11rem)';
+
 export function Grupos() {
   const { grupos, cargado, guardadoOk, cargar, elegir } = useGrupos();
   const alCamino = useApp((s) => s.alCamino);
@@ -31,7 +34,7 @@ export function Grupos() {
   }, []);
 
   return (
-    <main data-pantalla="grupos" data-entrada-lista="true" className="textura relative flex h-full w-full flex-col items-center gap-[clamp(1rem,3vmin,2rem)] overflow-y-auto bg-gradient-to-b from-cielo to-verde-claro px-4 pt-6 pb-8">
+    <main data-pantalla="grupos" data-entrada-lista="true" className="textura relative flex h-full w-full flex-col items-center gap-[clamp(1rem,3vmin,2rem)] overflow-y-auto bg-gradient-to-b from-cielo to-verde-claro px-4 pt-6 pb-[calc(clamp(6.5rem,19vmin,11rem)+1.5rem)]">
       <BotonesSistema />
       <h1 className="text-[clamp(2.2rem,6vmin,4.5rem)] font-black text-white" style={{ WebkitTextStroke: '0.1em var(--color-verde)', paintOrder: 'stroke fill' }}>
         {TEXTOS_APP.grupos.titulo}
@@ -76,8 +79,12 @@ export function Grupos() {
         <p className="max-w-[44rem] rounded-2xl bg-white/80 px-4 py-2 text-center font-bold">{guardadoOk ? TEXTOS_APP.grupos.soloAqui : TEXTOS_APP.grupos.sinGuardar}</p>
         <SelloEcoUrban texto={TEXTOS_APP.ecoUrban.unProyectoDe} className="text-[clamp(0.95rem,2.2vmin,1.25rem)]" />
       </div>
-      <div className="fixed bottom-3 left-3">
-        <MixtleGuia alto="clamp(5rem,12vmin,8rem)" soloMientrasHabla />
+      {/*
+        Mixtle guía, del alto de su globo o un poco más (v3.1.2): así se ven su pin y su banda. pb del main:
+        lo último de la lista sube por encima de Mixtle (fijo abajo a la izquierda) y nunca queda tapado.
+      */}
+      <div className="fixed bottom-3 left-3" data-mixtle-grupos>
+        <MixtleGuia alto={ALTO_MIXTLE_GRUPOS} soloMientrasHabla />
       </div>
       {creando && <CrearGrupo alCerrar={() => setCreando(false)} />}
     </main>
