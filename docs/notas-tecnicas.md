@@ -53,8 +53,33 @@ Para la persona que facilita: **mantén presionado el logo de Mixtle (arriba a l
 
 Hasta la v2, el personaje se llamaba **Caco** y el juego, "Caco al rescate" (la versión que vio Eco Urban está en la etiqueta de git `v2-eco-urban`). Desde la v3 se llama **Mixtle**, y el juego, **"Mixtle al rescate"**, con el lema **"Guardianes del parque"**. La palabra "cacomixtle" se queda donde nombra al animal.
 
-- **Dirección:** el juego está en <https://mixtle-al-rescate.vercel.app>. Si se abre la dirección anterior, <https://caco-al-rescate.vercel.app>, el juego empaca los grupos y las preferencias de ese navegador, borra su copia sin conexión y abre la dirección nueva con todo eso en el fragmento de la URL (`#mudanza=…`, que nunca se envía a ningún servidor). En la dirección nueva, los grupos se juntan con los que ya hubiera, sin perder ninguno. Lo hace `src/servicios/mudanza.ts` y `mudarse.ts`.
+- **Dirección:** desde la v3.2 la dirección oficial es <https://mixtle.org> (de Eco Urban) y se define en un solo lugar, `src/sitio.ts`, junto con la lista de direcciones viejas (`mixtle-al-rescate.vercel.app`, `caco-al-rescate.vercel.app` y sus direcciones de prueba `*.vercel.app`). En la v3, `caco-al-rescate.vercel.app` mudaba los grupos a `mixtle-al-rescate.vercel.app`; ese paquete (v1) se sigue entendiendo. Ver *Mudanza a la dirección definitiva*.
 - **Datos guardados con el nombre anterior** (IndexedDB `caco-al-rescate` y las claves `caco-al-rescate:*` de `localStorage`) pasan solos a `mixtle-al-rescate` al abrir el juego (`src/servicios/migracion.ts`, con pruebas en `tests/migracion.test.ts`).
+
+## Mudanza a la dirección definitiva (v3.2)
+
+Los grupos viven solo en el navegador de cada aparato (IndexedDB), y cada dirección tiene su propio almacén: si el juego cambia de dirección, los grupos no se ven en la nueva. Por eso, desde la v3.2, una dirección vieja se muda **sola** a la definitiva, sin perder el avance de ningún grupo. Todo está en `src/sitio.ts` (las direcciones), `src/servicios/mudanzaDefinitiva.ts` (el acuerdo), `src/servicios/mudanza.ts` (el paquete) y `src/app/componentes/PantallaMudanza.tsx` (las pantallas).
+
+**Cuándo se activa.** Solo en una dirección de la lista de viejas. Un segundo y medio después de abrir, pide `https://mixtle.org/salud.json` (sin caché, con un límite de 6 s). Ese archivo lo genera el build (`{"app":"mixtle-al-rescate","version":"3.2.0","mudanza":2}`) y `vercel.json` le pone `Access-Control-Allow-Origin: *` (solo a ese archivo) para que otra dirección lo pueda leer. Si mixtle.org no responde, responde otra cosa (un aviso de dominio, otro sitio) o no hay internet, **no pasa nada**: el juego sigue normal donde está y vuelve a revisar la próxima vez que se abra o cuando regrese la conexión. En mixtle.org, en `localhost` y en cualquier dirección que no esté en la lista, nunca intenta mudarse. Por eso hoy, sin el juego en mixtle.org, la mudanza está dormida.
+
+**Cómo se muda** (solo en una pantalla segura: inicio, grupos, camino o álbum; nunca a media lección ni aventura):
+
+1. **Sin grupos** en ese aparato: abre mixtle.org directo.
+2. **Con grupos:** el aviso "El juego se cambió a mixtle.org. Vamos a llevar sus grupos" con la lista de grupos, un botón "Llevar los grupos" y una cuenta regresiva de 8 s. La vieja guarda una *mudanza pendiente* (id, firma de los grupos y firma de cada grupo) y abre `mixtle.org/#mudanza=…` con todos los grupos y las preferencias en el fragmento de la URL (el fragmento nunca se envía a ningún servidor).
+3. **mixtle.org** revisa la firma, junta los grupos con los que ya tuviera, guarda, **vuelve a leer** para comprobar que quedaron todos, y regresa a la vieja con `#paso=recibida&id&firma` (o `#paso=fallida`). Solo regresa a una dirección de la lista de viejas (nunca a cualquier sitio).
+4. **La vieja**, con `recibida` y el id y la firma de su mudanza pendiente, guarda primero un respaldo de los grupos mudados (`grupos-mudados`) y después los quita de su lista; solo quita los que no cambiaron desde que salieron (si alguien siguió jugando en otra pestaña, ese grupo se muda la próxima vez). Luego abre `mixtle.org/#paso=lista`, que da la bienvenida.
+
+**Si algo falla a la mitad**, la vieja no borró nada: si mixtle.org no pudo guardar, regresa con `fallida` y la vieja ofrece "Intentar otra vez" (o "Ahora no"); si mixtle.org se cae o la vuelta no llega, la vieja conserva sus grupos y su mudanza pendiente, y al reintentar los grupos se juntan por id en mixtle.org (no se duplican).
+
+**Grupos repetidos.** El mismo grupo (mismo id) que llega otra vez: se queda la copia con más avance. Otro grupo con el mismo nombre (mismo animal y etiqueta): se conservan los dos y el que llega se llama "(2)", "(3)"…; la bienvenida lo avisa (`juntarGrupos` en `src/logica/grupos.ts`).
+
+**App instalada.** Si el juego estaba instalado como app desde la dirección vieja, la bienvenida en mixtle.org explica cómo instalarlo otra vez (y ofrece el botón "Instalar" si el navegador lo permite); el ícono viejo se puede borrar.
+
+**Plan B: respaldo en archivo.** En el modo facilitador (y manteniendo presionado 3 s el título de "¿Quién va a jugar?", aunque no haya grupos): "Exportar grupos" descarga `mixtle-grupos-AAAA-MM-DD.json` con todos los grupos del aparato (también los ya mudados); "Importar grupos" lo valida por completo (que sea de este juego, el formato, cada grupo y la firma) antes de tocar nada, enseña qué se va a agregar y lo junta igual que la mudanza. Funciona sin internet (`src/servicios/respaldo.ts`).
+
+**Cómo se prueba.** `tests/mudanzaDefinitiva.test.ts` (el acuerdo completo con almacenes de prueba) y `npm run mudanza:probar` (`scripts/probar-mudanza.mjs`): construye el juego con la definitiva en `http://127.0.0.1:4312` y la vieja en `localhost:4311` (`VITE_DIRECCION_DEFINITIVA`, `VITE_DIRECCIONES_VIEJAS`, solo para esa prueba) y recorre en Chrome sin ventana: definitiva no disponible, mudanza completa, fallas a la mitad, nombre repetido y respaldo en archivo.
+
+**Para cambiar de dirección otra vez** (por ejemplo, si un día el juego se va de mixtle.org): en `src/sitio.ts`, `DIRECCION_DEFINITIVA` pasa a ser la nueva y la anterior entra a `DIRECCIONES_VIEJAS`; la vieja tiene que seguir sirviendo el juego (con esa lista) hasta que los aparatos se hayan mudado.
 
 ## Correrlo en Windows
 
@@ -92,7 +117,7 @@ El proyecto es un sitio estático y ya incluye `vercel.json` (Vite, `npm run bui
 - **Instant Rollback en Vercel:** en el proyecto → *Deployments* → el despliegue de `cb13f92` → ⋯ → *Instant Rollback* (o *Promote to Production*). Es inmediato y no toca el repositorio; las laptops lo reciben como cualquier versión nueva (ver *Cuando se publica una versión nueva*).
 - **Con git:** `git revert --no-commit v3-estable..main && git commit -m "Volver a v3-estable"` y `git push`. Deshace los commits posteriores sin reescribir la historia; Vercel publica el resultado.
 
-**Hoy:** el proyecto de Vercel `mixtle-al-rescate` está conectado a este repositorio: **cada *push* a `main` se publica solo en producción** (<https://mixtle-al-rescate.vercel.app>).
+**Hoy:** mientras Eco Urban recibe el proyecto, el proyecto de Vercel `mixtle-al-rescate` (de quien lo desarrolló) sigue conectado a este repositorio y publica cada *push* a `main` en la dirección vieja. Cuando Eco Urban lo importe en su cuenta de Vercel y conecte mixtle.org (ver [`docs/traspaso.md`](traspaso.md)), **cada *push* a `main` se publicará solo en <https://mixtle.org>**. El proyecto de Eco Urban **no debe llamarse `mixtle-al-rescate`** (sugerencia: `mixtle`): las direcciones `mixtle-al-rescate*.vercel.app` están en la lista de direcciones viejas.
 
 **Con GitHub (recomendado):** en [vercel.com](https://vercel.com), *Add New → Project* e importa el repositorio. Cada rama o *pull request* genera una **versión de prueba** (*preview*) con su propia dirección; lo que llega a `main` se publica en **producción**. Así Eco Urban puede revisar cambios antes de que lleguen a los salones.
 
@@ -209,7 +234,7 @@ Medido en Chrome real con ventana, laptop a 48 kHz, 120 s por corrida. Autoplay 
 
 ### Depurar el audio (`?depurar-audio`)
 
-Si la música se detiene sola o no arranca, se puede ver qué pasó: abre el juego con **`?depurar-audio`** al final de la dirección (<https://mixtle-al-rescate.vercel.app/?depurar-audio>). Aparece un recuadro negro abajo a la izquierda que anota, con hora, cada intento de `play()` y si el navegador lo aceptó o lo rechazó, las pausas (y si las pidió el juego), los tropiezos del streaming (`stalled`, `waiting`, `error`), cuándo la pista vuelve a empezar, el *ducking* (agachar y levantar mientras habla Mixtle), el estado del `AudioContext`, cuándo se esconde o se muestra la pestaña, la descarga para jugar sin internet y las recargas por versión nueva. Cada ~5 s anota "avanza" con el tiempo de reproducción: si deja de avanzar sin un `stop()` del juego, ahí está el problema. Lo mismo sale en la consola (F12) con el prefijo `[audio …]`.
+Si la música se detiene sola o no arranca, se puede ver qué pasó: abre el juego con **`?depurar-audio`** al final de la dirección (<https://mixtle.org/?depurar-audio>). Aparece un recuadro negro abajo a la izquierda que anota, con hora, cada intento de `play()` y si el navegador lo aceptó o lo rechazó, las pausas (y si las pidió el juego), los tropiezos del streaming (`stalled`, `waiting`, `error`), cuándo la pista vuelve a empezar, el *ducking* (agachar y levantar mientras habla Mixtle), el estado del `AudioContext`, cuándo se esconde o se muestra la pestaña, la descarga para jugar sin internet y las recargas por versión nueva. Cada ~5 s anota "avanza" con el tiempo de reproducción: si deja de avanzar sin un `stop()` del juego, ahí está el problema. Lo mismo sale en la consola (F12) con el prefijo `[audio …]`.
 
 **Para mandar el registro:** reproduce el problema con `?depurar-audio` y toca **"Copiar registro"** en el recuadro; pega el texto en un mensaje. Si el botón no copia, selecciona el texto del recuadro, o en la consola escribe `copy(__registroAudio())` y pega. Sin `?depurar-audio` el registro no existe y no cuesta nada.
 

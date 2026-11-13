@@ -6,7 +6,7 @@ Mixtle, un cacomixtle que vive en los árboles del parque, guía a cada grupo de
 
 - **Para quién:** niñas y niños de 1º a 3º de primaria (6 a 8 años). Mixtle narra todo en voz alta; el texto acompaña, pero no hace falta saber leer.
 - **Dónde se juega:** en la laptop de Eco Urban proyectada en el salón (todo el grupo participa) o en tablets táctiles. Después de la primera visita funciona **sin internet**.
-- **Dónde jugarlo:** <https://mixtle-al-rescate.vercel.app>.
+- **Dónde jugarlo:** <https://mixtle.org>, la dirección oficial de Eco Urban. Mientras se termina de conectar, el juego sigue en su dirección anterior, que pasa sola los grupos de cada aparato a mixtle.org en cuanto esa dirección esté lista (ver [`docs/traspaso.md`](docs/traspaso.md)).
 - **Qué es:** un prototipo jugable, completo de principio a fin, listo para probarse con un grupo real. No tiene servidor, cuentas ni analítica: el avance de cada grupo se guarda solo en el aparato donde juega.
 - **Versión entregada:** la etiqueta de git `v3-demo` es la versión que Eco Urban vio y aprobó el 30 de octubre de 2026; lo que vino después son cierres menores (ver [`CHANGELOG.md`](CHANGELOG.md)).
 
@@ -22,7 +22,7 @@ Mixtle, un cacomixtle que vive en los árboles del parque, guía a cada grupo de
 
 En corto:
 
-1. **Antes del taller, con buena señal,** abre <https://mixtle-al-rescate.vercel.app> una vez en cada aparato y espera a que el modo facilitador diga **"Listo para usar sin internet"** (unos 28 MB; 3.8 minutos con una red lenta). Desde entonces el juego funciona sin conexión.
+1. **Antes del taller, con buena señal,** abre <https://mixtle.org> una vez en cada aparato y espera a que el modo facilitador diga **"Listo para usar sin internet"** (unos 28 MB; 3.8 minutos con una red lenta). Desde entonces el juego funciona sin conexión.
 2. **Crea el grupo** en "¿Quién va a jugar?": un animal, un color y, si quieren, una etiqueta corta como "2°B". **Nunca se piden nombres** de niñas ni niños.
 3. **El camino.** Arriba está el parque del grupo, que se llena de vida conforme avanzan; abajo, las lecciones por unidad, un cofre a la mitad y la aventura al final. La primera vez, Mixtle hace un **recorrido guiado** de la pantalla (se puede saltar).
 4. **Modo facilitador:** mantén presionado el logo de Mixtle (arriba a la izquierda) 3 segundos. Ahí se puede abrir todas las lecciones para saltar a una, poner el **modo proyector** (todo más grande), las **animaciones suaves**, crear un **grupo de demostración** con todo terminado (para enseñar el juego en una reunión), reiniciar o borrar el grupo, y ver si ya está listo para usar sin internet.
@@ -98,7 +98,9 @@ Todo el contenido vive en archivos de datos separados de la lógica, marcados co
 
 ### Cómo se publica
 
-El juego es un sitio estático desplegado en **Vercel** desde este repositorio: **cada cambio que llega a la rama `main` se publica solo en producción** (<https://mixtle-al-rescate.vercel.app>) en uno o dos minutos; cada rama o *pull request* genera una versión de prueba con su propia dirección. Las laptops y tablets que ya tienen el juego reciben la versión nueva sin perder los grupos: se actualizan solas al volver a una pantalla segura (nunca a media lección), y si no, el inicio muestra "Hay una versión nueva. Toca para actualizar". **Nunca "Borrar datos del sitio"** desde el navegador: eso borra los grupos y su avance.
+**Traspaso a Eco Urban:** la guía paso a paso (sin conocimientos técnicos) para recibir el repositorio, publicarlo en una cuenta de Vercel de Eco Urban, conectar mixtle.org y qué pasa con los grupos de las direcciones viejas está en [`docs/traspaso.md`](docs/traspaso.md). La dirección del juego se cambia en un solo lugar: `src/sitio.ts`.
+
+El juego es un sitio estático desplegado en **Vercel** desde este repositorio: **cada cambio que llega a la rama `main` se publica solo en producción** (<https://mixtle.org>) en uno o dos minutos; cada rama o *pull request* genera una versión de prueba con su propia dirección. Las laptops y tablets que ya tienen el juego reciben la versión nueva sin perder los grupos: se actualizan solas al volver a una pantalla segura (nunca a media lección), y si no, el inicio muestra "Hay una versión nueva. Toca para actualizar". **Nunca "Borrar datos del sitio"** desde el navegador: eso borra los grupos y su avance.
 
 Para volver a una versión anterior hay dos formas: *Instant Rollback* en el panel de Vercel, o con git `git revert --no-commit v3-demo..main && git commit && git push`. La integración continua (`.github/workflows/ci.yml`) revisa tipos, lint, pruebas y build en Ubuntu y Windows, y después los recorridos en el navegador.
 
@@ -120,7 +122,7 @@ Medido entre el 27 y el 30 de octubre de 2026 en una laptop de 8 GB (Intel Core 
 | Pruebas unitarias (Vitest) | **1499 pruebas en 43 archivos, todas pasan** (contenido válido, voz completa, camino y grupos, arte de Mixtle, música, aventuras, privacidad de la llave) |
 | Recorridos en el navegador (Playwright) | **58 de 58 pasan contra producción** (30 de octubre de 2026): aventuras completas, lección con error, parque que crece, avance guardado, botones de 64 px, vestidor, modo facilitador, ninguna petición que envíe datos, en 1920×1080 y 1024×768 táctil |
 
-`npm run verificar` corre tipos, lint, pruebas unitarias, build y presupuesto de golpe; `npm run test:e2e` corre los recorridos en el navegador (contra producción: `$env:BASE_URL="https://mixtle-al-rescate.vercel.app"; npm run test:e2e`).
+`npm run verificar` corre tipos, lint, pruebas unitarias, build y presupuesto de golpe; `npm run test:e2e` corre los recorridos en el navegador (contra producción: `$env:BASE_URL="https://mixtle.org"; npm run test:e2e`). `npm run mudanza:probar` prueba en el navegador la mudanza de una dirección vieja a la definitiva, con dos direcciones locales.
 
 ---
 
