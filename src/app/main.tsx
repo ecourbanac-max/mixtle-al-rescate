@@ -23,6 +23,9 @@ import { useApp } from './estado/app';
 // página se va a otra dirección, no se pinta el juego.
 // Casi siempre no hay fragmento y el juego arranca en seguida (sin esperar nada: un "await" aquí partiría el
 // código de la primera pantalla en muchos pedazos y pesaría más).
+// Los ganchos de las pruebas (?e2e) van primero: una prueba que llega con un paquete de grupos (#mudanza=…)
+// los consulta mientras el paquete se guarda (3.2.1).
+exponerParaPruebas();
 if (location.hash.startsWith('#mudanza=') || location.hash.startsWith('#paso=')) {
   void import('../servicios/mudanzaDefinitiva')
     .then((m) => m.atenderFragmento())
@@ -35,7 +38,6 @@ if (location.hash.startsWith('#mudanza=') || location.hash.startsWith('#paso='))
 }
 
 function arrancar(): void {
-  exponerParaPruebas();
   // ?depurar-audio: registro de lo que pasa con la música y la voz (consola y recuadro en pantalla).
   if (new URLSearchParams(location.search).has('depurar-audio')) activarDepuracionDeAudio();
   // Si este equipo no sostiene las animaciones, se calman solas (ver servicios/rendimiento.ts).

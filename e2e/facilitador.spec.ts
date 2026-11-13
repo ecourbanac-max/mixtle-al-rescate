@@ -71,3 +71,21 @@ test('el modo facilitador cabe en pantalla y "Cerrar" siempre se ve', async ({ p
   }
   expect(errores).toEqual([]);
 });
+
+test('el respaldo de los grupos se abre desde el panel, en su propia ventana, y se vuelve al panel', async ({ page }) => {
+  const { errores } = await abrir(page);
+  await esperarPantalla(page, 'inicio');
+  await tocarBoton(page, /¡Jugar!/);
+  await crearGrupo(page, 'colibri');
+  const panel = await abrirFacilitador(page);
+  await panel.locator('[data-abrir-respaldo]').click();
+  const respaldo = page.locator('[data-respaldo]');
+  await expect(respaldo).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Exportar grupos' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Importar grupos' })).toBeVisible();
+  // Se cierra la ventana del respaldo (el "Cerrar" de encima) y el panel sigue ahí.
+  await page.getByRole('button', { name: 'Cerrar', exact: true }).last().click();
+  await expect(respaldo).toHaveCount(0);
+  await expect(panel).toBeVisible();
+  expect(errores).toEqual([]);
+});

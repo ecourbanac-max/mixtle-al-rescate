@@ -7,6 +7,7 @@ import { useGrupos } from '../estado/grupos';
 import { BotonGrande } from './BotonGrande';
 import { Modal } from './Modal';
 import { RespaldoGrupos } from './RespaldoGrupos';
+import { TEXTOS_RESPALDO } from '../../contenido/textosMudanza';
 
 /**
  * Modo facilitador (para la persona de Eco Urban o el maestro): reiniciar el grupo, abrir todas las
@@ -21,94 +22,127 @@ export function PanelFacilitador({ grupo, alCerrar, alRecorrido }: { grupo: Grup
   const { proyector, alternarProyector, suave, alternarSuave } = useApp();
   /** Qué acción está pidiendo confirmación (reiniciar o borrar el grupo). */
   const [confirmar, setConfirmar] = useState<'reiniciar' | 'borrar' | null>(null);
+  /** El respaldo de los grupos (exportar / importar) abierto en su propia ventana. */
+  const [respaldo, setRespaldo] = useState(false);
   const t = TEXTOS_APP.facilitador;
   const texto = 'text-[clamp(1.05rem,2.2vmin,1.4rem)]';
   const fila = `flex w-full items-center justify-between gap-4 rounded-2xl bg-white px-5 py-2.5 text-left ${texto} font-extrabold`;
   const boton = `h-16 ${texto} leading-tight`;
 
   return (
-    <Modal
-      etiqueta={t.titulo}
-      pie={
-        <BotonGrande color="verde" className={`w-full ${boton}`} onClick={alCerrar}>
-          {t.cerrar}
-        </BotonGrande>
-      }
-    >
-      <div className="flex flex-col items-center">
-        <h2 className="text-[clamp(1.5rem,3.6vmin,2.2rem)] leading-tight font-black text-verde">{t.titulo}</h2>
-        <p className="font-bold">{nombreDelGrupo(grupo)}</p>
-      </div>
-      <div className="flex w-full flex-col gap-2.5">
-        <label className={fila}>
-          {t.desbloquear}
-          <input type="checkbox" className="size-9 shrink-0 accent-verde" checked={grupo.desbloquearTodo} onChange={(e) => desbloquearTodo(grupo.id, e.target.checked)} />
-        </label>
-        <label className={fila}>
-          {t.proyector}
-          <input type="checkbox" className="size-9 shrink-0 accent-verde" checked={proyector} onChange={alternarProyector} />
-        </label>
-        <label className={fila}>
-          {t.suave}
-          <input type="checkbox" className="size-9 shrink-0 accent-verde" checked={suave} onChange={alternarSuave} />
-        </label>
-        <EstadoSinInternet />
-      </div>
-      {/* Plan B de la mudanza (v3.2): pasar todos los grupos a otro aparato o dirección con un archivo. */}
-      <RespaldoGrupos />
-      {/* Para enseñar el juego: el recorrido guiado otra vez, y un grupo de demostración (queda elegido). */}
-      <div className="flex w-full flex-col gap-2">
-        <div className="grid w-full gap-3 sm:grid-cols-2">
-          <BotonGrande color="azul" className={boton} onClick={alRecorrido}>
-            {t.recorrido}
+    <>
+      <Modal
+        etiqueta={t.titulo}
+        pie={
+          <BotonGrande color="verde" className={`w-full ${boton}`} onClick={alCerrar}>
+            {t.cerrar}
           </BotonGrande>
-          <BotonGrande
-            color="morado"
-            className={boton}
-            onClick={() => {
-              crearDemo();
-              alCerrar();
-            }}
-          >
-            {t.demo}
-          </BotonGrande>
+        }
+      >
+        <div className="flex flex-col items-center">
+          <h2 className="text-[clamp(1.5rem,3.6vmin,2.2rem)] leading-tight font-black text-verde">{t.titulo}</h2>
+          <p className="font-bold">{nombreDelGrupo(grupo)}</p>
         </div>
-        <p className="text-[clamp(0.9rem,1.8vmin,1.1rem)] leading-snug font-bold opacity-80">{t.demoAyuda}</p>
-      </div>
-      {confirmar ? (
-        <div className="flex w-full flex-col items-center gap-3 rounded-2xl border-4 border-naranja bg-white p-4" data-confirmar={confirmar}>
-          <p className="font-bold">{confirmar === 'borrar' ? t.borrarConfirmar : t.reiniciarConfirmar}</p>
-          <div className="flex gap-3">
-            <BotonGrande
-              color="naranja"
-              className="h-16 text-lg"
-              onClick={() => {
-                if (confirmar === 'borrar') {
-                  borrar(grupo.id);
-                  alCerrar();
-                } else reiniciar(grupo.id);
-                setConfirmar(null);
-              }}
+        <div className="flex w-full flex-col gap-2.5">
+          <label className={fila}>
+            {t.desbloquear}
+            <input type="checkbox" className="size-9 shrink-0 accent-verde" checked={grupo.desbloquearTodo} onChange={(e) => desbloquearTodo(grupo.id, e.target.checked)} />
+          </label>
+          <label className={fila}>
+            {t.proyector}
+            <input type="checkbox" className="size-9 shrink-0 accent-verde" checked={proyector} onChange={alternarProyector} />
+          </label>
+          <label className={fila}>
+            {t.suave}
+            <input type="checkbox" className="size-9 shrink-0 accent-verde" checked={suave} onChange={alternarSuave} />
+          </label>
+          {/* La descarga para usar sin internet y, al lado, el respaldo de los grupos (plan B de la mudanza,
+              v3.2: pasar todos los grupos a otro aparato o dirección con un archivo). El respaldo abre su
+              propia ventana y comparte renglón: así el panel sigue cabiendo sin desplazarse (3.2.1). */}
+          <div className="flex w-full items-stretch gap-2.5">
+            <div className="min-w-0 flex-1">
+              <EstadoSinInternet />
+            </div>
+            <button
+              type="button"
+              className={`flex shrink-0 cursor-pointer items-center gap-3 rounded-2xl bg-white px-5 py-2.5 text-left ${texto} font-extrabold`}
+              onClick={() => setRespaldo(true)}
+              data-abrir-respaldo
             >
-              {confirmar === 'borrar' ? t.borrar : t.reiniciar}
-            </BotonGrande>
-            <BotonGrande color="gris" className="h-16 text-lg" onClick={() => setConfirmar(null)}>
-              {TEXTOS_APP.grupos.cancelar}
-            </BotonGrande>
+              {TEXTOS_RESPALDO.titulo}
+              <span aria-hidden="true" className="text-verde">
+                ›
+              </span>
+            </button>
           </div>
         </div>
-      ) : (
-        <div className="flex flex-wrap justify-center gap-3">
-          <BotonGrande color="naranja" className={boton} onClick={() => setConfirmar('reiniciar')}>
-            {t.reiniciar}
-          </BotonGrande>
-          {/* Borrar vale para cualquier grupo (también el de demostración). */}
-          <BotonGrande color="gris" className={boton} onClick={() => setConfirmar('borrar')}>
-            {t.borrar}
-          </BotonGrande>
+        {/* Para enseñar el juego: el recorrido guiado otra vez, y un grupo de demostración (queda elegido). */}
+        <div className="flex w-full flex-col gap-2">
+          <div className="grid w-full gap-3 sm:grid-cols-2">
+            <BotonGrande color="azul" className={boton} onClick={alRecorrido}>
+              {t.recorrido}
+            </BotonGrande>
+            <BotonGrande
+              color="morado"
+              className={boton}
+              onClick={() => {
+                crearDemo();
+                alCerrar();
+              }}
+            >
+              {t.demo}
+            </BotonGrande>
+          </div>
+          <p className="text-[clamp(0.9rem,1.8vmin,1.1rem)] leading-snug font-bold opacity-80">{t.demoAyuda}</p>
         </div>
+        {confirmar ? (
+          <div className="flex w-full flex-col items-center gap-3 rounded-2xl border-4 border-naranja bg-white p-4" data-confirmar={confirmar}>
+            <p className="font-bold">{confirmar === 'borrar' ? t.borrarConfirmar : t.reiniciarConfirmar}</p>
+            <div className="flex gap-3">
+              <BotonGrande
+                color="naranja"
+                className="h-16 text-lg"
+                onClick={() => {
+                  if (confirmar === 'borrar') {
+                    borrar(grupo.id);
+                    alCerrar();
+                  } else reiniciar(grupo.id);
+                  setConfirmar(null);
+                }}
+              >
+                {confirmar === 'borrar' ? t.borrar : t.reiniciar}
+              </BotonGrande>
+              <BotonGrande color="gris" className="h-16 text-lg" onClick={() => setConfirmar(null)}>
+                {TEXTOS_APP.grupos.cancelar}
+              </BotonGrande>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap justify-center gap-3">
+            <BotonGrande color="naranja" className={boton} onClick={() => setConfirmar('reiniciar')}>
+              {t.reiniciar}
+            </BotonGrande>
+            {/* Borrar vale para cualquier grupo (también el de demostración). */}
+            <BotonGrande color="gris" className={boton} onClick={() => setConfirmar('borrar')}>
+              {t.borrar}
+            </BotonGrande>
+          </div>
+        )}
+      </Modal>
+      {/* Fuera del panel (no dentro): una ventana encima de la otra, sobre toda la pantalla. */}
+      {respaldo && (
+        <Modal
+          etiqueta={TEXTOS_RESPALDO.titulo}
+          pie={
+            <BotonGrande color="verde" className={`w-full ${boton}`} onClick={() => setRespaldo(false)}>
+              {t.cerrar}
+            </BotonGrande>
+          }
+        >
+          <RespaldoGrupos />
+        </Modal>
       )}
-    </Modal>
+    </>
   );
 }
 
