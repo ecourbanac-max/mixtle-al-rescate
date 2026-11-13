@@ -1,7 +1,7 @@
 {
   "name": "mixtle-al-rescate",
   "private": true,
-  "version": "0.1.0",
+  "version": "3.2.0",
   "description": "Prototipo de videojuego educativo para Eco Urban A.C.: cuidar a los animales del parque y aprender a separar la basura.",
   "type": "module",
   "scripts": {
@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "mudanza:probar": "node scripts/probar-mudanza.mjs",
     "typecheck": "tsc --noEmit && tsc --noEmit -p e2e",
     "lint": "eslint .",
     "verificar": "npm run typecheck && npm run lint && npm test && npm run build && npm run presupuesto",

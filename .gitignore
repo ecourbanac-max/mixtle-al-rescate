@@ -21,3 +21,6 @@ __pycache__/
 # Muestras para elegir voz y música (se generan con npm run voz:muestras / musica:muestras)
 docs/muestras-voz/
 docs/muestras-musica/
+
+# Build de la prueba de mudanza (scripts/probar-mudanza.mjs)
+dist-mudanza/

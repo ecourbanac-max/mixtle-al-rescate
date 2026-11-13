@@ -93,11 +93,59 @@ function avanceDe(g: Grupo): number {
  * Un grupo nuevo se agrega; si ya existe (mismo id), se queda el que lleva más avance. Nunca se pierde uno.
  */
 export function fusionarGrupos(actuales: readonly Grupo[], llegan: readonly Grupo[]): Grupo[] {
-  const resultado = [...actuales];
+  return juntarGrupos(actuales, llegan).grupos;
+}
+
+export interface Juntados {
+  grupos: Grupo[];
+  /** Grupos que llegaron y se agregaron (ids). */
+  agregados: string[];
+  /** Grupos que ya estaban (mismo id): se quedó el de más avance. */
+  yaEstaban: string[];
+  /** Grupos distintos con un nombre que ya existía: se conservan los dos y el que llega lleva "(2)". */
+  renombrados: { antes: string; despues: string }[];
+}
+
+/** La etiqueta con " (n)" al final, sin pasar del largo de una etiqueta (se recorta el principio si hace falta). */
+function etiquetaNumerada(etiqueta: string, n: number): string {
+  const sufijo = `(${n})`;
+  const base = etiqueta.trim();
+  if (!base) return sufijo;
+  const cabe = Math.max(0, LARGO_ETIQUETA - sufijo.length - 1);
+  return `${base.slice(0, cabe).trimEnd()} ${sufijo}`.trim();
+}
+
+/**
+ * Junta los grupos que llegan (la mudanza a otra dirección, o un archivo importado) con los que ya hay,
+ * sin perder nunca ninguno (v3.2):
+ *  - el mismo grupo (mismo id), que llega otra vez: se queda la copia con más avance;
+ *  - un grupo distinto con el mismo nombre (otro "Ardilla 1°A" de otra laptop): se conservan los dos y al
+ *    que llega se le agrega "(2)" (o "(3)"…) a la etiqueta. Así ninguno se sobrescribe y el maestro los distingue.
+ */
+export function juntarGrupos(actuales: readonly Grupo[], llegan: readonly Grupo[]): Juntados {
+  const grupos = [...actuales];
+  const r: Juntados = { grupos, agregados: [], yaEstaban: [], renombrados: [] };
   for (const g of llegan) {
-    const i = resultado.findIndex((x) => x.id === g.id);
-    if (i < 0) resultado.push(g);
-    else if (avanceDe(g) > avanceDe(resultado[i]!)) resultado[i] = g;
+    const i = grupos.findIndex((x) => x.id === g.id);
+    if (i >= 0) {
+      if (avanceDe(g) > avanceDe(grupos[i]!)) grupos[i] = g;
+      r.yaEstaban.push(g.id);
+      continue;
+    }
+    const nombres = new Set(grupos.map((x) => nombreDelGrupo(x)));
+    let nuevo = g;
+    if (nombres.has(nombreDelGrupo(g))) {
+      for (let n = 2; ; n++) {
+        const candidato = { ...g, etiqueta: etiquetaNumerada(g.etiqueta, n) };
+        if (!nombres.has(nombreDelGrupo(candidato))) {
+          nuevo = candidato;
+          break;
+        }
+      }
+      r.renombrados.push({ antes: nombreDelGrupo(g), despues: nombreDelGrupo(nuevo) });
+    }
+    grupos.push(nuevo);
+    r.agregados.push(g.id);
   }
-  return resultado;
+  return r;
 }

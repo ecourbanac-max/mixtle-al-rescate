@@ -10,7 +10,7 @@ import {
 } from '../../logica/camino';
 import { alternarPuesto, comprarAccesorio, type IdAccesorio } from '../../logica/accesorios';
 import { grupoDemo } from '../../logica/demo';
-import { gruposValidos, nuevoGrupo, type Grupo } from '../../logica/grupos';
+import { gruposValidos, juntarGrupos, nuevoGrupo, type Grupo, type Juntados } from '../../logica/grupos';
 import { marcarRecorridoVisto } from '../../logica/recorridoGuiado';
 import { almacenIndexedDb, type Almacen } from '../../servicios/almacen';
 
@@ -26,6 +26,11 @@ interface EstadoGrupos {
   crearDemo: () => Grupo;
   /** Quita un grupo con todo su avance (si era el elegido, ya no hay grupo elegido). */
   borrar: (id: string) => void;
+  /**
+   * Plan B de la mudanza (v3.2): agrega los grupos de un respaldo sin sobrescribir ninguno (ver juntarGrupos).
+   * Devuelve qué pasó con cada uno, para decírselo al maestro.
+   */
+  importar: (grupos: readonly Grupo[]) => Juntados;
   /** El grupo actual ya vio (o saltó) el recorrido guiado. */
   marcarRecorridoVisto: () => void;
   elegir: (id: string | null) => void;
@@ -97,6 +102,12 @@ export const useGrupos = create<EstadoGrupos>((set, get) => {
       const { grupos, actualId } = get();
       set({ grupos: grupos.filter((g) => g.id !== id), actualId: actualId === id ? null : actualId });
       guardar();
+    },
+    importar(llegan) {
+      const juntos = juntarGrupos(get().grupos, llegan);
+      set({ grupos: juntos.grupos });
+      guardar();
+      return juntos;
     },
     marcarRecorridoVisto() {
       cambiarProgreso(marcarRecorridoVisto);

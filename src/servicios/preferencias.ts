@@ -1,5 +1,4 @@
 import { migrarPreferencias, PREFIJO } from './migracion';
-import { leerMudanza } from './mudanza';
 
 /**
  * Preferencias del dispositivo. Solo se guarda si la voz (con los efectos) y la música están
@@ -22,24 +21,26 @@ function almacenPorDefecto(): Almacen | null {
   }
 }
 
-/**
- * Al cargar, antes de que nadie lea una preferencia: pasar las guardadas con el nombre anterior del
- * juego y, si se llegó con una mudanza de dirección (#mudanza=…), poner las que traía (sin pisar las
- * que ya hay en esta dirección). Nunca lanza.
- */
-export function prepararPreferencias(almacen: Storage | null = almacenPorDefecto() as Storage | null, fragmento = typeof location !== 'undefined' ? location.hash : ''): void {
+/** Al cargar, antes de que nadie lea una preferencia: pasar las guardadas con el nombre anterior del juego. */
+export function prepararPreferencias(almacen: Storage | null = almacenPorDefecto() as Storage | null): void {
   migrarPreferencias(almacen);
-  const mudanza = leerMudanza(fragmento);
-  if (!almacen || !mudanza) return;
+}
+prepararPreferencias();
+
+/**
+ * Las preferencias que trae una mudanza de dirección (src/servicios/mudanzaDefinitiva.ts): se ponen sin
+ * pisar las que ya hay en esta dirección. Nunca lanza.
+ */
+export function ponerPreferenciasQueLlegan(preferencias: Record<string, string>, almacen: Storage | null = almacenPorDefecto() as Storage | null): void {
+  if (!almacen) return;
   try {
-    for (const [clave, valor] of Object.entries(mudanza.preferencias)) {
+    for (const [clave, valor] of Object.entries(preferencias)) {
       if (almacen.getItem(`${PREFIJO}:${clave}`) === null) almacen.setItem(`${PREFIJO}:${clave}`, valor);
     }
   } catch {
     // Almacenamiento bloqueado: se usan las de por defecto.
   }
 }
-prepararPreferencias();
 
 /** Lee un interruptor (encendido por defecto). Nunca lanza. */
 export function leerInterruptor(clave: string, almacen: Almacen | null = almacenPorDefecto()): boolean {

@@ -1,11 +1,11 @@
 import 'fake-indexeddb/auto';
 import { createStore, get, set } from 'idb-keyval';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { COLORES_GRUPO, fusionarGrupos, nuevoGrupo, type Grupo } from '../src/logica/grupos';
 import { completarLeccion } from '../src/logica/camino';
 import { migrarGrupos, migrarPreferencias, PREFIJO, PREFIJO_ANTERIOR } from '../src/servicios/migracion';
-import { enDireccionAnterior, fragmentoDeMudanza, leerMudanza } from '../src/servicios/mudanza';
-import { prepararPreferencias } from '../src/servicios/preferencias';
+import { fragmentoDeMudanza, leerMudanza } from '../src/servicios/mudanza';
+import { ponerPreferenciasQueLlegan } from '../src/servicios/preferencias';
 
 /** localStorage de mentira (con key y length, como el de verdad). */
 function almacenFalso(inicial: Record<string, string> = {}): Storage {
@@ -73,13 +73,8 @@ describe('nombre anterior → Mixtle: grupos (IndexedDB)', () => {
   });
 });
 
-describe('mudanza de caco-al-rescate.vercel.app a mixtle-al-rescate.vercel.app', () => {
-  it('solo se muda en la dirección anterior', () => {
-    expect(enDireccionAnterior('caco-al-rescate.vercel.app')).toBe(true);
-    expect(enDireccionAnterior('mixtle-al-rescate.vercel.app')).toBe(false);
-    expect(enDireccionAnterior('localhost')).toBe(false);
-  });
-
+// Las direcciones viejas y la mudanza con confirmación (v3.2): tests/mudanzaDefinitiva.test.ts.
+describe('el paquete de una mudanza (v1, de la v3)', () => {
   it('los grupos y preferencias viajan completos en el fragmento (con acentos y "1°A")', () => {
     const g = { ...grupo('g1', '1°A'), progreso: completarLeccion(grupo('g1').progreso, 'u1-l1', { hojitas: 12, aLaPrimera: 2 }, '2026-10-20') };
     const fragmento = fragmentoDeMudanza({ v: 1, grupos: [g], preferencias: { sonido: 'no', proyector: 'si' } });
@@ -100,7 +95,7 @@ describe('mudanza de caco-al-rescate.vercel.app a mixtle-al-rescate.vercel.app',
 
   it('al llegar, las preferencias que traía se ponen sin pisar las que ya hay', () => {
     const a = almacenFalso({ [`${PREFIJO}:musica`]: 'si' });
-    prepararPreferencias(a, fragmentoDeMudanza({ v: 1, grupos: [], preferencias: { musica: 'no', sonido: 'no' } }));
+    ponerPreferenciasQueLlegan(leerMudanza(fragmentoDeMudanza({ v: 1, grupos: [], preferencias: { musica: 'no', sonido: 'no' } }))!.preferencias, a);
     expect(a.getItem(`${PREFIJO}:musica`)).toBe('si');
     expect(a.getItem(`${PREFIJO}:sonido`)).toBe('no');
   });
@@ -112,22 +107,5 @@ describe('mudanza de caco-al-rescate.vercel.app a mixtle-al-rescate.vercel.app',
     expect(resultado.map((g) => g.id)).toEqual(['a', 'b', 'c']);
     expect(resultado[0]!.progreso.hojitas).toBe(15);
     expect(fusionarGrupos([lejosConAvance], [local])[0]!.progreso.hojitas).toBe(15);
-  });
-});
-
-describe('al abrir la dirección nueva con una mudanza', () => {
-  afterEach(() => {
-    history.replaceState(null, '', '/');
-    vi.resetModules();
-  });
-
-  it('el almacén junta los grupos que llegan con los que ya había y limpia el fragmento', async () => {
-    await set('grupos', [grupo('aqui')], createStore(PREFIJO, 'datos'));
-    history.replaceState(null, '', `/${fragmentoDeMudanza({ v: 1, grupos: [grupo('llego', '3°C')], preferencias: {} })}`);
-    vi.resetModules();
-    const { almacenIndexedDb } = await import('../src/servicios/almacen');
-    const grupos = (await almacenIndexedDb.leer()) as Grupo[];
-    expect(grupos.map((g) => g.id).sort()).toEqual(['aqui', 'llego']);
-    expect(location.hash).toBe('');
   });
 });

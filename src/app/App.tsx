@@ -1,6 +1,7 @@
 import { MotionConfig } from 'motion/react';
 import { lazy, Suspense } from 'react';
 import { PantallaCarga } from './componentes/PantallaCarga';
+import { useMudanza } from '../servicios/estadoMudanza';
 import { PanelTransicion, useTransicionMarca } from './componentes/TransicionMarca';
 import { useApp, type Pantalla as NombrePantalla } from './estado/app';
 import { cargarAlbum, cargarAventura, cargarCamino, cargarGrupos, cargarLeccion } from './pantallas/cargadores';
@@ -15,6 +16,8 @@ const Camino = lazy(() => cargarCamino().then((m) => ({ default: m.Camino })));
 const Leccion = lazy(() => cargarLeccion().then((m) => ({ default: m.Leccion })));
 const Aventura = lazy(() => cargarAventura().then((m) => ({ default: m.Aventura })));
 const Album = lazy(() => cargarAlbum().then((m) => ({ default: m.Album })));
+/** Las pantallas de la mudanza solo se descargan si hay mudanza (casi nunca): no pesan en la primera pantalla. */
+const PantallaMudanza = lazy(() => import('./componentes/PantallaMudanza').then((m) => ({ default: m.PantallaMudanza })));
 const Revision = lazy(() => import('./pantallas/RevisionMixtle').then((m) => ({ default: m.RevisionMixtle })));
 
 function Pantalla({ pantalla }: { pantalla: NombrePantalla }) {
@@ -38,6 +41,7 @@ function Pantalla({ pantalla }: { pantalla: NombrePantalla }) {
 
 export function App() {
   const suave = useApp((s) => s.suave);
+  const hayMudanza = useMudanza((s) => s.estado.fase !== 'dormida');
   const { mostrada, fase } = useTransicionMarca();
   return (
     // Movimiento reducido: el del sistema ("user") o, con "animaciones suaves", siempre.
@@ -46,6 +50,12 @@ export function App() {
         <Pantalla pantalla={mostrada} />
       </Suspense>
       <PanelTransicion fase={fase} />
+      {/* La mudanza a la dirección definitiva del juego (v3.2): aviso, reintento o bienvenida. */}
+      {hayMudanza && (
+        <Suspense fallback={null}>
+          <PantallaMudanza />
+        </Suspense>
+      )}
     </MotionConfig>
   );
 }

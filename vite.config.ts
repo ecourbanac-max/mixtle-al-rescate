@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { archivosEsenciales, listaSinInternet } from './scripts/lista-sin-internet.mjs';
+import { APP_ID, DIRECCION_DEFINITIVA, PROTOCOLO_MUDANZA } from './src/sitio';
 import { defineConfig, type Plugin } from 'vitest/config';
 
 /**
@@ -20,6 +21,42 @@ function logoDeCarga(): Plugin {
       return html
         .replace('<!--logo-carga-->', logo.replace('<svg ', '<svg class="pantalla-carga-logo" aria-hidden="true" '))
         .replace('<!--marca-carga-->', `<div class="pantalla-carga-marca" role="img" aria-label="Eco Urban">${marca.replace('<svg ', '<svg aria-hidden="true" ')}</div>`);
+    },
+  };
+}
+
+const VERSION = (JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string }).version;
+
+/** /salud.json: así una dirección vieja sabe que la dirección definitiva ya sirve ESTE juego (src/sitio.ts). */
+const SALUD = JSON.stringify({ app: APP_ID, version: VERSION, mudanza: PROTOCOLO_MUDANZA });
+
+/**
+ * La dirección del juego en un solo lugar (src/sitio.ts): la url canónica y los metadatos para compartir en
+ * index.html, y /salud.json (al construir, y en el servidor de desarrollo).
+ */
+function sitio(): Plugin {
+  return {
+    name: 'mixtle-sitio',
+    transformIndexHtml: (html) =>
+      html.replace(
+        '<!--sitio-->',
+        [
+          `<link rel="canonical" href="${DIRECCION_DEFINITIVA}/" />`,
+          `<meta property="og:type" content="website" />`,
+          `<meta property="og:url" content="${DIRECCION_DEFINITIVA}/" />`,
+          `<meta property="og:title" content="Mixtle al rescate" />`,
+          `<meta property="og:locale" content="es_MX" />`,
+        ].join('\n    '),
+      ),
+    configureServer(servidor) {
+      servidor.middlewares.use('/salud.json', (_req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.end(SALUD);
+      });
+    },
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'salud.json', source: SALUD });
     },
   };
 }
@@ -54,6 +91,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     logoDeCarga(),
+    sitio(),
     listaParaSinInternet(),
     VitePWA({
       // El juego se guarda en el dispositivo tras la primera visita y funciona sin internet. El service

@@ -6,6 +6,7 @@ import { porcentaje, useDescargaSinInternet } from '../../servicios/sinInternet'
 import { useGrupos } from '../estado/grupos';
 import { BotonGrande } from './BotonGrande';
 import { Modal } from './Modal';
+import { RespaldoGrupos } from './RespaldoGrupos';
 
 /**
  * Modo facilitador (para la persona de Eco Urban o el maestro): reiniciar el grupo, abrir todas las
@@ -53,6 +54,8 @@ export function PanelFacilitador({ grupo, alCerrar, alRecorrido }: { grupo: Grup
         </label>
         <EstadoSinInternet />
       </div>
+      {/* Plan B de la mudanza (v3.2): pasar todos los grupos a otro aparato o dirección con un archivo. */}
+      <RespaldoGrupos />
       {/* Para enseñar el juego: el recorrido guiado otra vez, y un grupo de demostración (queda elegido). */}
       <div className="flex w-full flex-col gap-2">
         <div className="grid w-full gap-3 sm:grid-cols-2">

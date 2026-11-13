@@ -1,6 +1,6 @@
 import { MarcaEcoUrban } from '../componentes/MarcaEcoUrban';
 import { motion } from 'motion/react';
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { TEXTOS_APP } from '../../contenido/textosApp';
 import { accesoriosPuestos } from '../../logica/accesorios';
 import { COLORES_GRUPO, LARGO_ETIQUETA, limpiarEtiqueta, MASCOTAS, nombreDelGrupo, type IdMascota } from '../../logica/grupos';
@@ -10,6 +10,9 @@ import { BotonesSistema } from '../componentes/BotonesSistema';
 import { BotonGrande } from '../componentes/BotonGrande';
 import { MixtleGuia } from '../componentes/MixtleGuia';
 import { Modal } from '../componentes/Modal';
+import { RespaldoGrupos } from '../componentes/RespaldoGrupos';
+import { TEXTOS_MUDANZA, TEXTOS_RESPALDO } from '../../contenido/textosMudanza';
+import { useMudanza } from '../../servicios/estadoMudanza';
 import { useApp } from '../estado/app';
 import { useGrupos } from '../estado/grupos';
 import { callar, decir } from '../estado/narrador';
@@ -40,6 +43,15 @@ export function Grupos() {
   const { grupos, cargado, guardadoOk, cargar, elegir } = useGrupos();
   const alCamino = useApp((s) => s.alCamino);
   const [creando, setCreando] = useState(false);
+  // Plan B de la mudanza (v3.2): mantener presionado el título 3 s abre el respaldo de los grupos (para el
+  // maestro: exportar o importar; funciona aunque todavía no haya ningún grupo).
+  const [respaldo, setRespaldo] = useState(false);
+  const temporizador = useRef<number | null>(null);
+  const soltar = () => {
+    if (temporizador.current) window.clearTimeout(temporizador.current);
+    temporizador.current = null;
+  };
+  const mudadosA = useMudanza((s) => s.mudadosA);
   const baja = usePantallaBaja();
 
   useEffect(() => {
@@ -67,7 +79,18 @@ export function Grupos() {
         data-lista-grupos
       >
       <BotonesSistema />
-      <h1 className="text-[clamp(2.2rem,6vmin,4.5rem)] font-black text-white" style={{ WebkitTextStroke: '0.1em var(--color-verde)', paintOrder: 'stroke fill' }}>
+      <h1 className="text-[clamp(2.2rem,6vmin,4.5rem)] font-black text-white" style={{ WebkitTextStroke: '0.1em var(--color-verde)', paintOrder: 'stroke fill' }}
+        onPointerDown={() => {
+          soltar();
+          temporizador.current = window.setTimeout(() => setRespaldo(true), 3000);
+        }}
+        onPointerUp={soltar}
+        onPointerLeave={soltar}
+        onPointerCancel={soltar}
+        onContextMenu={(e) => e.preventDefault()}
+        title={TEXTOS_RESPALDO.gestoGrupos}
+        data-titulo-grupos
+      >
         {TEXTOS_APP.grupos.titulo}
       </h1>
       <div className="flex max-w-[70rem] flex-wrap justify-center gap-[clamp(1rem,3vmin,2rem)]">
@@ -106,12 +129,33 @@ export function Grupos() {
           <span className="text-[clamp(1.2rem,2.8vmin,1.8rem)] font-black">{TEXTOS_APP.grupos.nuevo}</span>
         </motion.button>
       </div>
+      {/* En una dirección vieja, después de la mudanza: aquí ya no quedan grupos; están en la dirección nueva. */}
+      {mudadosA && grupos.length === 0 && (
+        <div className="flex max-w-[44rem] flex-col items-center gap-2 rounded-2xl bg-white px-4 py-3 text-center font-bold" data-ya-mudados>
+          <p>{TEXTOS_MUDANZA.yaMudados(new URL(mudadosA).host)}</p>
+          <BotonGrande color="verde" className="h-14 text-lg" onClick={() => location.assign(mudadosA)}>
+            {TEXTOS_MUDANZA.irAlla(new URL(mudadosA).host)}
+          </BotonGrande>
+        </div>
+      )}
       <p className="max-w-[44rem] rounded-2xl bg-white/80 px-4 py-2 text-center font-bold">{guardadoOk ? TEXTOS_APP.grupos.soloAqui : TEXTOS_APP.grupos.sinGuardar}</p>
       </div>
       {!baja && <GuiaGrupos baja={false} />}
       {/* Eco Urban abajo a la derecha (Mixtle va a la izquierda). */}
       <MarcaEcoUrban esquina="abajo-derecha" />
       {creando && <CrearGrupo alCerrar={() => setCreando(false)} />}
+      {respaldo && (
+        <Modal
+          etiqueta={TEXTOS_RESPALDO.titulo}
+          pie={
+            <BotonGrande color="verde" className="h-16 w-full text-lg" onClick={() => setRespaldo(false)}>
+              {TEXTOS_APP.facilitador.cerrar}
+            </BotonGrande>
+          }
+        >
+          <RespaldoGrupos />
+        </Modal>
+      )}
     </main>
   );
 }

@@ -1,7 +1,5 @@
 import { createStore, get, set, type UseStore } from 'idb-keyval';
-import { fusionarGrupos, gruposValidos } from '../logica/grupos';
 import { ALMACEN_IDB, CLAVE_GRUPOS, migrarGrupos, PREFIJO } from './migracion';
-import { leerMudanza } from './mudanza';
 
 /**
  * Dónde se guarda el progreso de los grupos: IndexedDB del propio dispositivo (nada sale de él).
@@ -23,25 +21,38 @@ function tiendaIdb(): UseStore {
 }
 
 /**
- * Antes de la primera lectura: pasar lo guardado con el nombre anterior del juego y, si se llegó
- * con una mudanza de dirección (#mudanza=…), juntar esos grupos y preferencias. Una sola vez.
+ * Antes de la primera lectura: pasar lo guardado con el nombre anterior del juego. Una sola vez. (La
+ * mudanza de dirección se atiende al arrancar, antes que nada: src/servicios/mudanzaDefinitiva.ts.)
  */
-let preparado: Promise<void> | null = null;
-function preparar(): Promise<void> {
-  preparado ??= (async () => {
-    await migrarGrupos();
-    const mudanza = typeof location !== 'undefined' ? leerMudanza(location.hash) : null;
-    if (!mudanza) return;
-    try {
-      const actuales = gruposValidos(await get(CLAVE, tiendaIdb()));
-      await set(CLAVE, fusionarGrupos(actuales, mudanza.grupos), tiendaIdb());
-    } catch {
-      // Sin almacenamiento: la mudanza no se puede guardar, pero el juego sigue.
-    }
-    // El fragmento ya no hace falta (ni debe quedarse en el historial).
-    history.replaceState(null, '', location.pathname + location.search);
-  })();
+let preparado: Promise<unknown> | null = null;
+function preparar(): Promise<unknown> {
+  preparado ??= migrarGrupos();
   return preparado;
+}
+
+/**
+ * Otras cosas guardadas junto a los grupos (la mudanza pendiente, el respaldo de los grupos que ya se
+ * mudaron). Lanzan si no hay almacenamiento: quien las usa decide qué hacer.
+ */
+export const extrasIndexedDb = {
+  async leer(clave: string): Promise<unknown> {
+    await preparar();
+    return get(clave, tiendaIdb());
+  },
+  async guardar(clave: string, valor: unknown): Promise<void> {
+    await set(clave, valor, tiendaIdb());
+  },
+};
+
+/** Lee los grupos sin tragarse los errores (la mudanza necesita saber si de verdad se pudo leer). */
+export async function leerGruposEstricto(): Promise<unknown> {
+  await preparar();
+  return get(CLAVE, tiendaIdb());
+}
+
+/** Guarda los grupos sin tragarse los errores. */
+export async function guardarGruposEstricto(valor: unknown): Promise<void> {
+  await set(CLAVE, valor, tiendaIdb());
 }
 
 export const almacenIndexedDb: Almacen = {
