@@ -9,6 +9,8 @@ Al terminar:
 - Las laptops y tablets que hoy usan la dirección vieja (`mixtle-al-rescate.vercel.app` o `caco-al-rescate.vercel.app`) **pasarán solas sus grupos a mixtle.org**, sin perder el avance.
 - René quedará como colaborador, para ayudar si algo falla.
 
+> **Estado (13 de noviembre de 2026):** los pasos 1, 2 y 3 ya están hechos. El repositorio es de Eco Urban (`github.com/ecourbanac-max/mixtle-al-rescate`, con René como colaborador), el juego se publica desde la cuenta de Vercel de Eco Urban y **<https://mixtle.org> está activo desde el 13 de noviembre de 2026** (`www.mixtle.org` lleva a `mixtle.org`). Desde entonces la mudanza de las direcciones viejas está **activa** (paso 4). Lo que sigue: pedir a los facilitadores que abran una vez el juego en cada aparato (paso 4) y, cuando se cumpla el paso 5, que René borre su proyecto.
+
 > **Importante para todos los salones:** el avance de cada grupo se guarda **solo en el navegador** de cada laptop o tablet. **Nunca usen "Borrar datos del sitio" o "Borrar historial y datos"** en el navegador: eso borra los grupos.
 
 ---
@@ -137,6 +139,8 @@ Vercel guarda cada versión publicada (*deployment*). Para poder regresar a una 
 3. Si empezó después de un cambio reciente, hagan **Instant Rollback** (arriba).
 4. Si hace falta, **Exportar grupos** en el modo facilitador guarda los grupos en un archivo, por si acaso.
 5. Escríbanle a René o a quien mantenga el código, con la captura y los datos del punto 2.
+
+**Si en una escuela mixtle.org no abre** (sale una página de "Acceso denegado" o "sitio bloqueado", o el navegador dice que no se puede conectar): es el filtro de internet de esa escuela, que a veces bloquea los dominios nuevos. No es un error del juego. Pídanle al área de sistemas de la escuela que permita `mixtle.org`. Mientras tanto, en esa red el juego de la dirección vieja sigue funcionando normal y **no se muda** (solo se muda cuando de verdad puede abrir mixtle.org), así que nadie pierde sus grupos. (Le pasó a René en la red del Tec de Monterrey el 13 de noviembre de 2026.)
 
 ### Cambiar lo que dice Mixtle (la voz)
 

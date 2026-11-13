@@ -6,7 +6,7 @@ Mixtle, un cacomixtle que vive en los árboles del parque, guía a cada grupo de
 
 - **Para quién:** niñas y niños de 1º a 3º de primaria (6 a 8 años). Mixtle narra todo en voz alta; el texto acompaña, pero no hace falta saber leer.
 - **Dónde se juega:** en la laptop de Eco Urban proyectada en el salón (todo el grupo participa) o en tablets táctiles. Después de la primera visita funciona **sin internet**.
-- **Dónde jugarlo:** <https://mixtle.org>, la dirección oficial de Eco Urban. Mientras se termina de conectar, el juego sigue en su dirección anterior, que pasa sola los grupos de cada aparato a mixtle.org en cuanto esa dirección esté lista (ver [`docs/traspaso.md`](docs/traspaso.md)).
+- **Dónde jugarlo:** <https://mixtle.org>, la dirección oficial de Eco Urban, activa desde el 13 de noviembre de 2026. Las direcciones anteriores (`mixtle-al-rescate.vercel.app` y `caco-al-rescate.vercel.app`) pasan solas los grupos de cada aparato a mixtle.org, sin perder el avance (ver [`docs/traspaso.md`](docs/traspaso.md)).
 - **Qué es:** un prototipo jugable, completo de principio a fin, listo para probarse con un grupo real. No tiene servidor, cuentas ni analítica: el avance de cada grupo se guarda solo en el aparato donde juega.
 - **Versión entregada:** la etiqueta de git `v3-demo` es la versión que Eco Urban vio y aprobó el 30 de octubre de 2026; lo que vino después son cierres menores (ver [`CHANGELOG.md`](CHANGELOG.md)).
 
