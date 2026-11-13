@@ -78,7 +78,7 @@ export class BiciScene extends Phaser.Scene {
     this.crearCarriles();
     this.crearBici();
     this.crearMarcador();
-    this.narrador = new Narrador(this, this.mixtle, { x: 60, y: 110, ancho: 1120, apuntaA: { x: BICI_X, y: 560 }, tamanoTexto: 44 });
+    this.narrador = new Narrador(this, this.mixtle, { x: 60, y: 110, ancho: 1120, apuntaA: { x: BICI_X, y: 620 }, tamanoTexto: 44 });
     agregarBotonSonido(this);
     this.time.delayedCall(450, () => this.narrador.decir(T.intro, () => (this.andando = true)));
   }

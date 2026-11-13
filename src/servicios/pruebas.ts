@@ -97,6 +97,12 @@ export function exponerParaPruebas(): void {
     /** Pantalla de React visible (por ejemplo "inicio" o "aventura"). */
     pantalla: () => document.querySelector<HTMLElement>('[data-pantalla]')?.dataset.pantalla ?? null,
     tocables,
+    /** Globos de Mixtle en las escenas activas: a dónde apunta la colita y dónde está Mixtle. */
+    globos: () =>
+      escenasActivas().flatMap((s) => {
+        const n = (s as unknown as { narrador?: { paraPruebas?: () => unknown } }).narrador;
+        return n && typeof n.paraPruebas === 'function' ? [{ escena: s.scene.key, ...(n.paraPruebas() as object) }] : [];
+      }),
     resumen: () => resumenDiploma(progreso(), ANIMALES),
     /** Marcador de la aventura de las unidades 2 a 5 (lo que llevan rescatado, sembrado, etc.). */
     marcador: () => (juegoActual()?.registry.get('marcador') as Record<string, number> | undefined) ?? null,

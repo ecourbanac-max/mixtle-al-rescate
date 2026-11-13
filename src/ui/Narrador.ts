@@ -61,6 +61,12 @@ export class Narrador {
     });
   }
 
+  /** Solo pruebas: si el globo se ve, a dónde apunta su colita y dónde está Mixtle. */
+  paraPruebas(): { visible: boolean; apuntaA: { x: number; y: number }; mixtle: { x: number; y: number; ancho: number; alto: number } } {
+    const b = this.mixtle.getBounds();
+    return { visible: this.globo.visible, apuntaA: this.globo.apuntaA, mixtle: { x: b.x, y: b.y, ancho: b.width, alto: b.height } };
+  }
+
   ocultar(): void {
     this.globo.ocultar();
     this.repetir.setVisible(false);

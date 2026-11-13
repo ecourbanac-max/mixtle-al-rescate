@@ -18,6 +18,7 @@ interface Gancho {
   escenas(): string[];
   pantalla(): string | null;
   tocables(): Tocable[];
+  globos(): { escena: string; visible: boolean; apuntaA: { x: number; y: number }; mixtle: { x: number; y: number; ancho: number; alto: number } }[];
   resumen(): { residuosSeparados: number; animalesAyudados: number; plantados: number };
   fps(): number;
   quieto(): boolean;

@@ -50,6 +50,11 @@ export class Globo extends Phaser.GameObjects.Container {
     return this.texto.text;
   }
 
+  /** El punto al que apunta la colita (la boca de quien habla). */
+  get apuntaA(): { x: number; y: number } {
+    return this.op.apuntaA;
+  }
+
   mostrar(texto: string): void {
     this.texto.setWordWrapWidth(this.op.ancho - RELLENO * 2 - this.margenDerecho, true);
     this.texto.setText(texto);

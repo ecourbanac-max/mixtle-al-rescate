@@ -22,7 +22,12 @@ import { Narrador } from '../ui/Narrador';
 import { entrar, irA } from '../ui/transicion';
 
 const BOTES = { desde: 560, hasta: 1880, yBase: 975, anchoMaximo: 290 };
-const CAIDA = { x: 1220, desde: -120, hasta: 600 };
+/**
+ * Dónde empieza y termina la caída. Empieza ya DENTRO de lo que se ve (antes salía de fuera, arriba, y en un
+ * celular acostado solo se veía una orilla mientras Mixtle preguntaba a qué bote va): con 200 px y meciéndose
+ * ±10°, su orilla de arriba queda a ~75 px del borde.
+ */
+const CAIDA = { x: 1220, desde: 190, hasta: 600 };
 /** Tarda en caer: tranquilo, para que el grupo se ponga de acuerdo. */
 const DURACION_CAIDA_MS = 9000;
 const TAMANO = 200;
@@ -93,6 +98,10 @@ export class BonusScene extends Phaser.Scene {
     const { imagen } = actual;
     this.estado = caeBasura(actual.residuo.id);
     imagen.setPosition(CAIDA.x, CAIDA.desde);
+    // Aparece en su lugar (no de golpe): crece desde chiquito.
+    const escala = TAMANO / Math.max(imagen.width, imagen.height);
+    imagen.setScale(escala * 0.3);
+    this.tweens.add({ targets: imagen, scale: escala, duration: 350, ease: 'Back.easeOut' });
     this.tweens.add({ targets: imagen, angle: { from: -10, to: 10 }, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     actual.caida = this.tweens.add({
       targets: imagen,

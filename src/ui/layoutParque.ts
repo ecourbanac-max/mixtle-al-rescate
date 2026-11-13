@@ -18,6 +18,11 @@ export const POS_ANIMALES = {
   ],
 } as const;
 
+/**
+ * Las zonas de reparto son para el CENTRO de cada basura (124 px, girada hasta ±26°: hasta ~83 px del
+ * centro a la orilla). Para que se vea completa y lejos de las orillas en cualquier pantalla, el centro
+ * queda al menos a 83 + 24 px de los bordes del juego (tests/layoutParque.test.ts lo revisa).
+ */
 export interface ZonaParque {
   animal: Animal['id'];
   reparto: ZonaReparto;
@@ -29,7 +34,7 @@ export const ZONAS: readonly ZonaParque[] = [
   {
     animal: 'ardilla',
     reparto: {
-      rect: { x: 530, y: 820, ancho: 380, alto: 200 },
+      rect: { x: 530, y: 770, ancho: 380, alto: 190 },
       evitar: [{ x: 650, y: 720, r: 120 }],
     },
     plantar: [
@@ -40,7 +45,7 @@ export const ZONAS: readonly ZonaParque[] = [
   {
     animal: 'colibri',
     reparto: {
-      rect: { x: 950, y: 870, ancho: 380, alto: 150 },
+      rect: { x: 950, y: 800, ancho: 380, alto: 160 },
       evitar: [{ x: 1100, y: 760, r: 130 }],
     },
     plantar: [
@@ -51,13 +56,13 @@ export const ZONAS: readonly ZonaParque[] = [
   {
     animal: 'mariposas',
     reparto: {
-      rect: { x: 1390, y: 860, ancho: 460, alto: 160 },
+      rect: { x: 1370, y: 820, ancho: 430, alto: 140 },
       evitar: POS_ANIMALES.mariposas.map((m) => ({ x: m.x, y: m.y, r: 70 })),
     },
     plantar: [
       { x: 1460, y: 990, que: 'flores' },
       { x: 1640, y: 940, que: 'flores' },
-      { x: 1810, y: 1000, que: 'flores' },
+      { x: 1790, y: 1000, que: 'flores' },
     ],
   },
 ];
