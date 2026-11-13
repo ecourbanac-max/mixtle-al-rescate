@@ -276,13 +276,19 @@ export function vigilarMudanza(host: string = location.hostname, pedir: typeof f
     }
   })();
   let revisando = false;
-  const revisar = async () => {
+  /**
+   * `alVolverLaConexion`: la revisión que pide el evento "online". Es la única que se hace aunque ya haya
+   * fallado en esta sesión (el evento solo llega cuando la conexión cambia, así que no es un bucle).
+   */
+  const revisar = async (alVolverLaConexion: boolean) => {
     if (revisando || useMudanza.getState().estado.fase !== 'dormida') return;
     if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+    if (!alVolverLaConexion && yaFalloEnEstaSesion()) return;
     revisando = true;
     try {
       for (const destino of destinos) {
         if (!(await sirveEsteJuego(destino, pedir))) continue;
+        anotarFallo(false);
         let nombres: string[] = [];
         try {
           nombres = gruposValidos(await leerGruposEstricto()).map((g) => nombreDelGrupo(g));
@@ -292,12 +298,36 @@ export function vigilarMudanza(host: string = location.hostname, pedir: typeof f
         if (useMudanza.getState().estado.fase === 'dormida') useMudanza.setState({ estado: { fase: 'disponible', destino, grupos: nombres } });
         return;
       }
+      // Ninguna dirección nueva sirve el juego todavía: no se vuelve a preguntar en esta sesión.
+      anotarFallo(true);
     } finally {
       revisando = false;
     }
   };
-  setTimeout(() => void revisar(), ESPERA_REVISION_MS);
-  window.addEventListener('online', () => void revisar());
+  setTimeout(() => void revisar(false), ESPERA_REVISION_MS);
+  window.addEventListener('online', () => void revisar(true));
+}
+
+/**
+ * La revisión de la dirección definitiva se hace una vez por sesión (pestaña): si falla (hoy, mientras
+ * mixtle.org no sirve el juego), no se repite al recargar ni al cambiar de versión; solo al volver la
+ * conexión. Si no hay sessionStorage, se revisa una vez por carga.
+ */
+const CLAVE_SIN_RESPUESTA = `${PREFIJO}:definitiva-sin-respuesta`;
+function yaFalloEnEstaSesion(): boolean {
+  try {
+    return sessionStorage.getItem(CLAVE_SIN_RESPUESTA) === '1';
+  } catch {
+    return false;
+  }
+}
+function anotarFallo(fallo: boolean): void {
+  try {
+    if (fallo) sessionStorage.setItem(CLAVE_SIN_RESPUESTA, '1');
+    else sessionStorage.removeItem(CLAVE_SIN_RESPUESTA);
+  } catch {
+    // Sin sessionStorage: se revisa una vez por carga.
+  }
 }
 
 /** Para el texto de las pantallas: "mixtle.org" (sin https://). */

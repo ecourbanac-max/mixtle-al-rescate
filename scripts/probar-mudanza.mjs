@@ -49,8 +49,9 @@ const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '
  * juego (normal), apagado (corta la conexión), otro (otra página en todo), sinCors (/salud.json sin CORS).
  */
 function servidor(puerto) {
-  const s = { modo: 'juego' };
+  const s = { modo: 'juego', salud: 0 };
   const srv = http.createServer((req, res) => {
+    if (req.url.startsWith('/salud.json')) s.salud++;
     if (s.modo === 'apagado') return req.socket.destroy();
     if (s.modo === 'otro') {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -153,6 +154,16 @@ async function sembrar(pagina, direccion, grupos) {
   await enInicio(pagina);
 }
 
+/** Clave con la que el juego anota que la definitiva no respondió en esta sesión (pestaña). */
+const CLAVE_SIN_RESPUESTA = 'mixtle-al-rescate:definitiva-sin-respuesta';
+/** Olvida ese fallo en la dirección donde está la página (como abrir el juego otro día). */
+const olvidarFallo = (pagina) => pagina.evaluate((k) => sessionStorage.removeItem(k), CLAVE_SIN_RESPUESTA);
+/** Vuelve a abrir el juego como en una sesión nueva: la revisión en segundo plano se hace otra vez. */
+async function otraSesion(pagina) {
+  await olvidarFallo(pagina);
+  await pagina.reload();
+}
+
 const ningunaMudanza = async (pagina) => (await pagina.locator('[data-mudanza]').count()) === 0;
 const origen = (pagina) => {
   try {
@@ -199,11 +210,21 @@ const casos = {
     await sembrar(pagina, A, GRUPOS);
     for (const modo of ['apagado', 'otro', 'sinCors']) {
       sb.s.modo = modo;
-      await pagina.reload();
+      const antes = sb.s.salud;
+      await otraSesion(pagina);
       await enInicio(pagina);
       await pagina.waitForTimeout(5000);
-      comprobar('a', (await ningunaMudanza(pagina)) && origen(pagina) === A, `definitiva ${modo}: no aparece ningún aviso y el juego sigue en la vieja`);
+      comprobar('a', (await ningunaMudanza(pagina)) && origen(pagina) === A && sb.s.salud === antes + 1, `definitiva ${modo}: preguntó una vez, no aparece ningún aviso y el juego sigue en la vieja`);
     }
+    // Ya falló en esta sesión: al recargar (o al llegar una versión nueva) no vuelve a preguntar.
+    sb.s.modo = 'juego';
+    const antes = sb.s.salud;
+    for (let i = 0; i < 2; i++) {
+      await pagina.reload();
+      await enInicio(pagina);
+    }
+    await pagina.waitForTimeout(5000);
+    comprobar('a', sb.s.salud === antes && (await ningunaMudanza(pagina)), `después de fallar, dos recargas en la misma sesión no vuelven a preguntar (${sb.s.salud - antes} peticiones)`);
     comprobar('a', iguales(await leer(pagina, 'grupos'), GRUPOS), 'los grupos siguen intactos en la vieja');
     // Sin internet: no revisa; al volver la conexión, sí (y aparece el aviso).
     sb.s.modo = 'juego';
@@ -231,7 +252,7 @@ const casos = {
     const { ctx, pagina } = await contexto();
     await sembrar(pagina, A, GRUPOS);
     sb.s.modo = 'juego';
-    await pagina.reload();
+    await otraSesion(pagina);
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
     const texto = await pagina.locator('[data-mudanza="aviso"]').innerText();
     comprobar('b', texto.includes(`El juego se cambió a ${new URL(B).host}`) && texto.includes('Ardilla 2°B') && texto.includes('Ajolote 1°A'), 'el aviso dice a dónde se cambió el juego y qué grupos se llevan');
@@ -266,6 +287,7 @@ const casos = {
     comprobar('b', iguales(archivo.grupos, GRUPOS), 'exportar en la vieja después de mudarse incluye los grupos que se mudaron');
     // Con la definitiva disponible, la vieja sin grupos manda directo (sin aviso).
     sb.s.modo = 'juego';
+    await olvidarFallo(pagina); // otro día
     await pagina.goto(`${A}/`);
     await pagina.waitForURL((u) => u.origin === B, { timeout: 20000 });
     await enInicio(pagina);
@@ -279,7 +301,7 @@ const casos = {
     await sembrar(pagina, A, GRUPOS);
     await ctx.addCookies([{ name: 'romper', value: '1', url: B }]);
     sb.s.modo = 'juego';
-    await pagina.reload();
+    await otraSesion(pagina);
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
     await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
     const fallo = await pagina.waitForSelector('[data-mudanza="fallo"]', { timeout: 30000 }).then(() => true, () => false);
@@ -298,7 +320,7 @@ const casos = {
     const { ctx, pagina } = await contexto();
     await sembrar(pagina, A, GRUPOS);
     sb.s.modo = 'juego';
-    await pagina.reload();
+    await otraSesion(pagina);
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
     sb.s.modo = 'apagado'; // la nueva se cae justo antes de llevar los grupos
     await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
@@ -309,7 +331,7 @@ const casos = {
     await pagina.waitForTimeout(4000);
     comprobar('c', await ningunaMudanza(pagina), 'mientras la nueva sigue caída, el juego sigue normal en la vieja');
     sb.s.modo = 'juego';
-    await pagina.reload();
+    await otraSesion(pagina);
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
     // Esta vez nadie toca: la cuenta regresiva lo lleva sola.
     await pagina.waitForSelector('[data-mudanza="llegaron"]', { timeout: 40000 });
@@ -323,7 +345,7 @@ const casos = {
     const { ctx, pagina } = await contexto({ serviceWorkers: 'block' });
     await sembrar(pagina, A, GRUPOS);
     sb.s.modo = 'juego';
-    await pagina.reload();
+    await otraSesion(pagina);
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
     sa.s.modo = 'apagado'; // la vuelta a la vieja (la confirmación) no va a llegar
     await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
@@ -339,7 +361,7 @@ const casos = {
     comprobar('c', iguales(await leer(pagina, 'grupos'), GRUPOS), 'sin la confirmación, la vieja no borró nada');
     comprobar('c', (await leer(pagina, 'mudanza-pendiente')) !== null, 'la vieja recuerda la mudanza pendiente');
     sb.s.modo = 'juego';
-    await pagina.reload();
+    await otraSesion(pagina);
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
     await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
     await pagina.waitForSelector('[data-mudanza="llegaron"]', { timeout: 30000 });
@@ -359,7 +381,7 @@ const casos = {
     sb.s.modo = 'apagado';
     await sembrar(pagina, A, GRUPOS);
     sb.s.modo = 'juego';
-    await pagina.reload();
+    await otraSesion(pagina);
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
     await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
     await pagina.waitForSelector('[data-mudanza="llegaron"]', { timeout: 30000 });

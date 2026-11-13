@@ -14,6 +14,7 @@ import {
   mudarAhora,
   sirveEsteJuego,
   usarNavegacion,
+  vigilarMudanza,
 } from '../src/servicios/mudanzaDefinitiva';
 import { crearRespaldo, leerRespaldo } from '../src/servicios/respaldo';
 import { APP_ID, DIRECCION_DEFINITIVA, DIRECCION_PUENTE, destinosDeMudanza, esOrigenViejo, PROTOCOLO_MUDANZA } from '../src/sitio';
@@ -77,6 +78,60 @@ describe('dónde vive el juego (src/sitio.ts)', () => {
     const pedida = respuesta({ app: APP_ID, mudanza: 2 });
     await sirveEsteJuego('https://mixtle.org', pedida);
     expect(pedida).toHaveBeenCalledWith('https://mixtle.org/salud.json', expect.objectContaining({ cache: 'no-store', mode: 'cors' }));
+  });
+});
+
+describe('la revisión en segundo plano: una vez por sesión, sin reintentar en bucle', () => {
+  const VIEJA = 'mixtle-al-rescate.vercel.app';
+  const caida = () => vi.fn(async () => Promise.reject(new TypeError('net::ERR_NAME_NOT_RESOLVED')));
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    sessionStorage.clear();
+    useMudanza.setState({ estado: { fase: 'dormida' }, mudadosA: null, pospuesta: false });
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('si la definitiva no responde, pregunta una sola vez y no vuelve a preguntar al recargar', async () => {
+    const pedir = caida();
+    vigilarMudanza(VIEJA, pedir as unknown as typeof fetch);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(pedir).toHaveBeenCalledTimes(1);
+    expect(pedir).toHaveBeenCalledWith('https://mixtle.org/salud.json', expect.anything());
+    // Recarga (o versión nueva) en la misma pestaña: ya no pregunta.
+    const otraVez = caida();
+    vigilarMudanza(VIEJA, otraVez as unknown as typeof fetch);
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(otraVez).not.toHaveBeenCalled();
+    expect(useMudanza.getState().estado.fase).toBe('dormida');
+  });
+
+  it('al volver la conexión sí pregunta otra vez (y si ya sirve, ofrece la mudanza)', async () => {
+    const pedir = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError('sin red'))
+      .mockResolvedValue({ ok: true, json: async () => ({ app: APP_ID, mudanza: PROTOCOLO_MUDANZA }) });
+    vigilarMudanza(VIEJA, pedir as unknown as typeof fetch);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(pedir).toHaveBeenCalledTimes(1);
+    window.dispatchEvent(new Event('online'));
+    await vi.advanceTimersByTimeAsync(100);
+    await vi.waitFor(() => expect(useMudanza.getState().estado.fase).toBe('disponible'));
+    expect(pedir).toHaveBeenCalledTimes(2);
+  });
+
+  it('si la definitiva responde, no se anota ningún fallo (una mudanza a medias se puede volver a ofrecer)', async () => {
+    const pedir = vi.fn(async () => ({ ok: true, json: async () => ({ app: APP_ID, mudanza: PROTOCOLO_MUDANZA }) }));
+    vigilarMudanza(VIEJA, pedir as unknown as typeof fetch);
+    await vi.advanceTimersByTimeAsync(10_000);
+    await vi.waitFor(() => expect(useMudanza.getState().estado.fase).toBe('disponible'));
+    expect(sessionStorage.getItem('mixtle-al-rescate:definitiva-sin-respuesta')).toBeNull();
+  });
+
+  it('en la dirección definitiva no pregunta nunca', async () => {
+    const pedir = caida();
+    vigilarMudanza('mixtle.org', pedir as unknown as typeof fetch);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(pedir).not.toHaveBeenCalled();
   });
 });
 

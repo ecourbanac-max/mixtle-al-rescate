@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { expect, type Locator, type Page, type Request, type TestInfo } from '@playwright/test';
+import { expect, type ConsoleMessage, type Locator, type Page, type Request, type TestInfo } from '@playwright/test';
+import { DIRECCION_DEFINITIVA } from '../src/sitio';
 
 export interface Tocable {
   nombre: string;
@@ -39,13 +40,29 @@ declare global {
 }
 
 
+/**
+ * El único error de consola que se tolera: en una dirección vieja, el juego revisa en segundo plano si la
+ * dirección definitiva ya sirve el juego (src/servicios/mudanzaDefinitiva.ts). Mientras mixtle.org no exista,
+ * esa revisión falla con ERR_NAME_NOT_RESOLVED y Chrome lo anota en la consola aunque el juego lo maneja.
+ * Solo ese error y solo si viene de la dirección definitiva; cualquier otro error de red sigue contando.
+ */
+function esRevisionDeLaDefinitiva(m: ConsoleMessage): boolean {
+  if (!m.text().includes('net::ERR_NAME_NOT_RESOLVED')) return false;
+  try {
+    return new URL(m.location().url).host === new URL(DIRECCION_DEFINITIVA).host;
+  } catch {
+    return false;
+  }
+}
+
 /** Abre el juego y registra errores de consola y todas las peticiones de red. */
 export async function abrir(page: Page, ruta = '/?e2e') {
   const errores: string[] = [];
   const peticiones: Request[] = [];
   page.on('pageerror', (e) => errores.push(String(e)));
   page.on('console', (m) => {
-    if (m.type() === 'error') errores.push(m.text());
+    if (m.type() !== 'error' || esRevisionDeLaDefinitiva(m)) return;
+    errores.push(m.text());
   });
   page.on('request', (r) => peticiones.push(r));
   await page.goto(ruta);

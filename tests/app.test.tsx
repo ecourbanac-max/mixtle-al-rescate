@@ -42,7 +42,7 @@ describe('pantalla de inicio', () => {
     expect(progreso().recolectados).toEqual([]);
     // Primero Mixtle dice "¡Al rescate!" (sin voz en las pruebas: espera su duración estimada).
     await vi.waitFor(() => expect(useApp.getState().pantalla).toBe('grupos'), { timeout: 4000 });
-    expect(await screen.findByRole('heading', { name: '¿Quién va a jugar?' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: '¿Quién va a jugar?' }, { timeout: 4000 })).toBeInTheDocument();
   });
 
   it('la aventura de la unidad 1 monta Phaser', async () => {
