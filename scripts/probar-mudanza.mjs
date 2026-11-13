@@ -35,7 +35,8 @@ if (!process.argv.includes('--sin-construir') || !existsSync(join(DIST, 'index.h
   const r = spawnSync('npx', ['vite', 'build', '--outDir', DIST, '--emptyOutDir'], {
     stdio: 'inherit',
     shell: true,
-    env: { ...process.env, VITE_DIRECCION_DEFINITIVA: B, VITE_DIRECCIONES_VIEJAS: 'localhost' },
+    // NODE_ENV: runnerImport (arriba) lo deja en "development", y un build así no registra el service worker.
+    env: { ...process.env, NODE_ENV: 'production', VITE_DIRECCION_DEFINITIVA: B, VITE_DIRECCIONES_VIEJAS: 'localhost' },
   });
   if (r.status !== 0) process.exit(r.status ?? 1);
 }
@@ -77,8 +78,11 @@ await Promise.all([sa.listo, sb.listo]);
 // La salud del build: es la que sirve la definitiva.
 const salud = JSON.parse(readFileSync(join(DIST, 'salud.json'), 'utf8'));
 
-const navegador = await chromium.launch({ channel: 'chrome', headless: true });
+/** Un solo Chrome sin ventana a la vez (uno nuevo por caso). */
+let navegador = null;
 const resultados = [];
+/** La última página abierta: si un caso falla, se guarda su captura. */
+let ultimaPagina = null;
 const errores = [];
 let fallos = 0;
 
@@ -110,6 +114,7 @@ async function contexto(opciones = {}) {
     }
   });
   const pagina = await ctx.newPage();
+  ultimaPagina = pagina;
   pagina.setDefaultTimeout(30000);
   pagina.on('pageerror', (e) => errores.push(`${pagina.url().slice(0, 40)}: ${e.message}`));
   return { ctx, pagina };
@@ -157,8 +162,17 @@ const origen = (pagina) => {
   }
 };
 
+/** Toca con el ratón el centro del elemento (como un dedo), donde se ve en la pantalla. */
+async function tocarEnPantalla(pagina, elemento) {
+  const caja = await elemento.boundingBox();
+  await pagina.mouse.click(caja.x + caja.width / 2, caja.y + caja.height / 2);
+}
+
 async function aGrupos(pagina) {
-  await pagina.getByRole('button', { name: /¡Jugar!/ }).first().click({ force: true });
+  // Como scripts/demo/jugar.mjs: se toca cuando la pantalla terminó de entrar (antes no recibe toques).
+  await enInicio(pagina);
+  await pagina.waitForSelector('.transicion-marca', { state: 'detached' });
+  await tocarEnPantalla(pagina, pagina.getByRole('button', { name: /¡Jugar!/ }).first());
   await pagina.waitForSelector('[data-pantalla="grupos"][data-entrada-lista="true"]');
   await pagina.waitForSelector('.transicion-marca', { state: 'detached' });
 }
@@ -193,6 +207,13 @@ const casos = {
     comprobar('a', iguales(await leer(pagina, 'grupos'), GRUPOS), 'los grupos siguen intactos en la vieja');
     // Sin internet: no revisa; al volver la conexión, sí (y aparece el aviso).
     sb.s.modo = 'juego';
+    // Como un aparato que ya usó el juego: el service worker ya guardó lo esencial y controla la página.
+    await pagina.evaluate(() => navigator.serviceWorker.ready);
+    sb.s.modo = 'apagado';
+    await pagina.reload();
+    await enInicio(pagina);
+    await pagina.waitForFunction(() => !!navigator.serviceWorker.controller);
+    sb.s.modo = 'juego';
     await ctx.setOffline(true);
     await pagina.reload();
     await enInicio(pagina);
@@ -215,14 +236,17 @@ const casos = {
     const texto = await pagina.locator('[data-mudanza="aviso"]').innerText();
     comprobar('b', texto.includes(`El juego se cambió a ${new URL(B).host}`) && texto.includes('Ardilla 2°B') && texto.includes('Ajolote 1°A'), 'el aviso dice a dónde se cambió el juego y qué grupos se llevan');
     await pagina.screenshot({ path: `${SALIDA}/b-aviso.png` });
-    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click();
+    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
     await pagina.waitForSelector('[data-mudanza="llegaron"]', { timeout: 30000 });
     comprobar('b', origen(pagina) === B, 'al terminar, el juego está abierto en la definitiva');
     comprobar('b', (await pagina.getAttribute('[data-mudanza="llegaron"]', 'data-cuantos')) === '2', 'la bienvenida dice que llegaron 2 grupos');
     await pagina.screenshot({ path: `${SALIDA}/b-bienvenida.png` });
     comprobar('b', iguales(await leer(pagina, 'grupos'), GRUPOS), 'los 2 grupos llegaron completos (avance, hojitas, estampas, accesorios)');
     comprobar('b', !new URL(pagina.url()).hash, 'la dirección quedó limpia (sin el paquete en la URL)');
-    await pagina.getByRole('button', { name: '¡A jugar!' }).click();
+    const aJugar = pagina.getByRole('dialog').getByRole('button', { name: '¡A jugar!', exact: true });
+    await tocarEnPantalla(pagina, aJugar);
+    await pagina.waitForSelector('[data-mudanza]', { state: 'detached', timeout: 10000 });
+    comprobar('b', true, '"¡A jugar!" cierra la bienvenida');
     await aGrupos(pagina);
     comprobar('b', (await pagina.locator('[data-grupo]').count()) === 2, 'en "¿Quién va a jugar?" de la definitiva están los 2 grupos');
     // La vieja: sin grupos (quedaron en el respaldo), sin mudanza pendiente, con aviso de a dónde se fueron.
@@ -237,7 +261,7 @@ const casos = {
     comprobar('b', yaMudados, 'la vieja avisa en "¿Quién va a jugar?" que los grupos se cambiaron (con botón para ir)');
     // Exportar en la vieja incluye los que se mudaron.
     await abrirRespaldo(pagina);
-    const [descarga] = await Promise.all([pagina.waitForEvent('download'), pagina.getByRole('button', { name: 'Exportar grupos' }).click()]);
+    const [descarga] = await Promise.all([pagina.waitForEvent('download'), pagina.getByRole('button', { name: 'Exportar grupos' }).click({ force: true })]);
     const archivo = JSON.parse(readFileSync(await descarga.path(), 'utf8'));
     comprobar('b', iguales(archivo.grupos, GRUPOS), 'exportar en la vieja después de mudarse incluye los grupos que se mudaron');
     // Con la definitiva disponible, la vieja sin grupos manda directo (sin aviso).
@@ -257,13 +281,13 @@ const casos = {
     sb.s.modo = 'juego';
     await pagina.reload();
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
-    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click();
+    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
     const fallo = await pagina.waitForSelector('[data-mudanza="fallo"]', { timeout: 30000 }).then(() => true, () => false);
     comprobar('c', fallo && origen(pagina) === A, 'la nueva no pudo guardar: regresa a la vieja con "No se pudieron llevar los grupos"');
     await pagina.screenshot({ path: `${SALIDA}/c-fallo.png` });
     comprobar('c', iguales(await leer(pagina, 'grupos'), GRUPOS), 'la vieja conserva todos sus grupos');
     await ctx.clearCookies();
-    await pagina.getByRole('button', { name: 'Intentar otra vez' }).click();
+    await pagina.getByRole('button', { name: 'Intentar otra vez' }).click({ force: true });
     await pagina.waitForSelector('[data-mudanza="llegaron"]', { timeout: 30000 });
     comprobar('c', origen(pagina) === B && iguales(await leer(pagina, 'grupos'), GRUPOS), 'al reintentar, los grupos se mudan completos');
     await ctx.close();
@@ -277,7 +301,7 @@ const casos = {
     await pagina.reload();
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
     sb.s.modo = 'apagado'; // la nueva se cae justo antes de llevar los grupos
-    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click();
+    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
     await pagina.waitForTimeout(3000);
     await pagina.goto(`${A}/`);
     await enInicio(pagina);
@@ -302,14 +326,14 @@ const casos = {
     await pagina.reload();
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
     sa.s.modo = 'apagado'; // la vuelta a la vieja (la confirmación) no va a llegar
-    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click();
+    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
     await pagina.waitForURL((u) => u.startsWith(`${A}/#paso=recibida`) || u.startsWith('chrome-error'), { timeout: 30000 }).catch(() => {});
     await pagina.waitForTimeout(2000);
     sa.s.modo = 'juego';
-    sb.s.modo = 'apagado';
     await pagina.goto(`${B}/`);
     await enInicio(pagina);
     comprobar('c', iguales(await leer(pagina, 'grupos'), GRUPOS), 'la nueva guardó los grupos aunque la confirmación no llegó');
+    sb.s.modo = 'apagado'; // para ver la vieja tal como quedó, sin que se mude otra vez todavía
     await pagina.goto(`${A}/`);
     await enInicio(pagina);
     comprobar('c', iguales(await leer(pagina, 'grupos'), GRUPOS), 'sin la confirmación, la vieja no borró nada');
@@ -317,7 +341,7 @@ const casos = {
     sb.s.modo = 'juego';
     await pagina.reload();
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
-    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click();
+    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
     await pagina.waitForSelector('[data-mudanza="llegaron"]', { timeout: 30000 });
     const enB = await leer(pagina, 'grupos');
     comprobar('c', iguales(enB, GRUPOS), 'al reintentar, en la nueva quedan los mismos 2 grupos (sin duplicados)');
@@ -329,15 +353,15 @@ const casos = {
   },
 
   async d() {
-    sb.s.modo = 'apagado';
     const { ctx, pagina } = await contexto();
     const deB = nuevoGrupo({ mascota: 'ardilla', color: '#C0392B', etiqueta: '2°B' }, 'grupo-de-b', 0);
-    await sembrar(pagina, B, [deB]);
+    await sembrar(pagina, B, [deB]); // la definitiva ya tenía un grupo "Ardilla 2°B" (otro grupo)
+    sb.s.modo = 'apagado';
     await sembrar(pagina, A, GRUPOS);
     sb.s.modo = 'juego';
     await pagina.reload();
     await pagina.waitForSelector('[data-mudanza="aviso"]', { timeout: 20000 });
-    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click();
+    await pagina.getByRole('button', { name: 'Llevar los grupos' }).click({ force: true });
     await pagina.waitForSelector('[data-mudanza="llegaron"]', { timeout: 30000 });
     const renombrados = await pagina.locator('[data-mudanza-renombrados]').innerText().catch(() => '');
     comprobar('d', renombrados.includes('Ardilla 2°B (2)'), `la bienvenida avisa del nombre repetido: "${renombrados.trim()}"`);
@@ -358,13 +382,15 @@ const casos = {
     await ctx.setOffline(true);
     await abrirRespaldo(pagina);
     await pagina.screenshot({ path: `${SALIDA}/e-respaldo.png` });
-    const [descarga] = await Promise.all([pagina.waitForEvent('download'), pagina.getByRole('button', { name: 'Exportar grupos' }).click()]);
+    const [descarga] = await Promise.all([pagina.waitForEvent('download'), pagina.getByRole('button', { name: 'Exportar grupos' }).click({ force: true })]);
     const ruta = `${SALIDA}/${descarga.suggestedFilename()}`;
     await descarga.saveAs(ruta);
     const archivo = JSON.parse(readFileSync(ruta, 'utf8'));
     comprobar('e', /^mixtle-grupos-\d{4}-\d{2}-\d{2}\.json$/.test(descarga.suggestedFilename()) && archivo.app === 'mixtle-al-rescate' && iguales(archivo.grupos, GRUPOS), `sin internet, "Exportar grupos" descarga ${descarga.suggestedFilename()} con los 2 grupos completos`);
     await ctx.close();
 
+    // Otro aparato, en la definitiva.
+    sb.s.modo = 'juego';
     ({ ctx, pagina } = await contexto());
     await pagina.goto(`${B}/`);
     await enInicio(pagina);
@@ -384,16 +410,17 @@ const casos = {
     await pagina.waitForSelector('[data-respaldo-confirmar]');
     const vistaPrevia = await pagina.locator('[data-respaldo-confirmar]').innerText();
     comprobar('e', vistaPrevia.includes('Ardilla 2°B') && vistaPrevia.includes('Ajolote 1°A'), 'antes de importar, enseña qué grupos se van a agregar');
-    await pagina.getByRole('button', { name: 'Agregarlos' }).click();
+    await pagina.getByRole('button', { name: 'Agregarlos' }).click({ force: true });
     await pagina.waitForFunction(() => document.querySelector('[data-respaldo-mensaje]')?.textContent?.includes('Listo'));
     comprobar('e', iguales(await leer(pagina, 'grupos'), GRUPOS), 'sin internet, "Importar grupos" agrega los 2 grupos completos en otro aparato');
     await entrada.setInputFiles(ruta);
     await pagina.waitForSelector('[data-respaldo-confirmar]');
-    await pagina.getByRole('button', { name: 'Agregarlos' }).click();
+    await pagina.getByRole('button', { name: 'Agregarlos' }).click({ force: true });
     await pagina.waitForFunction(() => document.querySelector('[data-respaldo-mensaje]')?.textContent?.includes('avance más grande'));
-    comprobar('e', iguales(await leer(pagina, 'grupos'), GRUPOS), 'importar otra vez el mismo archivo no duplica grupos');
+    const segunda = await mensaje();
+    comprobar('e', iguales(await leer(pagina, 'grupos'), GRUPOS) && segunda.includes('2 grupos ya estaban') && !segunda.includes('se agregaron'), `importar otra vez el mismo archivo no duplica grupos y lo dice: "${segunda.trim()}"`);
     await pagina.screenshot({ path: `${SALIDA}/e-importado.png` });
-    await pagina.getByRole('button', { name: 'Cerrar' }).first().click().catch(() => {});
+    await pagina.getByRole('button', { name: 'Cerrar' }).first().click({ force: true }).catch(() => {});
     comprobar('e', (await pagina.locator('[data-grupo]').count()) === 2, 'los grupos importados aparecen en "¿Quién va a jugar?"');
     await ctx.close();
   },
@@ -409,14 +436,19 @@ for (const [nombre, caso] of Object.entries(casos)) {
   console.log(`Caso ${nombre}`);
   sa.s.modo = 'juego';
   sb.s.modo = 'juego';
+  // Un Chrome nuevo por caso: el mismo navegador va juntando memoria de un caso a otro (laptop de 8 GB).
+  navegador = await chromium.launch({ channel: 'chrome', headless: true });
   try {
     await caso();
   } catch (e) {
     comprobar(nombre, false, `error: ${e.message.split('\n')[0]}`);
+    await ultimaPagina?.screenshot({ path: `${SALIDA}/${nombre}-error.png` }).catch(() => {});
+    console.log(`    (en ${ultimaPagina?.url().slice(0, 60)}; captura en ${SALIDA}/${nombre}-error.png)`);
+  } finally {
+    await navegador.close();
   }
 }
 
-await navegador.close();
 sa.srv.close();
 sb.srv.close();
 comprobar('salud', salud.app === 'mixtle-al-rescate' && salud.mudanza === 2, `/salud.json del build: ${JSON.stringify(salud)}`);

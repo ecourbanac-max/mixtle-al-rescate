@@ -52,7 +52,8 @@ export function RespaldoGrupos() {
     if (!porImportar) return;
     const r = importar(porImportar);
     setPorImportar(null);
-    setMensaje([T.importados(r.agregados.length + r.yaEstaban.length), ...(r.yaEstaban.length ? [T.yaEstaban] : []), ...r.renombrados.map((x) => T.renombrado(x.antes, x.despues))]);
+    // Nuevos y repetidos por separado: importar dos veces el mismo archivo no "agrega" nada.
+    setMensaje([...(r.agregados.length ? [T.importados(r.agregados.length)] : []), ...(r.yaEstaban.length ? [T.yaEstaban(r.yaEstaban.length)] : []), ...r.renombrados.map((x) => T.renombrado(x.antes, x.despues))]);
   };
 
   return (

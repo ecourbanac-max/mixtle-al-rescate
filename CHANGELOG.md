@@ -2,6 +2,42 @@
 
 Fechas de octubre y noviembre de 2026. Las etiquetas de git marcan las versiones que vio Eco Urban.
 
+## v3.2 (13 de noviembre) — Traspaso a Eco Urban y mudanza a mixtle.org
+
+La versión anterior queda en la etiqueta `v3.1.3-antes-traspaso`. Guía para Eco Urban: [`docs/traspaso.md`](docs/traspaso.md).
+
+### 1. Mudanza automática a mixtle.org
+
+- **La dirección del juego, en un solo lugar** (`src/sitio.ts`): la definitiva es **https://mixtle.org**; las viejas son `mixtle-al-rescate.vercel.app`, `caco-al-rescate.vercel.app` y sus direcciones de prueba `*.vercel.app`.
+- **Se activa sola.** En una dirección vieja, el juego revisa en segundo plano si mixtle.org ya sirve **este** juego (`/salud.json`, con el nombre de la app y la versión; `vercel.json` le pone CORS solo a ese archivo). Si no responde, responde otra cosa o no hay internet, no pasa nada. Hoy mixtle.org no tiene el juego, así que la mudanza está dormida.
+- **Cuando mixtle.org responde:** sin grupos, abre mixtle.org directo; con grupos, el aviso "El juego se cambió a mixtle.org. Vamos a llevar sus grupos" (solo en una pantalla segura, con botón y cuenta regresiva de 8 s), lleva todos los grupos con su avance y abre mixtle.org con la bienvenida.
+- **No se pierde ningún grupo:** la dirección vieja solo quita sus grupos cuando mixtle.org confirma que los guardó y los volvió a leer (con firma). Si algo falla a la mitad, no se borra nada y se puede reintentar; al reintentar, el mismo grupo no se duplica. Los grupos mudados quedan además en un respaldo en la vieja.
+- **Nombres repetidos:** el mismo grupo que llega dos veces se queda con el avance más grande; otro grupo con el mismo nombre se conserva como "(2)" y la bienvenida lo avisa.
+- **App instalada** desde la dirección vieja: la bienvenida explica cómo instalarla otra vez desde mixtle.org.
+- **Plan B a mano:** "Respaldo de los grupos" en el modo facilitador (y con 3 s sobre el título de "¿Quién va a jugar?", aunque no haya grupos): **Exportar grupos** descarga un archivo; **Importar grupos** lo valida por completo (juego, formato, cada grupo y la firma) y enseña qué se va a agregar antes de tocar nada. Funciona sin internet.
+- La lógica y las pantallas de la mudanza se descargan solo cuando hacen falta: lo que se descarga antes de la primera pantalla bajó de 249.7 a **247.7 KB**.
+
+### 2. El repositorio ya no depende de la cuenta de quien lo desarrolló
+
+- README y notas técnicas apuntan a mixtle.org; las direcciones viejas solo quedan en la lista de `src/sitio.ts` y en la historia (este archivo y las mediciones con fecha). `index.html` lleva la url canónica y los metadatos para compartir desde `src/sitio.ts`.
+- **Sin secretos:** no hay llaves, tokens, `.env` ni `.vercel/` en el repositorio ni en su historia, y la integración continua no usa secretos. La única llave del proyecto es la de Azure Speech, que solo sirve para generar voces nuevas: Eco Urban tendría que crear la suya (plan gratuito) y ponerla en `.env.local`, que nunca se sube.
+- **Comprobado en un proyecto nuevo de Vercel sin variables de entorno** (13 de noviembre): una copia limpia del repositorio, sin `.env.local`, se construyó y publicó sola; el juego, `/salud.json` (con su CORS), el manifiesto, el service worker, las voces y la lista para usar sin internet respondieron 200. El proyecto de prueba se borró después.
+
+### 3. Guía de traspaso
+
+- [`docs/traspaso.md`](docs/traspaso.md), en español sencillo: recibir el repositorio en GitHub, publicar en Vercel, conectar mixtle.org y www.mixtle.org, qué pasa con los grupos, cuándo se puede borrar el proyecto puente, cómo volver a una versión anterior y cómo cambiar lo que dice Mixtle.
+
+### Verificado (13 de noviembre)
+
+- Pruebas unitarias: **1622 de 1622** (25 nuevas de la mudanza y el respaldo en `tests/mudanzaDefinitiva.test.ts`).
+- Prueba en el navegador con dos direcciones locales (`npm run mudanza:probar`: la vieja en `localhost:4311`, la definitiva en `127.0.0.1:4312`; un Chrome sin ventana, uno nuevo por caso): **42 de 42**.
+  - a) Con la definitiva apagada, sirviendo otra página o sin CORS, y sin internet: no aparece ningún aviso y los grupos siguen intactos; al volver la conexión revisa otra vez y aparece el aviso.
+  - b) Dos grupos con avance (lecciones, cofre, estampa, accesorios puestos) llegan idénticos a la definitiva, que da la bienvenida; la vieja queda sin grupos, con su respaldo, sin mudanza pendiente, avisa a dónde se fueron y después manda directo a la definitiva.
+  - c) La definitiva no puede guardar, se cae justo antes, o la confirmación de vuelta no llega: la vieja conserva todo; al reintentar (con el botón o con la cuenta regresiva) los grupos llegan completos y sin duplicados.
+  - d) En la definitiva ya había otro "Ardilla 2°B": se conservan los dos, el que llegó se llama "Ardilla 2°B (2)" con todo su avance y la bienvenida lo dice.
+  - e) Sin internet, "Exportar grupos" descarga el archivo y en otro aparato "Importar grupos" los agrega; un archivo ajeno o alterado se rechaza sin cambiar nada, e importar dos veces el mismo no duplica.
+- Lo que encontró la prueba: al importar dos veces el mismo archivo, el aviso decía "se agregaron 2 grupos"; ahora dice cuántos ya estaban. Y el build de la prueba salía en modo de desarrollo (sin service worker) por una variable que dejaba otra herramienta; solo afectaba a la prueba, no al juego publicado.
+
 ## v3.1.3 (11 de noviembre) — Ajuste final
 
 La versión anterior queda en la etiqueta `v3.1.2`.

@@ -18,7 +18,8 @@ export const TEXTOS_RESPALDO = {
   confirmarSi: 'Agregarlos',
   confirmarNo: 'Cancelar',
   importados: (n: number) => (n === 1 ? 'Listo: se agregó 1 grupo.' : `Listo: se agregaron ${n} grupos.`),
-  yaEstaban: 'Los que ya estaban en este aparato se quedaron con el avance más grande.',
+  yaEstaban: (n: number) =>
+    n === 1 ? '1 grupo ya estaba en este aparato: se quedó con el avance más grande.' : `${n} grupos ya estaban en este aparato: cada uno se quedó con el avance más grande.`,
   renombrado: (antes: string, despues: string) => `Ya había un grupo "${antes}": el que llegó se llama "${despues}".`,
   gestoGrupos: 'Mantén presionado el título 3 segundos para respaldar o pasar grupos.',
 };
