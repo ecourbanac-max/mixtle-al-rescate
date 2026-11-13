@@ -15,7 +15,7 @@ import { TEXTOS_MUDANZA, TEXTOS_RESPALDO } from '../../contenido/textosMudanza';
 import { useMudanza } from '../../servicios/estadoMudanza';
 import { useApp } from '../estado/app';
 import { useGrupos } from '../estado/grupos';
-import { callar, decir } from '../estado/narrador';
+import { callarAlSalir, decir } from '../estado/narrador';
 
 /** Elegir o crear el grupo que va a jugar. El progreso es por grupo, nunca por niño. */
 /** Alto de Mixtle guía en "¿Quién va a jugar?": del alto de su globo o un poco más (se ven su pin y su banda). */
@@ -60,8 +60,9 @@ export function Grupos() {
   // La bienvenida, una vez: si Mixtle aún dice "¡Al rescate!" (la transición no lo espera), primero
   // lo termina (800 ms como mucho).
   useEffect(() => {
-    decir(TEXTOS_APP.grupos.bienvenida, { trasLaActualMs: 800 });
-    return () => callar();
+    // Si "¡Al rescate!" sigue sonando, la bienvenida espera a que termine (ver servicios/dialogo.ts).
+    decir(TEXTOS_APP.grupos.bienvenida);
+    return callarAlSalir();
   }, []);
 
   return (
@@ -121,7 +122,7 @@ export function Grupos() {
           whileHover={{ scale: 1.04 }}
           onClick={() => {
             setCreando(true);
-            decir([TEXTOS_APP.grupos.crear, TEXTOS_APP.grupos.aviso]);
+            decir([TEXTOS_APP.grupos.crear, TEXTOS_APP.grupos.aviso], { interrumpir: true });
           }}
           className="flex w-[clamp(10rem,24vmin,15rem)] cursor-pointer flex-col items-center justify-center gap-2 rounded-[2rem] border-[6px] border-dashed border-verde bg-white/70 p-4 text-verde"
         >

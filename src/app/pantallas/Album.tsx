@@ -11,7 +11,7 @@ import { DiplomaUnidad } from '../componentes/DiplomaUnidad';
 import { MixtleGuia } from '../componentes/MixtleGuia';
 import { useApp } from '../estado/app';
 import { useGrupoActual } from '../estado/grupos';
-import { callar, decir } from '../estado/narrador';
+import { callarAlSalir, decir } from '../estado/narrador';
 
 /** Álbum de animales de Toluca: una estampa por unidad terminada, con su dato curioso narrado. */
 export function Album() {
@@ -21,7 +21,7 @@ export function Album() {
 
   useEffect(() => {
     decir(TEXTOS_APP.album.bienvenida);
-    return () => callar();
+    return callarAlSalir();
   }, []);
 
   return (
@@ -44,7 +44,7 @@ export function Album() {
                 data-estampa={u.estampa.id}
                 data-ganada={ganada}
                 aria-label={ganada ? u.estampa.nombre : TEXTOS_APP.album.bloqueada}
-                onClick={() => decir(ganada ? [u.estampa.nombre, u.estampa.dato] : TEXTOS_APP.album.bloqueada, { expresion: ganada ? 'feliz' : 'pensando' })}
+                onClick={() => decir(ganada ? [u.estampa.nombre, u.estampa.dato] : TEXTOS_APP.album.bloqueada, { expresion: ganada ? 'feliz' : 'pensando', interrumpir: true })}
                 className={`flex w-[clamp(10rem,17vw,14rem)] cursor-pointer flex-col items-center gap-2 rounded-[1.75rem] border-[6px] p-4 shadow-[0_0.45rem_0_rgba(18,61,43,0.2)] ${ganada ? 'border-[#FFD23F] bg-white' : 'border-white bg-white/60'}`}
               >
                 <div className="flex h-[clamp(7rem,20vmin,12rem)] w-full items-center justify-center overflow-hidden">

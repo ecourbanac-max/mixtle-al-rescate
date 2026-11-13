@@ -194,7 +194,7 @@ export function Inicio() {
     setSaliendo(true);
     // La transición empieza ya, sin esperar a la voz: Mixtle dice "¡Al rescate!" encima. Si su audio
     // no está listo en 800 ms (red muy lenta), no se dice tarde.
-    decir(FRASE_MIXTLE, { expresion: 'celebrando', esperaMaximaMs: ESPERA_VOZ_MS });
+    decir(FRASE_MIXTLE, { expresion: 'celebrando', esperaMaximaMs: ESPERA_VOZ_MS, cruzaPantalla: true });
     jugar();
   };
 

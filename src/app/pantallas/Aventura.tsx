@@ -74,7 +74,7 @@ export function Aventura() {
             icono={<span className="text-[clamp(1.8rem,4vmin,3rem)] leading-none">✕</span>}
             onClick={() => {
               setPreguntaSalir(true);
-              decir(TEXTOS_APP.leccion.salirPregunta, { expresion: 'sorprendido' });
+              decir(TEXTOS_APP.leccion.salirPregunta, { expresion: 'sorprendido', interrumpir: true });
             }}
           />
         </div>

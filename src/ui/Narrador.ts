@@ -1,23 +1,23 @@
 import type Phaser from 'phaser';
 import { PALETA } from '../config';
-import { voz } from '../servicios/voz';
+import * as dialogo from '../servicios/dialogo';
 import { textoDeLocucion, type Locucion } from '../voz/locucion';
 import { Boton } from './Boton';
 import type { Mixtle } from './Mixtle';
 import { Globo, type OpcionesGlobo } from './Globo';
 
-/** Margen extra tras la duración estimada antes de seguir aunque la voz no haya avisado. */
-const MARGEN_MS = 1200;
-
 /**
- * Une a Mixtle, su globo de texto y la voz. Todo lo que Mixtle dice se narra en voz alta
- * y se muestra en el globo; el botón de repetir (o tocar a Mixtle) lo vuelve a decir.
+ * Une a Mixtle, su globo de texto y la voz en las aventuras. Lo que se dice y en qué orden lo decide el
+ * único narrador del juego (servicios/dialogo.ts): cada escena es dueña de sus frases, así que nada de
+ * una escena (ni de una pantalla de React) se cuela en otra. El botón de repetir (o tocar a Mixtle)
+ * vuelve a decir la última frase de la escena.
  */
 export class Narrador {
   readonly globo: Globo;
   private repetir: Boton;
   private activo = true;
-  private ultima: Locucion | null = null;
+  /** El dueño de las frases de esta escena. */
+  private readonly dueno: number;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -37,36 +37,28 @@ export class Narrador {
     }).setDepth(501);
     this.repetir.setVisible(false);
 
+    this.dueno = dialogo.nuevoDueno();
     mixtle.hacerTocable().on('pointerup', () => this.repetirFrase());
     scene.events.once('shutdown', () => {
       this.activo = false;
-      voz.callar();
+      // Solo se calla si las frases siguen siendo de esta escena (no las de la escena o pantalla que sigue).
+      if (dialogo.duenoActual() === this.dueno) dialogo.nuevoDueno();
     });
   }
 
   /**
-   * Mixtle dice la frase (voz + globo). `alTerminar` se llama una sola vez: al acabar la voz
-   * o, si se interrumpe o no hay voz, poco después de la duración estimada.
+   * Mixtle dice la frase (voz + globo) en cuanto termine la que esté diciendo. `alTerminar` se llama una
+   * sola vez, al acabar la voz (o, si el audio no suena, después del tiempo para leerla), y nunca si la
+   * escena ya terminó.
    */
-  decir(locucion: Locucion, alTerminar?: () => void): number {
-    this.ultima = locucion;
-    // El globo es el subtítulo: muestra lo que dice Mixtle (con cifras en lugar de números en palabras).
-    this.globo.mostrar(textoDeLocucion(locucion));
-    this.repetir.setPosition(this.globo.x + this.globo.ancho - 84, this.globo.y + 80).setVisible(true);
-    let hecho = false;
-    const fin = () => {
-      if (hecho || !this.activo) return;
-      hecho = true;
-      alTerminar?.();
-    };
-    const ms = voz.decir(locucion, () => {
-      if (!this.activo) return;
-      this.mixtle.callar();
-      fin();
+  decir(locucion: Locucion, alTerminar?: () => void): void {
+    dialogo.decir(locucion, {
+      alTerminar: () => {
+        if (this.activo) alTerminar?.();
+      },
+      dueno: this.dueno,
+      vista: this.vista(locucion),
     });
-    this.mixtle.hablar(ms);
-    if (alTerminar) this.scene.time.delayedCall(ms + MARGEN_MS, fin);
-    return ms;
   }
 
   ocultar(): void {
@@ -74,12 +66,24 @@ export class Narrador {
     this.repetir.setVisible(false);
   }
 
+  private vista(locucion: Locucion): dialogo.Vista {
+    return {
+      alEmpezar: (ms) => {
+        if (!this.activo) return;
+        // El globo es el subtítulo: muestra lo que dice Mixtle (con cifras en lugar de números en palabras).
+        this.globo.mostrar(textoDeLocucion(locucion));
+        this.repetir.setPosition(this.globo.x + this.globo.ancho - 84, this.globo.y + 80).setVisible(true);
+        this.mixtle.hablar(ms);
+      },
+      alAcabar: () => {
+        if (this.activo) this.mixtle.callar();
+      },
+    };
+  }
+
   private repetirFrase(): void {
-    if (!this.globo.visible || !this.ultima) return;
-    const ms = voz.decir(this.ultima, () => {
-      if (this.activo) this.mixtle.callar();
-    });
-    this.mixtle.hablar(ms);
+    if (!this.globo.visible || dialogo.duenoActual() !== this.dueno) return;
+    dialogo.repetir();
     this.scene.tweens.add({ targets: this.globo, scale: 1.03, duration: 120, yoyo: true });
   }
 }

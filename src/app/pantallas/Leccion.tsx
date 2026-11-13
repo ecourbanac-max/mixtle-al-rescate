@@ -35,7 +35,7 @@ import { soltarAlNarrar } from './precargaLeccion';
 import type { Respuesta } from '../ejercicios/comun';
 import { useApp } from '../estado/app';
 import { useGrupoActual, useGrupos } from '../estado/grupos';
-import { callar, decir, ponerExpresion } from '../estado/narrador';
+import { callar, callarAlSalir, decir, decirConsigna, ponerExpresion } from '../estado/narrador';
 
 /** Pista con "¡Casi!" al principio, si no lo trae ya. */
 function conCasi(pista: Locucion): Locucion {
@@ -86,7 +86,8 @@ export function Leccion() {
     if (!datos) alCamino();
   }, [datos, alCamino]);
 
-  // Mixtle dice la consigna de cada ejercicio (y la bienvenida en el primero).
+  // Mixtle dice la consigna de cada ejercicio (y la bienvenida en el primero). Cada ejercicio es dueño de
+  // sus frases: lo pendiente del anterior se descarta, y el botón de repetir dice esta consigna.
   useEffect(() => {
     if (!sesion || !actual) return;
     ponerExpresion('normal');
@@ -98,14 +99,14 @@ export function Leccion() {
     if (sesion.hechos === 0 && sesion.erroresActual === 0) piezas.push(sesion.leccion.bienvenida);
     if (esRepaso) piezas.push(TEXTOS_APP.leccion.repaso);
     piezas.push(actual.consigna);
-    decir(piezas);
+    decirConsigna(piezas, actual.consigna);
     // Primer ejercicio en pantalla: en cuanto Mixtle se oye, la descarga en segundo plano sigue.
     if (sesion.hechos === 0 && sesion.erroresActual === 0) soltarAlNarrar();
     // Solo al cambiar de ejercicio.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [claveEjercicio]);
 
-  useEffect(() => () => callar(), []);
+  useEffect(() => callarAlSalir(), []);
 
   if (!datos || !sesion) return null;
   if (terminada(sesion)) return <FinLeccion sesion={sesion} unidadColor={datos.unidad.color} />;
@@ -122,7 +123,8 @@ export function Leccion() {
       const exito = r.exito ? (typeof r.exito === 'string' ? [r.exito] : r.exito) : [];
       const texto: Locucion = extra.length || exito.length ? [animo, ...extra, ...exito] : animo;
       sonido.tocar('acierto');
-      decir(texto, { expresion: CELEBRACIONES[vuelta % CELEBRACIONES.length] });
+      // El festejo se dice después de la consigna (si aún suena) y se lee en el aviso: el globo no cambia.
+      decir(texto, { expresion: CELEBRACIONES[vuelta % CELEBRACIONES.length], enGlobo: false });
       setBanner({ tipo: 'bien', texto });
       // Lluvia de hojitas y chispas donde tocaron; la hojita ganada (a la primera) vuela al contador.
       lluviaDeHojitas(12);
@@ -143,7 +145,7 @@ export function Leccion() {
       // La racha se va sin decir nada: solo deja de verse.
       setRacha(null);
       setSesion((s) => (s ? registrarError(s) : s));
-      decir(texto, { expresion: 'pensando' });
+      decir(texto, { expresion: 'pensando', enGlobo: false });
       setBanner({ tipo: 'casi', texto });
     }
   };
@@ -235,7 +237,7 @@ export function Leccion() {
 
 function PreguntaSalir({ alQuedarse, alSalir }: { alQuedarse: () => void; alSalir: () => void }) {
   useEffect(() => {
-    decir(TEXTOS_APP.leccion.salirPregunta, { expresion: 'sorprendido' });
+    decir(TEXTOS_APP.leccion.salirPregunta, { expresion: 'sorprendido', interrumpir: true });
   }, []);
   return (
     <Modal etiqueta={TEXTOS_APP.leccion.salir}>

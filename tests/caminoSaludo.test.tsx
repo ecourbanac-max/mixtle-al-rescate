@@ -2,7 +2,7 @@ import { act, render } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useApp } from '../src/app/estado/app';
 import { useGrupos, usarAlmacen } from '../src/app/estado/grupos';
-import { useNarrador } from '../src/app/estado/narrador';
+import { callar, useNarrador } from '../src/app/estado/narrador';
 import { Camino } from '../src/app/pantallas/Camino';
 import { TEXTOS_APP } from '../src/contenido/textosApp';
 import { PROGRESO_VACIO } from '../src/logica/camino';
@@ -19,6 +19,8 @@ beforeEach(() => {
   usarAlmacen(almacenEnMemoria());
   useGrupos.setState({ grupos: [colibri], actualId: colibri.id, cargado: true, guardadoOk: true });
   useApp.setState({ pantalla: 'camino', estampaNueva: undefined });
+  // Como al llegar al camino desde otra pantalla: lo que Mixtle decía antes se descarta.
+  callar();
   useNarrador.setState({ subtitulo: '', hablando: false });
 });
 

@@ -1,4 +1,4 @@
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 import { piezasDeTexto, type Locucion } from '../voz/locucion';
 import { PAUSA_ENTRE_PIEZAS_MS, planDeLocucion, type Manifiesto } from '../voz/plan';
 import { hayAudio, musica, rutaAudio } from './audio/motor';
@@ -98,8 +98,10 @@ class Voz {
    * `alTerminar` se llama al acabar; si otra frase interrumpe a esta, ya no se llama.
    * Con `esperaMaximaMs`, si el audio no está listo para entonces, la frase no se dice tarde: se
    * termina (queda el subtítulo). Sin ella, a los 2 s empieza con lo que haya bajado.
+   * `alSonar` se llama cuando el audio de verdad empieza a oírse (no si está apagado, bloqueado o no carga).
+   * Lo usa servicios/dialogo.ts, el único que le habla a la voz.
    */
-  decir(locucion: Locucion, alTerminar?: () => void, op: { esperaMaximaMs?: number } = {}): number {
+  decir(locucion: Locucion, alTerminar?: () => void, op: { esperaMaximaMs?: number; alSonar?: () => void } = {}): number {
     this.ultimo = locucion;
     const plan = planDeLocucion(locucion, this.manifiesto);
     const hablado = piezasDeTexto(locucion).join(' ');
@@ -115,8 +117,9 @@ class Voz {
       this.soltarMusica();
       alTerminar?.();
     };
-    // Respaldo: nunca dejamos el juego esperando a una voz que no llega.
-    window.setTimeout(terminar, ms + 1500);
+    // Respaldo: nunca dejamos el juego esperando a una voz que no llega. Se cuenta desde que la frase
+    // EMPIEZA a sonar (no desde que se pidió): si el audio tardó en bajar, no se corta antes de acabar.
+    const respaldo = () => window.setTimeout(terminar, ms + 1500);
 
     if (!estadoSonido.estaActivo) {
       window.setTimeout(terminar, ms);
@@ -127,13 +130,16 @@ class Voz {
 
     if (conAudio) {
       this.cuenta.conAudio += 1;
-      this.reproducirCadena(plan.archivos!, miTurno, terminar, op.esperaMaximaMs);
+      this.reproducirCadena(plan.archivos!, miTurno, terminar, op.esperaMaximaMs, respaldo, op.alSonar);
     } else {
       this.cuenta.conNavegador += 1;
       if (import.meta.env.DEV && plan.faltantes.length) {
         console.warn('[voz] Sin audio, se usa la voz del navegador para:', plan.faltantes, '→ npm run voz:generar');
       }
-      this.hablarConNavegador(hablado, terminar);
+      respaldo();
+      this.hablarConNavegador(hablado, terminar, () => {
+        if (miTurno === this.turno) op.alSonar?.();
+      });
     }
     return ms;
   }
@@ -178,14 +184,15 @@ class Voz {
     return h;
   }
 
-  private reproducirCadena(archivos: string[], turno: number, terminar: () => void, esperaMaximaMs?: number): void {
+  private reproducirCadena(archivos: string[], turno: number, terminar: () => void, esperaMaximaMs: number | undefined, respaldo: () => void, alSonar?: () => void): void {
     // Todas las piezas se cargan ANTES de empezar a hablar: así no hay tropiezos entre una y otra
     // esperando a que baje el siguiente audio (con un tope de 2 s para no quedarse callado).
     const howls = archivos.map((a) => this.howl(a));
     let listo = false;
     const empezar = () => {
-      if (listo) return;
+      if (listo || turno !== this.turno) return;
       listo = true;
+      respaldo();
       siguiente(0);
     };
     const revisar = () => {
@@ -216,6 +223,11 @@ class Voz {
       }
       const h = this.howl(archivos[i]!);
       this.sonando = h;
+      // Solo cuenta como "se oyó" si el audio del navegador está corriendo (no suspendido o bloqueado).
+      if (i === 0 && alSonar)
+        h.once('play', () => {
+          if (turno === this.turno && audioCorriendo()) alSonar();
+        });
       h.once('end', () => window.setTimeout(() => siguiente(i + 1), PAUSA_ENTRE_PIEZAS_MS));
       // Si un audio no carga, se sigue con lo demás en vez de quedarse callado para siempre.
       h.once('loaderror', () => siguiente(i + 1));
@@ -225,7 +237,7 @@ class Voz {
     revisar();
   }
 
-  private hablarConNavegador(texto: string, terminar: () => void): void {
+  private hablarConNavegador(texto: string, terminar: () => void, alSonar: () => void): void {
     const s = this.sintesis();
     if (!s) return;
     try {
@@ -234,6 +246,7 @@ class Voz {
       if (this.vozNavegador) u.voice = this.vozNavegador;
       u.rate = VELOCIDAD_NAVEGADOR;
       u.pitch = TONO_NAVEGADOR;
+      u.onstart = alSonar;
       u.onend = terminar;
       u.onerror = terminar;
       s.speak(u);
@@ -258,6 +271,16 @@ class Voz {
     } catch {
       return null;
     }
+  }
+}
+
+/** ¿El audio de Howler se oye? (Si su contexto sigue suspendido, el navegador lo tiene bloqueado.) */
+function audioCorriendo(): boolean {
+  try {
+    const ctx = Howler.ctx as AudioContext | undefined;
+    return !ctx || ctx.state === 'running';
+  } catch {
+    return true;
   }
 }
 

@@ -101,20 +101,21 @@ describe('la voz no detiene el juego si llega tarde', () => {
 });
 
 describe('Mixtle no se corta a sí mismo al cambiar de pantalla', () => {
-  it('la bienvenida espera a que termine "¡Al rescate!" (como mucho 800 ms) y no se dice si se calló a Mixtle', async () => {
+  it('la bienvenida espera a que termine "¡Al rescate!" (como mucho 800 ms) y lo de la pantalla anterior no se dice', async () => {
     vi.useFakeTimers();
     const { decir, callar, useNarrador } = await import('../src/app/estado/narrador');
-    decir('¡Al rescate!');
+    decir('¡Al rescate!', { cruzaPantalla: true });
     expect(useNarrador.getState().hablando).toBe(true);
-    decir('¿Quién va a jugar?', { trasLaActualMs: 800 });
+    callar(); // cambió la pantalla
+    decir('¿Quién va a jugar?');
     expect(useNarrador.getState().subtitulo).toBe('¡Al rescate!');
     vi.advanceTimersByTime(800);
     expect(useNarrador.getState().subtitulo).toBe('¿Quién va a jugar?');
 
     decir('Una frase larga que todavía se está diciendo cuando se cambia de pantalla.');
-    decir('Esta ya no', { trasLaActualMs: 800 });
+    decir('Esta ya no');
     callar();
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(20_000);
     expect(useNarrador.getState().subtitulo).not.toBe('Esta ya no');
   });
 });

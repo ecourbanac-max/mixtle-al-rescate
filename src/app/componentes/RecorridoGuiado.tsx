@@ -79,7 +79,7 @@ export function RecorridoGuiado({ alTerminar }: { alTerminar: () => void }) {
     if (!paso) return;
     const el = paso.objetivo ? buscar(paso.objetivo) : null;
     if (el) llevarALaVista(el, suave);
-    decir(textoDe(paso), { expresion: paso.id === 'fin' ? 'celebrando' : paso.objetivo ? 'senalando' : 'feliz' });
+    decir(textoDe(paso), { expresion: paso.id === 'fin' ? 'celebrando' : paso.objetivo ? 'senalando' : 'feliz', interrumpir: true });
     botones.current?.querySelector<HTMLButtonElement>(':scope > button:last-child')?.focus({ preventScroll: true });
     if (!el) return;
     let antes: Caja | null = null;

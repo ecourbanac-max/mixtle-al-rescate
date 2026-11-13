@@ -48,11 +48,11 @@ export function Vestidor({ grupo, alCerrar }: { grupo: Grupo; alCerrar: () => vo
 
   const preguntar = (id: IdAccesorio) => {
     if (faltanPara(p, id) > 0) {
-      decir(TEXTOS_APP.vestidor.faltan, { expresion: 'animo' });
+      decir(TEXTOS_APP.vestidor.faltan, { expresion: 'animo', interrumpir: true });
       return;
     }
     setPorComprar(id);
-    decir(confirmacion(id), { expresion: 'sorprendido' });
+    decir(confirmacion(id), { expresion: 'sorprendido', interrumpir: true });
   };
 
   const comprar = (id: IdAccesorio) => {
@@ -63,7 +63,7 @@ export function Vestidor({ grupo, alCerrar }: { grupo: Grupo; alCerrar: () => vo
       const c = centroDe(figura.current);
       chispas(c.x, c.y, { cantidad: 16, alcance: 140 });
     }
-    decir(TEXTOS_APP.vestidor.comprada, { expresion: 'celebrando' });
+    decir(TEXTOS_APP.vestidor.comprada, { expresion: 'celebrando', interrumpir: true });
   };
 
   return (

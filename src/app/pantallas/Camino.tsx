@@ -28,7 +28,7 @@ import { precargarLeccion } from './cargadores';
 import { prepararLeccion } from './precargaLeccion';
 import { useApp } from '../estado/app';
 import { useGrupoActual, useGrupos } from '../estado/grupos';
-import { callar, decir } from '../estado/narrador';
+import { callar, callarAlSalir, decir } from '../estado/narrador';
 
 // Los ambientes de las unidades solo se ven en el camino: se registran al cargar esta pantalla.
 registrarArte([...ARTE_AMBIENTES, ...ARTE_DECORACIONES]);
@@ -78,7 +78,7 @@ export function Camino() {
     precargarLeccion();
     // Con el recorrido, Mixtle saluda al terminarlo.
     if (!estampaNueva && !recorrido) saludar();
-    return () => callar();
+    return callarAlSalir();
     // Solo al entrar al camino.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -91,6 +91,8 @@ export function Camino() {
     grupoSaludado.current = grupo.id;
     const mostrar = debeMostrarRecorrido(location.search, grupo.progreso);
     setRecorrido(mostrar);
+    // Lo que se decía del grupo anterior ya no vale: se descarta (otro dueño de las frases).
+    callar();
     if (!mostrar) saludar();
     // Solo cuando cambia el grupo.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,7 +109,7 @@ export function Camino() {
   const tocar = (n: Nodo, estado: EstadoNodo) => {
     sonido.desbloquear();
     if (estado === 'bloqueado') {
-      decir(TEXTOS_APP.camino.bloqueada, { expresion: 'pensando' });
+      decir(TEXTOS_APP.camino.bloqueada, { expresion: 'pensando', interrumpir: true });
       return;
     }
     if (n.tipo === 'leccion') {
@@ -117,7 +119,7 @@ export function Camino() {
     } else if (n.tipo === 'aventura') abrirAventura(n.unidad.id);
     else if (estado === 'disponible') {
       setCofre(n.unidad.id);
-      decir(TEXTOS_APP.cofre.llegaron(HOJITAS_COFRE), { expresion: 'sorprendido' });
+      decir(TEXTOS_APP.cofre.llegaron(HOJITAS_COFRE), { expresion: 'sorprendido', interrumpir: true });
     }
   };
 
@@ -210,7 +212,7 @@ export function Camino() {
             if (caja) hojitasAlContador(centroDe(caja), document.querySelector('[data-contador-grupo]'), HOJITAS_COFRE);
             abrirCofre(cofre);
             sonido.celebrar();
-            decir(TEXTOS_APP.cofre.abierto(HOJITAS_COFRE), { expresion: 'celebrando' });
+            decir(TEXTOS_APP.cofre.abierto(HOJITAS_COFRE), { expresion: 'celebrando', interrumpir: true });
           }}
           alCerrar={() => setCofre(null)}
         />
@@ -279,7 +281,7 @@ function EncabezadoUnidad({ unidadId }: { unidadId: string }) {
   return (
     <button
       type="button"
-      onClick={() => decir([TEXTOS_APP.camino.encabezadoUnidad(u.numero, u.titulo), u.tema])}
+      onClick={() => decir([TEXTOS_APP.camino.encabezadoUnidad(u.numero, u.titulo), u.tema], { interrumpir: true })}
       className="relative -mt-8 flex w-full max-w-[52rem] cursor-pointer items-center gap-4 rounded-[1.75rem] border-[5px] border-white px-6 py-4 text-left text-white shadow-[0_0.45rem_0_rgba(18,61,43,0.25)]"
       style={{ backgroundColor: u.color }}
       data-unidad={u.id}
