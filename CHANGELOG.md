@@ -2,6 +2,47 @@
 
 Fechas de octubre y noviembre de 2026. Las etiquetas de git marcan las versiones que vio Eco Urban.
 
+## v3.2.1 (14 de noviembre) — Mixtle dice la consigna correcta y en las aventuras todo se ve completo
+
+La versión anterior queda en la etiqueta `v3.2-antes-correcciones`. Es la primera versión que se publica desde la cuenta de Eco Urban: **mixtle.org quedó activo el 13 de noviembre de 2026** (el repositorio está en `github.com/ecourbanac-max/mixtle-al-rescate`; cada cambio a `main` se publica ahí). Desde ese día la mudanza de las direcciones viejas está activa.
+
+### 1. Mixtle decía frases de otra pantalla y se saltaba la consigna
+
+- **Lo que se veía:** al empezar una lección, el globo de Mixtle cambiaba la consigna del ejercicio por "¡Miren cómo crece su parque!" (la frase del final de la lección anterior), y el botón de repetir la repetía. A veces sí y a veces no; y los diálogos "se adelantaban".
+- **La causa (reproducida):** la pantalla final de una lección dice "¡Lo lograron!" y, al terminar, la frase del parque. Si el adulto sale antes de que Mixtle acabe, la voz se corta y ya no avisa que terminó; pero el temporizador de respaldo del narrador (la duración de la frase más 1.2 s) seguía vivo, y al cumplirse decía la frase del parque en la pantalla en la que estuvieran entonces: la consigna de la lección siguiente. Las aventuras tenían el mismo error. "Se adelantan" venía del respaldo de la voz, que se contaba desde que se pedía la frase y no desde que empezaba a sonar: con la red lenta, cortaba frases que aún no terminaban.
+- **Cómo se reprodujo:** `e2e/dialogo.spec.ts` termina una lección, sale de la pantalla final a los 1.5 s, entra a la siguiente y vigila el globo 9 s, en 7 condiciones: normal, red lenta (cada audio tarda 2.5 s), computadora 4 veces más lenta, voz apagada, audio bloqueado por el navegador, audios que no cargan y cambiar de pestaña. Antes del cambio fallaba en las **7** (también en la normal); después, pasa en las 7.
+- **El cambio:** un solo narrador para todo el juego (`src/servicios/dialogo.ts`), que usan las pantallas y las aventuras; nunca suenan dos a la vez.
+  - Cada pantalla, ejercicio y escena es dueña de sus frases. Al cambiar se descarta lo pendiente y se corta lo que suena; los avisos tardíos de audios viejos se ignoran (cada frase lleva su número de turno). Lo que una frase pidió hacer "al terminar" solo se hace si sigue en la misma pantalla. El globo tampoco se queda con el texto de la pantalla anterior.
+  - En un ejercicio la consigna manda: se dice al empezar, se queda en el globo hasta que contestan (el festejo y la pista se dicen y se leen en el aviso de abajo) y el botón de repetir dice la consigna.
+  - Las frases de una misma pantalla van en orden: una nueva espera a que termine la que suena. Las respuestas a un toque (salir, una lección cerrada, una estampa) sí se dicen en seguida.
+  - Si el audio no suena por cualquier motivo, el globo se queda al menos 3 s más 0.5 s por palabra. Los ejercicios nunca avanzan solos por tiempos de audio.
+- **Pruebas que se quedan:** `tests/dialogo.test.ts` (18), `e2e/dialogo.spec.ts` (7 condiciones) y `e2e/consignas.spec.ts`: la unidad 1 completa con la voz encendida y la unidad 2 con la voz apagada; en sus 48 ejercicios el globo muestra la consigna de ese ejercicio.
+
+### 2. En la aventura de los botes, en el celular, la basura no se veía
+
+- **Lo que se veía:** en un celular acostado (1346×644), en "¿A qué bote va el envase de jugo?", el envase salía cortado arriba; solo se veía una orilla.
+- **La causa:** en la ronda extra de la aventura 1, la basura empezaba a caer desde FUERA del juego (arriba) con una caída que arranca muy despacio: durante 4 a 5 s, justo mientras Mixtle pregunta, solo se veía su orilla de abajo.
+- **Revisadas las 5 aventuras** con una prueba nueva (`e2e/aventurasPantalla.spec.ts`): cada escena en celular acostado, tablet, compu, proyector y laptop con zoom de 125 % y 150 %. Lo que se toca o arrastra tiene que quedar completo, a 24 px de la orilla y sin que lo tape un botón de la página; la colita del globo tiene que apuntar a Mixtle. Antes fallaban 4 de 8 escenas; ahora pasan las 8:
+  - Ronda extra: la basura aparece ya dentro de lo que se ve y cae desde ahí.
+  - Nivel 1 (recoger basura en el parque): algunas piezas salían cortadas abajo o pegadas a la orilla derecha; las zonas donde se reparten dejan ahora lugar para la pieza completa (`tests/layoutParque.test.ts` lo revisa con 200 repartos al azar).
+  - Nivel 3: un hoyo para plantar quedaba casi en la orilla.
+  - Bici: la colita del globo apuntaba por encima de la cabeza de Mixtle.
+
+### 3. Otras correcciones de la v3.2
+
+- **Modo facilitador:** el respaldo de los grupos (exportar / importar) hacía crecer el panel y, en una laptop de 1366×768 o una tablet de 1024×768, "Borrar este grupo" quedaba debajo de lo que se ve. Ahora es un botón al lado del estado de "usar sin internet" que abre su propia ventana; el panel vuelve a caber.
+- **Mudanza:** en una dirección vieja, la revisión de si mixtle.org ya sirve el juego se hace una vez por sesión; si falla, no se repite al recargar (solo al volver la conexión).
+
+### 4. Documentos
+
+- Manual del facilitador, README, `docs/traspaso.md` y notas técnicas: la dirección es mixtle.org, activa desde el 13 de noviembre de 2026. La guía explica qué hacer si el filtro de internet de una escuela bloquea mixtle.org (pasa en la red del Tec de Monterrey): en esa red no se muda nada y nadie pierde grupos.
+
+### Verificado (14 de noviembre, contra el build de producción en local)
+
+- Pruebas unitarias: **1647 de 1647**.
+- Pruebas en el navegador, un solo navegador sin ventana: diálogo 7 de 7; aventuras en 6 pantallas 8 de 8; consignas de dos unidades enteras 2 de 2; grupos, camino, ficha, vestidor, recorrido completo de la aventura 1, árboles, encuentra el error, aventuras de las unidades 2 a 5 y modo facilitador: todas pasan, en proyector y en tablet.
+- Mudanza con dos direcciones locales (`npm run mudanza:probar`): 43 de 43.
+
 ## v3.2 (13 de noviembre) — Traspaso a Eco Urban y mudanza a mixtle.org
 
 La versión anterior queda en la etiqueta `v3.1.3-antes-traspaso`. Guía para Eco Urban: [`docs/traspaso.md`](docs/traspaso.md).

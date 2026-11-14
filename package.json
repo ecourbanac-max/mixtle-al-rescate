@@ -1,7 +1,7 @@
 {
   "name": "mixtle-al-rescate",
   "private": true,
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Prototipo de videojuego educativo para Eco Urban A.C.: cuidar a los animales del parque y aprender a separar la basura.",
   "type": "module",
   "scripts": {
